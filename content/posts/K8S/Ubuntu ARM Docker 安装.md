@@ -87,4 +87,4 @@ systemstl status docker
 
 正常运行则会显示
 
-![image-20220513142604338](/images/Ubuntu-ARM-Docker-安装/image-20220513142604338.png)
+![image-20220513142604338.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc9697284d7.png)

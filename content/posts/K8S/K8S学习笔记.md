@@ -16,7 +16,7 @@ typora-root-url: ../../../static
 
 ## 1、基础概念
 
-![image-20220511143900784](/images/K8S学习笔记/image-20220511143900784.png)
+![image-20220511143900784.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc9679349bf.png)
 
 * 基础组件
   1. kubectl
@@ -138,7 +138,7 @@ K8S 的网络模型假定了所有 Pod 都在一个可以直接连通的扁平�
 
 Flannel 是 CoreOS 团队针对 Kubernetes 设计的一个网络规划服务，简单来说，它的功能是让集群中的不同节点主机创建的 Docker 容器都具有**全集群唯一**的虚拟 IP 地址。而且它还能在这些 IP 地址之间建立一个覆盖网络（Overlay Network），通过这个覆盖网络，将数据包原封不动地传输到目标容器内。基于 etcd 实现。
 
-![image-20220511161041771](/images/K8S学习笔记/image-20220511161041771.png)
+![image-20220511161041771.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967966952.png)
 
 实现步骤：
 
@@ -387,7 +387,7 @@ kubectl create deployment nginx --image=nginx
 kubectl get po -o wide
 ```
 
-![image-20220516143518665](/images/K8S学习笔记/image-20220516143518665.png)
+![image-20220516143518665.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc96799f01b.png)
 
 ##### 7.2、创建 svc 网络
 
@@ -398,7 +398,7 @@ kubectl create svc clusterip nginx --tcp=80:80
 kubectl get svc
 ```
 
-![image-20220516144027369](/images/K8S学习笔记/image-20220516144027369.png)
+![image-20220516144027369.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc9679d176a.png)
 
 ## 4、资源清单
 
@@ -510,7 +510,7 @@ kubectl get pod xxx.xxx.xxx -o yaml
 
 ### 执行流程
 
-![image-20220519113924249](/images/K8S学习笔记/image-20220519113924249.png)
+![image-20220519113924249.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967a1b824.png)
 
 1. Pause：在一个 Pod 启动前，会先启动一个 Pause 容器。它会初始化相应的网络栈，同时把自身的网络卷共享给 Pod 内的容器
 2. 初始化容器「initC」，可以有0到无限个
@@ -597,7 +597,7 @@ kubectl create -f init-pod.yaml
 kubectl get po
 ```
 
-![image-20220520113207122](/images/K8S学习笔记/image-20220520113207122.png)
+![image-20220520113207122.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967a42ca7.png)
 
 查看初始化容器日志
 
@@ -605,7 +605,7 @@ kubectl get po
 kubectl logs my-nginx-pod -c init-my-service
 ```
 
-![image-20220520113313026](/images/K8S学习笔记/image-20220520113313026.png)
+![image-20220520113313026.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967a81553.png)
 
 发现一直在解析域名，这时我们创建响应的 service
 
@@ -613,11 +613,11 @@ kubectl logs my-nginx-pod -c init-my-service
 kubectl create -f init-test-pod.yaml
 ```
 
-![image-20220520114643785](/images/K8S学习笔记/image-20220520114643785.png)
+![image-20220520114643785.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967ad3879.png)
 
 然后我们再去查看容器的状态，可能需要等待一定的时间
 
-![image-20220520114607465](/images/K8S学习笔记/image-20220520114607465.png)
+![image-20220520114607465.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967aa9460.png)
 
 ### 探针
 
@@ -797,11 +797,11 @@ kubectl create -f rc.yaml
 
 然后我们查看对应 Pod：
 
-![image-20220524112307900](/images/K8S学习笔记/image-20220524112307900.png)
+![image-20220524112307900.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967b0df40.png)
 
 这也就是 RC 控制器的功能，我们可以尝试删除其中一个 Pod 会发现又被重新创建
 
-![image-20220524112425852](/images/K8S学习笔记/image-20220524112425852.png)
+![image-20220524112425852.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967b3ca17.png)
 
 ### RS 控制器
 
@@ -1140,17 +1140,17 @@ Spec
 
 ####  1、userspace 代理模式
 
-![image-20220623162309337](/images/K8S学习笔记/image-20220623162309337.png)
+![image-20220623162309337.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967b81671.png)
 
 #### 2、iptables 代理模式
 
-![image-20220623162348313](/images/K8S学习笔记/image-20220623162348313.png)
+![image-20220623162348313.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967bcda8f.png)
 
 #### 3、ipvs 代理模式
 
 注意：ipvs 模式假定运行 kube-proxy 之前在节点上都已经安装了 IPVS 内核模块。当 kube-proxy以 ipvs 代理模式启动时，kube-proxy 将验证节点是否安装 IPVS 模块，如果未安装，则回退到 iptables 代理模式
 
-![image-20220623162509357](/images/K8S学习笔记/image-20220623162509357.png)
+![image-20220623162509357.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc967c30fc1.png)
 
 ### 限制
 
