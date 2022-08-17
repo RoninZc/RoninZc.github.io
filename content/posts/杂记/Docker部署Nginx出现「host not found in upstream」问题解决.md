@@ -2,12 +2,9 @@
 title: "Docker 部署 Nginx 出现「host not found in upstream」问题解决"
 date: 2022-07-20T15:17:19+08:00
 draft: false
-toc: false
 tags: 
   - Docker
   - Nginx
-typora-root-url: ../../../static/
-
 ---
 
 ## 问题

@@ -2,12 +2,10 @@
 title: "如何在Hugo和Typora中显示图片"
 date: 2022-05-11T14:02:19+08:00
 draft: false
-toc: false
 images:
 tags: 
   - Typora
   - image
-typora-root-url: ../../../static/
 ---
 
 ### 问题

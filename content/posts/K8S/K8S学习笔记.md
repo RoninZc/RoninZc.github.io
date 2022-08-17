@@ -1,11 +1,9 @@
 ---
 title: "K8S学习笔记"
 date: 2022-06-07T10:45:00+08:00
-toc: false
 images:
 tags: 
   - k8s
-typora-root-url: ../../../static
 ---
 
 > 这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频

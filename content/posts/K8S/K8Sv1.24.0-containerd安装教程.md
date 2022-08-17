@@ -1,13 +1,10 @@
 ---
 title: "K8Sv1.24.0 containerd 安装教程"
 date: 2022-05-14T16:45:00+08:00
-toc: false
 images:
 tags: 
   - k8s
   - containerd
-typora-root-url: ../../../static
-
 ---
 
 ### 1、卸载旧版本

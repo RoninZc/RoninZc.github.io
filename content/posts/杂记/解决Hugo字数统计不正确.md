@@ -2,7 +2,6 @@
 title: "解决Hugo字数统计不正确"
 date: 2022-05-11T17:26:29+08:00
 draft: false
-toc: false
 images:
 tags: 
   - Hugo
