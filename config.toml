@@ -48,7 +48,7 @@ theme = "FixIt"
     pre = "<i class=\"fa-solid fa-info-circle fa-fw fa-sm\"></i>"
     post = ""
     name = "关于"
-    url = "/about"
+    url = "/about/"
     title = ""
     weight = 4
 
