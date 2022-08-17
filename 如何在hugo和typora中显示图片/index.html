@@ -238,22 +238,22 @@
 <p><img
     class="lazyload"
     src="/svg/loading.min.svg"
-    data-src="/images/%e5%a6%82%e4%bd%95%e5%9c%a8Hugo%e5%92%8cTypora%e4%b8%ad%e6%98%be%e7%a4%ba%e5%9b%be%e7%89%87/image-20220511141441075.png"
-    data-srcset="/images/%e5%a6%82%e4%bd%95%e5%9c%a8Hugo%e5%92%8cTypora%e4%b8%ad%e6%98%be%e7%a4%ba%e5%9b%be%e7%89%87/image-20220511141441075.png, /images/%e5%a6%82%e4%bd%95%e5%9c%a8Hugo%e5%92%8cTypora%e4%b8%ad%e6%98%be%e7%a4%ba%e5%9b%be%e7%89%87/image-20220511141441075.png 1.5x, /images/%e5%a6%82%e4%bd%95%e5%9c%a8Hugo%e5%92%8cTypora%e4%b8%ad%e6%98%be%e7%a4%ba%e5%9b%be%e7%89%87/image-20220511141441075.png 2x"
+    data-src="https://lsky.ronin-zc.com/i/2022/08/17/62fc964e34f23.png"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/08/17/62fc964e34f23.png, https://lsky.ronin-zc.com/i/2022/08/17/62fc964e34f23.png 1.5x, https://lsky.ronin-zc.com/i/2022/08/17/62fc964e34f23.png 2x"
     data-sizes="auto"
-    alt="/images/如何在Hugo和Typora中显示图片/image-20220511141441075.png"
-    title="image-20220511141441075" /></p>
+    alt="https://lsky.ronin-zc.com/i/2022/08/17/62fc964e34f23.png"
+    title="image-20220511141441075.png" /></p>
 <p>也可以再加上 <code>static/images/${filename}/</code>，这样可以更加方便的管理图片。</p>
 <p>但是这样配置完会发现，Hugo 读取图片的条件满足了，Typora 预览没法满足，在设置里我们也找到调整的位置。</p>
 <p>其实 Typora 有一个隐藏的配置，<code>格式( Format ) -&gt; 图像( Image ) -&gt; 设置图片根目录( Use Image Root Path )</code>，具体可以依据下图。</p>
 <p><img
     class="lazyload"
     src="/svg/loading.min.svg"
-    data-src="/images/%e5%a6%82%e4%bd%95%e5%9c%a8Hugo%e5%92%8cTypora%e4%b8%ad%e6%98%be%e7%a4%ba%e5%9b%be%e7%89%87/image-20220511141908384.png"
-    data-srcset="/images/%e5%a6%82%e4%bd%95%e5%9c%a8Hugo%e5%92%8cTypora%e4%b8%ad%e6%98%be%e7%a4%ba%e5%9b%be%e7%89%87/image-20220511141908384.png, /images/%e5%a6%82%e4%bd%95%e5%9c%a8Hugo%e5%92%8cTypora%e4%b8%ad%e6%98%be%e7%a4%ba%e5%9b%be%e7%89%87/image-20220511141908384.png 1.5x, /images/%e5%a6%82%e4%bd%95%e5%9c%a8Hugo%e5%92%8cTypora%e4%b8%ad%e6%98%be%e7%a4%ba%e5%9b%be%e7%89%87/image-20220511141908384.png 2x"
+    data-src="https://lsky.ronin-zc.com/i/2022/08/17/62fc964ec9604.png"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/08/17/62fc964ec9604.png, https://lsky.ronin-zc.com/i/2022/08/17/62fc964ec9604.png 1.5x, https://lsky.ronin-zc.com/i/2022/08/17/62fc964ec9604.png 2x"
     data-sizes="auto"
-    alt="/images/如何在Hugo和Typora中显示图片/image-20220511141908384.png"
-    title="image-20220511141908384" /></p>
+    alt="https://lsky.ronin-zc.com/i/2022/08/17/62fc964ec9604.png"
+    title="image-20220511141908384.png" /></p>
 <p>配置是在当个 <code>md</code> 文件中生效的，在设置后在文件的开头会添加上<code>typora-root-url: ../../../static/</code>，也就是具体的原理了。</p>
 </div><div class="post-footer" id="post-footer">
   <div class="post-info">
