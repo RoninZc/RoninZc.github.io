@@ -10,7 +10,7 @@ languageCode = "zh-CN"
 hasCJKLanguage = true
 
 # 网站标题
-title = "<p>RoninZc 的个人博客</p>"
+title = "RoninZc 的个人博客"
 
 # 更改使用 Hugo 构建网站时使用的默认主题
 theme = "FixIt"
@@ -425,9 +425,16 @@ theme = "FixIt"
       enable = true
       #  Disqus 评论系统设置 (https://disqus.com)
       [params.page.comment.disqus]
-        enable = true
+        enable = false
         # Disqus 的 shortname，用来在文章中启用 Disqus 评论系统
         shortname = "ronin-zc"
+      # 评论系统设置 (https://disqus.com)
+      [params.page.comment.gitalk]
+        enable = true
+        owner = "RoninZc"
+        repo = "RoninZc.github.io"
+        clientId = "9c7b40a3888f1e78b982"
+        clientSecret = "735c7f29eddf00774f46187ff25824109753fb3a"
     #  第三方库配置
     [params.page.library]
       [params.page.library.css]
