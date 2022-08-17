@@ -183,7 +183,8 @@
 <div class="search-dropdown mobile">
   <div id="search-dropdown-mobile"></div>
 </div>
-<main class="container" page-style="normal"><aside class="toc" id="toc-auto"></aside>
+<main class="container" page-style="normal"><aside class="toc" id="toc-auto"><h2 class="toc-title">目录 <i class="toc-icon fa-solid fa-angle-down fa-fw"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside>
 
   <aside class="aside-custom">
     
@@ -224,7 +225,128 @@
         <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 21 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="K8S学习笔记">
               <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
             </span>&nbsp;</div>
-    </div><div
+    </div><div class="details toc" id="toc-static" kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#1基础概念">1、基础概念</a></li>
+    <li><a href="#2pod">2、Pod</a>
+      <ul>
+        <li><a href="#pod种类">Pod种类</a></li>
+        <li><a href="#控制器种类">控制器种类</a>
+          <ul>
+            <li><a href="#replication-controller-rc-replicasetrs--deployment">Replication Controller （RC）&amp; ReplicaSet（RS） &amp; Deployment</a>
+              <ul>
+                <li><a href="#滚动更新">滚动更新</a></li>
+                <li><a href="#hpahorizontalpodautoscale自动扩缩容">HPA（HorizontalPodAutoScale）自动扩缩容</a></li>
+              </ul>
+            </li>
+            <li><a href="#statefulset">StatefulSet</a></li>
+            <li><a href="#daemonset">DaemonSet</a></li>
+            <li><a href="#job--cronjob">Job &amp; cronJob</a></li>
+          </ul>
+        </li>
+        <li><a href="#网络模型">网络模型</a>
+          <ul>
+            <li><a href="#flannel">Flannel</a></li>
+            <li><a href="#网络通讯模式">网络通讯模式</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#3k8s安装">3、K8S安装</a>
+      <ul>
+        <li><a href="#前置准备">前置准备</a></li>
+        <li><a href="#安装-kubernetes">安装 Kubernetes</a>
+          <ul>
+            <li><a href="#1安装容器组件">1、安装容器组件</a></li>
+            <li><a href="#2安装-kubeadm-主从配置">2、安装 Kubeadm （主从配置）</a></li>
+            <li><a href="#3初始化主节点">3、初始化主节点</a></li>
+            <li><a href="#4工作节点加入">4、工作节点加入</a></li>
+            <li><a href="#5工作节点退出">5、工作节点退出</a></li>
+            <li><a href="#6创建网络flannel">6、创建网络「flannel」</a></li>
+            <li><a href="#7集群测试">7、集群测试</a>
+              <ul>
+                <li><a href="#71创建pod">7.1、创建pod</a></li>
+                <li><a href="#72创建-svc-网络">7.2、创建 svc 网络</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#4资源清单">4、资源清单</a>
+      <ul>
+        <li><a href="#格式">格式</a></li>
+        <li><a href="#常用命令">常用命令</a>
+          <ul>
+            <li><a href="#获取-apiversion-版本信息">获取 apiversion 版本信息</a></li>
+            <li><a href="#字段配置格式">字段配置格式</a></li>
+          </ul>
+        </li>
+        <li><a href="#通过定义清单文件创建-pod">通过定义清单文件创建 Pod</a></li>
+      </ul>
+    </li>
+    <li><a href="#5pod-生命周期">5、Pod 生命周期</a>
+      <ul>
+        <li><a href="#执行流程">执行流程</a></li>
+        <li><a href="#init-容器">init 容器</a></li>
+        <li><a href="#简单实操">简单实操</a></li>
+        <li><a href="#探针">探针</a>
+          <ul>
+            <li><a href="#readinessprobe就绪探针"><strong>readinessProbe「就绪探针」</strong></a></li>
+            <li><a href="#livenessprobe存活探针"><strong>livenessProbe「存活探针」</strong></a></li>
+          </ul>
+        </li>
+        <li><a href="#启动退出动作hook">启动、退出动作「hook」</a></li>
+      </ul>
+    </li>
+    <li><a href="#6控制器详解">6、控制器详解</a>
+      <ul>
+        <li><a href="#rc-控制器">RC 控制器</a></li>
+        <li><a href="#rs-控制器">RS 控制器</a>
+          <ul>
+            <li><a href="#示例">示例</a></li>
+          </ul>
+        </li>
+        <li><a href="#deployment-控制器">Deployment 控制器</a>
+          <ul>
+            <li><a href="#1部署一个简单的-nginx-应用">1、部署一个简单的 Nginx 应用</a></li>
+            <li><a href="#2扩容">2、扩容</a></li>
+            <li><a href="#3更新镜像">3、更新镜像</a></li>
+            <li><a href="#4回滚">4、回滚</a></li>
+            <li><a href="#5更新策略">5、更新策略</a></li>
+            <li><a href="#6金丝雀部署">6、金丝雀部署</a></li>
+          </ul>
+        </li>
+        <li><a href="#daemonset-1">DaemonSet</a></li>
+        <li><a href="#job">Job</a></li>
+        <li><a href="#cronjob">CronJob</a></li>
+      </ul>
+    </li>
+    <li><a href="#7service">7、Service</a>
+      <ul>
+        <li><a href="#核心迭代">核心迭代</a>
+          <ul>
+            <li><a href="#1userspace-代理模式">1、userspace 代理模式</a></li>
+            <li><a href="#2iptables-代理模式">2、iptables 代理模式</a></li>
+            <li><a href="#3ipvs-代理模式">3、ipvs 代理模式</a></li>
+          </ul>
+        </li>
+        <li><a href="#限制">限制</a></li>
+        <li><a href="#类型">类型</a>
+          <ul>
+            <li><a href="#1clusterip">1、ClusterIP</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+      </div><div
       class="content"
       id="content"
       

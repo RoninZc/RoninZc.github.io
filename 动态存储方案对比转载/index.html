@@ -183,7 +183,8 @@
 <div class="search-dropdown mobile">
   <div id="search-dropdown-mobile"></div>
 </div>
-<main class="container" page-style="normal"><aside class="toc" id="toc-auto"></aside>
+<main class="container" page-style="normal"><aside class="toc" id="toc-auto"><h2 class="toc-title">目录 <i class="toc-icon fa-solid fa-angle-down fa-fw"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside>
 
   <aside class="aside-custom">
     
@@ -224,7 +225,67 @@
         <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 13 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="MySQL动态存储方案对比「转」">
               <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
             </span>&nbsp;</div>
-    </div><div
+    </div><div class="details toc" id="toc-static" kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#一前言">一、前言</a></li>
+    <li><a href="#二动态结构">二、动态结构</a>
+      <ul>
+        <li><a href="#eav模型">EAV模型</a></li>
+        <li><a href="#json模型">JSON模型</a></li>
+      </ul>
+    </li>
+    <li><a href="#三性能测试结果对比">三、性能测试结果对比</a></li>
+    <li><a href="#四总结">四、总结</a></li>
+    <li><a href="#五附加动态存储模型实际案例">五、附加：动态存储模型实际案例</a>
+      <ul>
+        <li><a href="#1-eav模型entity-attribute-value-model">1. EAV模型（Entity-Attribute-Value Model）</a>
+          <ul>
+            <li><a href="#表结构">表结构</a></li>
+            <li><a href="#插入属性数据">插入属性数据</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-json模型">2. JSON模型</a>
+          <ul>
+            <li><a href="#表结构-1">表结构</a></li>
+            <li><a href="#元数据">元数据</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+    <li><a href="#模型操作对比">模型操作对比</a>
+      <ul>
+        <li><a href="#1-字段操作">1. 字段操作</a>
+          <ul>
+            <li><a href="#增加一个edu学历字段">增加一个”edu”学历字段</a></li>
+            <li><a href="#删除mobile字段">删除mobile字段</a></li>
+          </ul>
+        </li>
+        <li><a href="#2-查询操作">2. 查询操作</a>
+          <ul>
+            <li><a href="#查询身高高于170cm年满18岁的男性用户">查询身高高于170cm，年满18岁的男性用户</a></li>
+            <li><a href="#查询用户详情查询用户id为3的用户信息">查询用户详情：查询用户ID为3的用户信息</a></li>
+          </ul>
+        </li>
+        <li><a href="#3-插入数据">3. 插入数据</a>
+          <ul>
+            <li><a href="#新增一条数据">新增一条数据</a></li>
+          </ul>
+        </li>
+        <li><a href="#4-更新数据">4. 更新数据</a>
+          <ul>
+            <li><a href="#新增一个字段-并且更新用户id3的用户学历为本科">新增一个字段, 并且更新用户ID=3的用户学历为本科</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+      </div><div
       class="content"
       id="content"
       
