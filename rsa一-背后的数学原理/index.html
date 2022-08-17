@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <title>RSA(一) 背后的数学原理 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</title><meta name="author" content="RoninZc">
+<meta name="author-link" content="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg">
+<meta name="description" content="前言 本篇文章将试图从数学原理上理清 RSA 的加密解密的原理；并写一个简单的加密解密的用例来使用； 备注，本文是作者的原创作品，转载请注明出处。 转载至" /><meta name="keywords" content='RSA' /><meta itemprop="name" content="RSA(一) 背后的数学原理">
+<meta itemprop="description" content="前言 本篇文章将试图从数学原理上理清 RSA 的加密解密的原理；并写一个简单的加密解密的用例来使用； 备注，本文是作者的原创作品，转载请注明出处。 转载至"><meta itemprop="datePublished" content="2021-03-03T13:40:25+08:00" />
+<meta itemprop="dateModified" content="2021-03-03T13:40:25+08:00" />
+<meta itemprop="wordCount" content="3747"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
+<meta itemprop="keywords" content="RSA," /><meta property="og:title" content="RSA(一) 背后的数学原理" />
+<meta property="og:description" content="前言 本篇文章将试图从数学原理上理清 RSA 的加密解密的原理；并写一个简单的加密解密的用例来使用； 备注，本文是作者的原创作品，转载请注明出处。 转载至" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" /><meta property="og:image" content="https://ronin-zc.com/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-03T13:40:25+08:00" />
+<meta property="article:modified_time" content="2021-03-03T13:40:25+08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://ronin-zc.com/logo.png"/>
+
+<meta name="twitter:title" content="RSA(一) 背后的数学原理"/>
+<meta name="twitter:description" content="前言 本篇文章将试图从数学原理上理清 RSA 的加密解密的原理；并写一个简单的加密解密的用例来使用； 备注，本文是作者的原创作品，转载请注明出处。 转载至"/>
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#252627"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" /><link rel="next" href="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "RSA(一) 背后的数学原理",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https:\/\/ronin-zc.com\/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86\/"
+    },"genre": "posts","keywords": "RSA","wordcount":  3747 ,
+    "url": "https:\/\/ronin-zc.com\/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86\/","datePublished": "2021-03-03T13:40:25+08:00","dateModified": "2021-03-03T13:40:25+08:00","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "RoninZc"
+      },"description": ""
+  }
+  </script></head>
+  <body header-desktop="sticky" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script><div class="wrapper"><header class="desktop" id="header-desktop">
+  <div class="header-wrapper" github-corner="right">
+    <div class="header-title">
+      <a href="/" title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"><img
+    class="lazyload logo"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"
+    title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;" /><span id="typeit-header-desktop" class="typeit"></span></a><span id="typeit-header-subtitle-desktop" class="typeit header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/posts/"
+                
+                
+              ><i class="fa-solid fa-archive fa-fw fa-sm"></i> 所有文章</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/categories/"
+                
+                
+              ><i class="fa-solid fa-th fa-fw fa-sm"></i> 分类</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/tags/"
+                
+                
+              ><i class="fa-solid fa-tags fa-fw fa-sm"></i> 标签</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/about"
+                
+                
+              ><i class="fa-solid fa-info-circle fa-fw fa-sm"></i> 关于</a></li><li class="menu-item delimiter"></li><li class="menu-item search" id="search-desktop">
+            <input type="text" placeholder="这里可以搜索哦～" id="search-input-desktop">
+            <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+              <i class="fa-solid fa-search fa-fw"></i>
+            </a>
+            <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+              <i class="fa-solid fa-times-circle fa-fw"></i>
+            </a>
+            <span class="search-button search-loading" id="search-loading-desktop">
+              <i class="fa-solid fa-spinner fa-fw fa-spin"></i>
+            </span>
+          </li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw"></i>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header><header class="mobile" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"><img
+    class="lazyload logo"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    title="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" /><span id="typeit-header-title-mobile" class="typeit"></span></a><span id="typeit-header-subtitle-mobile" class="typeit header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="search-wrapper">
+            <div class="search mobile" id="search-mobile">
+              <input type="text" placeholder="这里可以搜索哦～" id="search-input-mobile">
+              <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                <i class="fa-solid fa-search fa-fw"></i>
+              </a>
+              <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                <i class="fa-solid fa-times-circle fa-fw"></i>
+              </a>
+              <span class="search-button search-loading" id="search-loading-mobile">
+                <i class="fa-solid fa-spinner fa-fw fa-spin"></i>
+              </span>
+            </div>
+            <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+              取消
+            </a>
+          </li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/posts/"
+                
+                
+              ><i class="fa-solid fa-archive fa-fw fa-sm"></i> 所有文章</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/categories/"
+                
+                
+              ><i class="fa-solid fa-th fa-fw fa-sm"></i> 分类</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/tags/"
+                
+                
+              ><i class="fa-solid fa-tags fa-fw fa-sm"></i> 标签</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/about"
+                
+                
+              ><i class="fa-solid fa-info-circle fa-fw fa-sm"></i> 关于</a></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header>
+<div class="search-dropdown desktop">
+  <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+  <div id="search-dropdown-mobile"></div>
+</div>
+<main class="container" page-style="normal"><aside class="toc" id="toc-auto"></aside>
+
+  <aside class="aside-custom">
+    
+  </aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX">
+        <span>RSA(一) 背后的数学原理</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><a
+  href="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+  
+    title="作者"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer author"
+  
+  
+    class="author"
+  
+  
+><img
+    class="lazyload avatar"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="RoninZc"
+    title="RoninZc" />&nbsp;RoninZc</a></span></div>
+      <div class="post-meta-line"><span title=2021-03-03&#32;13:40:25>
+            <i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-03-03" >2021-03-03</time>
+          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 3747 字&nbsp;
+        <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 8 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="RSA(一) 背后的数学原理">
+              <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
+            </span>&nbsp;</div>
+    </div><div
+      class="content"
+      id="content"
+      
+      
+    ><h1 id="前言">前言</h1>
+<p>本篇文章将试图从数学原理上理清 RSA 的加密解密的原理；并写一个简单的加密解密的用例来使用；</p>
+<p>备注，本文是作者的原创作品，转载请注明出处。</p>
+<blockquote>
+<p>转载至<code>https://www.shangyang.me/2017/05/24/encrypt-rsa-keyformat/</code></p>
+</blockquote>
+<h1 id="数论相关">数论相关</h1>
+<h2 id="模-n">模 N</h2>
+<p>随机选择两个大的质数 p 和 q，p 不等于 q, 计算得到 𝑁=𝑝𝑞N=pq</p>
+<h2 id="欧拉函数的值-r--𝜑pq">欧拉函数的值 r = 𝜑(pq)</h2>
+<p>𝑟=𝜑(𝑝𝑞)=𝜑(𝑝)𝜑(𝑞)=(𝑝−1)(𝑞−1)r=𝜑(pq)=𝜑(p)𝜑(q)=(p−1)(q−1)</p>
+<p>欧拉函数值求的是有多少个小于 N 的数与 N 互质，如果 N 本身为质数，那么就有 N-1 个数与 N 互质；</p>
+<h2 id="随机数-e">随机数 e</h2>
+<p>选择一个整数 e 且 1&lt;𝑒&lt;𝑟1&lt;e&lt;r，使得 e 与 r 互质(两个数的公约数为 1)；取 e 的目的是为了求得 e 关于 r 的<a
+  href="https://www.shangyang.me/2017/05/19/encrypt-rsa-math/"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>模反元素</a> d；</p>
+<h2 id="模反元素-d">模反元素 d</h2>
+<h3 id="什么是模反元素-d">什么是模反元素 d</h3>
+<p>由<a
+  href="https://www.shangyang.me/2017/05/19/encrypt-rsa-math/#%e9%9a%8f%e6%9c%ba%e6%95%b0-e"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>e</a>小节可知，模反元素 d 是 e 关于 r 的模反元素且若模反元素 d 存在，当且仅当 e 与 r 互质；</p>
+<p>模反元素的数学意义</p>
+<p>𝑒𝑑≡1(mod𝑟)ed≡1(modr)</p>
+<p>若 e 与 r 互质，那么总会找到这么一个数 d，使得 ed 和 1 与模 r 同余；通俗的说法既是，ed 除以 r 的余数与 1 除以 r 的余数相等，因为 1 除以 r 的余数恒等于 1，所以 ed 除以 r 的余数为 1，也就推出</p>
+<p>𝑒𝑑−1=𝑘𝑟ed−1=kr</p>
+<p>，该表达式的意思就是 ed - 1 是 r 的倍数；</p>
+<h3 id="如何计算得到-d">如何计算得到 d</h3>
+<p>那么如何计算得出此模反元素 d 呢？</p>
+<p>根据<a
+  href="https://zh.wikipedia.org/wiki/%e6%89%a9%e5%b1%95%e6%ac%a7%e5%87%a0%e9%87%8c%e5%be%97%e7%ae%97%e6%b3%95"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>扩展欧几里得算法</a>的公式有，在(mod𝑟)(modr)之下，</p>
+<p>𝑒𝑥+𝑟𝑦=1ex+ry=1</p>
+<p>，此时 x 的解既是 e 关于模 r 的一个模反元素；认真的读者读到这里，肯定会产生疑问，上面的公式 𝑒𝑑−1=𝑘𝑟ed−1=kr 怎么看起来与 𝑒𝑥+𝑟𝑦=1ex+ry=1 怎么这么像呢，但是又有差别，我们将公式 𝑒𝑑−1=𝑘𝑟ed−1=kr 调整一下，得到</p>
+<p>𝑒𝑑−𝑘𝑟=1…①ed−kr=1…①</p>
+<p>将扩展欧几里得算法的公式 𝑒𝑥+𝑟𝑦=1ex+ry=1 的 x、y 值进行替换，x = d, y = k，得到</p>
+<p>𝑒𝑑+𝑘𝑟=1…②ed+kr=1…②</p>
+<p>什么，两个看似如此矛盾的两个不同的方程(公式 ① 和公式 ②)… 什么意思？谁是对的？谁是错的？</p>
+<p>摘抄<a
+  href="https://zh.wikipedia.org/wiki/%e6%a8%a1%e5%8f%8d%e5%85%83%e7%b4%a0"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>模反元素</a>中的一段内容如下，</p>
+<blockquote>
+<p>事实上， 𝑥+𝑘𝑛(𝑘∈ℤ)x+kn(k∈ℤ)都是a关于模n的模逆元，这里我们取最小的正整数解 𝑥(mod𝑛)(𝑥&lt;𝑛)x(modn)(x&lt;n)</p>
+</blockquote>
+<p>对应到我们的例子中来，也就是 𝑑+𝑘𝑟(𝑘∈ℤ)d+kr(k∈ℤ) 都是 e 关于模 r 的模逆元，这里我们取最小的正整数解 𝑑(mod𝑟)(𝑑&lt;𝑟)d(modr)(d&lt;r)；由此可知，d 的解实际上有无限多个，满足 𝑑+𝑘𝑟(𝑘∈ℤ)d+kr(k∈ℤ)；k 是整数集合，包含正整数、负整数和零；</p>
+<p>其实，公式①和公式②其实可以理解为同一个方程，只是 Y 轴（这里指 K 轴）的方向发生了变化而已；</p>
+<h1 id="加密和解密">加密和解密</h1>
+<p>假设 Bob 想给 Alice 送一个消息 m；</p>
+<h2 id="公钥和密钥">公钥和密钥</h2>
+<p>在 Alice 端，经过上述的步骤，我们总共得到了 6 个数字，p、q、N、r、e、d；并生成公钥和密钥，公钥就是(𝑁、𝑒)(N、e)组合；秘钥就是(𝑁、𝑑)(N、d)组合；并且 Alice 将公钥发送给 Bob；</p>
+<h2 id="加密过程">加密过程</h2>
+<p>Bob 想给 Alice 送一个消息 M，他拥有 Alice 的公钥，既是 (𝑁、𝑒)(N、e) 。他使用起先与 Alice 约好的编码格式将 M 转换为一个<code>小于</code> 模 <a
+  href="https://www.shangyang.me/2017/05/19/encrypt-rsa-math/#%e6%a8%a1-N"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>N</a>，且与 N 互质的整数 m；通常，我们传递的是字符串，但是字符可以转换为对应的 ASCII 码值或者 UNICODE 等整数数值；由于转换后的数字必须要小于 N，所以，一般的做法是，将原来的文本切割为很多小份，然后分别加密，将每一段转换为 m 后再传输；</p>
+<p>加密公式，</p>
+<p>𝑐≡𝑚𝑒(mod𝑁)c≡me(modN)</p>
+<p>将 m 转换为加密数值<code>c</code>，然后 Bob 将<code>c</code>传输给 Alice；那么<code>c</code>是如何计算得到的？其实这个求<code>c</code>的过程非常的简单，直接是</p>
+<p>𝑐=𝑚𝑒%𝑁c=me%N</p>
+<p>推导过程，𝑢=𝑚𝑒%𝑁u=me%N，因为 𝑢&lt;𝑁u&lt;N 导出 𝑢=𝑢%𝑁u=u%N 导出 𝑐=𝑢c=u 导出 <strong>余数 u</strong> 既是<code>c</code></p>
+<p><a
+  href="https://l2x.gitbooks.io/understanding-cryptography/docs/chapter-3/rsa.html"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://l2x.gitbooks.io/understanding-cryptography/docs/chapter-3/rsa.html</a></p>
+<h2 id="解密过程">解密过程</h2>
+<p>Alice 拿到 Bob 的加密信息<code>c</code>以后，她使用下面的公式来将<code>c</code>解密得到 m：</p>
+<p>𝑐𝑑≡𝑚(mod𝑁)cd≡m(modN)</p>
+<p>同<a
+  href="https://www.shangyang.me/2017/05/19/encrypt-rsa-math/#%e5%8a%a0%e5%af%86%e8%bf%87%e7%a8%8b"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>加密过程</a>求<code>c</code>一样，这里，得出</p>
+<p>𝑚=𝑐𝑑%𝑁m=cd%N</p>
+<p>这里的关键问题是，如何得到的解密方程式 𝑐𝑑≡𝑚(mod𝑁)cd≡m(modN)？</p>
+<h3 id="公式推导">公式推导</h3>
+<p>由加密公式，</p>
+<p>𝑐≡𝑚𝑒(mod𝑁)c≡me(modN)</p>
+<p>通过<a
+  href="https://zh.wikipedia.org/wiki/%e5%90%8c%e9%a4%98"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>同余</a>的基本运算规则
+<img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="/images/RSA/tongyu-basic-rule.png"
+    data-srcset="/images/RSA/tongyu-basic-rule.png, /images/RSA/tongyu-basic-rule.png 1.5x, /images/RSA/tongyu-basic-rule.png 2x"
+    data-sizes="auto"
+    alt="/images/RSA/tongyu-basic-rule.png"
+    title="img" /></p>
+<p>那么可以得出</p>
+<p>𝑐𝑑≡𝑚𝑒𝑑(mod𝑁)cd≡med(modN)</p>
+<p>下面相关部分摘要自 wikipedia，稍有不同的是，上述过程的原始消息是 m，下面过程的原始消息是 n</p>
+<p><img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="/images/RSA/decryption-formula-deduce-process-remains.png"
+    data-srcset="/images/RSA/decryption-formula-deduce-process-remains.png, /images/RSA/decryption-formula-deduce-process-remains.png 1.5x, /images/RSA/decryption-formula-deduce-process-remains.png 2x"
+    data-sizes="auto"
+    alt="/images/RSA/decryption-formula-deduce-process-remains.png"
+    title="img" /></p>
+<p>上面推论的重点在于，𝑛(𝑛φ(𝑁))ℎ≡𝑛(1)ℎ(mod𝑁)n(nφ(N))h≡n(1)h(modN) 是怎么导出来的？参考<a
+  href="https://zh.wikipedia.org/wiki/%e6%ac%a7%e6%8b%89%e5%87%bd%e6%95%b0"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>欧拉定理</a>
+<img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="/images/RSA/euler-theorem.png"
+    data-srcset="/images/RSA/euler-theorem.png, /images/RSA/euler-theorem.png 1.5x, /images/RSA/euler-theorem.png 2x"
+    data-sizes="auto"
+    alt="/images/RSA/euler-theorem.png"
+    title="img" /></p>
+<p>所以，有 𝑛φ(𝑁)≡1(mod𝑁)nφ(N)≡1(modN)，难道是将 𝑛φ(𝑁)≡1(mod𝑁)nφ(N)≡1(modN) 直接代入 𝑛(𝑛φ(𝑁))ℎn(nφ(N))h，所以得到 𝑛(𝑛φ(𝑁))ℎ≡𝑛(1)ℎ(mod𝑁)n(nφ(N))h≡n(1)h(modN)，除此之外，想不到原因了… 但是在<a
+  href="https://zh.wikipedia.org/wiki/%e5%90%8c%e9%a4%98"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>同余</a>中没找到这种参数代入法.. 所以会有些怀疑；好吧，姑且给自己有一个悬念吧..</p>
+<p>最终，经过上述的论证，我们得到了解密要用到的公式，</p>
+<p>𝑐𝑑≡𝑚(mod𝑁)cd≡m(modN)</p>
+<p><a
+  href="https://l2x.gitbooks.io/understanding-cryptography/docs/chapter-3/rsa.html"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://l2x.gitbooks.io/understanding-cryptography/docs/chapter-3/rsa.html</a></p>
+<h1 id="例证">例证</h1>
+<p>上面的原理性的东西说了一堆，这里通过一个实际的例子来看看 RSA 是如何做到加密解密的？</p>
+<p>Bob 试图通过 RSA 的加密的方式向 Alice 发送数据，</p>
+<h2 id="生成密钥">生成密钥</h2>
+<p>如下步骤描述了 Alice 如何通过 RSA 算法生成自己的密钥(公钥和公钥)；</p>
+<ol>
+<li>
+<p>模 N，Alice 选择两个质数 5、13，得到</p>
+<p>𝑁=5×13=65N=5×13=65</p>
+<p>备注，这里选择的时候一定要注意，之前就是因为错选了不是质数的 9，导致入坑很久没爬出来；</p>
+</li>
+<li>
+<p>欧拉函数值 r</p>
+<p>𝑟=φ(𝑁)=φ(5)φ(13)=(5−1)(13−1)=48r=φ(N)=φ(5)φ(13)=(5−1)(13−1)=48</p>
+</li>
+<li>
+<p>随机数 e，随机选择 e 且 (1&lt;𝑒&lt;𝑟)(1&lt;e&lt;r)，e 必须与 r 互质，这里，我随机选择一个</p>
+<p>𝑒=5e=5</p>
+</li>
+<li>
+<p>求 e 关于 r 的模反元素 d，有公式 𝑒𝑑≡1(mod𝑟)ed≡1(modr) 等价于求解</p>
+<p>5×𝑑≡1(mod48)5×d≡1(mod48)</p>
+<p>按照</p>
+<p>如何计算得到 d</p>
+<p>中所介绍的扩展欧几里得算法，得到公式</p>
+<p>5×𝑑+48𝑘=15×d+48k=1</p>
+<p>，同样也可以按照公式</p>
+<p>5×𝑑−48𝑘=15×d−48k=1</p>
+<p>来进行求解，两者之间的相互区别在</p>
+<p>如何计算得到 d</p>
+<p>有详细的描述；</p>
+<p>为了计算出 d，我按照求解的公式 5×𝑑−48𝑘=15×d−48k=1 写了一段程序来求解 d，从 k = -20 开始，不断的试探出 d 的取值，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">int k = -20;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">int e = 5;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">int r = 48;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">while( true ){
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   int d_mod = (r*k + 1)%e;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   if( d_mod == 0 ){
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      int d = ( (r*k + 1)/e );
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      System.out.println(&#34;=====&gt; k=&#34;+k+&#34;; d=&#34; + d );
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">      //break;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   }
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   //System.out.println(&#34;tried k=&#34;+k);       
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   k ++;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">   if( k &gt; 10 ) break;
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>求得取值范围如下，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">=====&gt; k=-17; d=-163
+</span></span><span class="line"><span class="cl">=====&gt; k=-12; d=-115
+</span></span><span class="line"><span class="cl">=====&gt; k=-7; d=-67
+</span></span><span class="line"><span class="cl">=====&gt; k=-2; d=-19
+</span></span><span class="line"><span class="cl">=====&gt; k=3; d=29
+</span></span><span class="line"><span class="cl">=====&gt; k=8; d=77
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这里要求取最小正整数的模反元素，所以取得 d = 29，k = 3；因为这里是按照𝑒𝑑−𝑘𝑟=1ed−kr=1的逻辑进行求解，所以，这里 k 的值为正整数 3，如果是按照扩展欧几里得算法的方式𝑒𝑑+𝑘𝑟=1ed+kr=1求解，那么 k = -3</p>
+</li>
+</ol>
+<p>Ok，至此，重要的 6 个元素已经集合完毕，他们分别是 𝑝=5,𝑞=13,𝑁=65,𝑟=48,𝑒=5,𝑑=29p=5,q=13,N=65,r=48,e=5,d=29</p>
+<p>于是，得到<code>公钥</code>为 65,565,5；得到<code>私钥</code>为 65,2965,29；最后 Alice 通过某种方式将<code>公钥</code>发送给 Bob；</p>
+<h2 id="传输加密信息">传输加密信息</h2>
+<p>Bob 通过 RSA 加密方式向 Alice 发送字符感叹号 !，</p>
+<p>首先，将字符 ! 转换成其对应的 ASCII 码值，对应为 41，记为 𝑚m</p>
+<p>再次，通过<a
+  href="https://www.shangyang.me/2017/05/19/encrypt-rsa-math/#%e5%8a%a0%e5%af%86%e8%bf%87%e7%a8%8b"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>加密公式</a> 𝑐=𝑚𝑒%𝑁c=me%N 既 𝑐=415%65=6c=415%65=6，由此得到 m 的加密后的数字为 𝑐=6c=6；注意，过程中使用到了 (N,e)；备注，这里可用编程的方式求解，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">System.out.println( Math.pow(41,5) % 65);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>最后，Bob 将加密数字 c = 6 发送给了 Alice；</p>
+<h2 id="解密加密信息">解密加密信息</h2>
+<p>Alice 接收到了 Bob 发送的加密数字 c (6)，之后使用私钥(65, 29)进行解密，</p>
+<p>首先，根据<a
+  href="https://www.shangyang.me/2017/05/19/encrypt-rsa-math/#%e8%a7%a3%e5%af%86%e8%bf%87%e7%a8%8b"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>解密公式</a> 𝑚=𝑐𝑑%𝑁m=cd%N 既 𝑚=629%65m=629%65，解出 𝑚=41m=41，正好得到 Bob 未加密之前的字符 ! 的 ASCII 码，因此，这里成功将其解密；备注，这里可以通过编程的方式求解，</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">System.out.println( Math.pow(6,29) % 65);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="为什么-rsa-很难被破解">为什么 RSA 很难被破解</h1>
+<p>因为要通过密文 c 反推得到明文 m，根据解密方程式 𝑚=𝑐𝑑%𝑁m=cd%N 我们知道，</p>
+<ol>
+<li>在公钥公开的前提下，既是知道 N、e 的前提下，必须要知道 d，才能解密出明文 m；</li>
+<li>而要知道 d，那么就必须对素数模 N 进行<code>因式分解</code>，得到 p 和 q，</li>
+<li>再通过欧拉函数的计算 𝜑(𝑝𝑞)=𝜑(𝑝)𝜑(𝑞)𝜑(pq)=𝜑(p)𝜑(q) 得到 r，</li>
+<li>最后通过 r 和 e，求出 e 于 r 的模反元素的计算才能最终推导出 d；</li>
+</ol>
+<p>而一切的一切的前提都必须对 N 进行因式分解，而如果 N 是一个非常大的素数，因式分解几乎是不可能的；这样，也就保证了 RSA 的加密技术的可靠性；</p>
+<h1 id="使用注意">使用注意</h1>
+<p>可以看到，在加密和解密过程中都会涉及到<code>特大指数级别</code>的运算，所以，运算过程是非常耗费计算机资源和时间的；所以一般的通讯中不直接使用 RSA 来进行加密通讯；而是通过公钥加密一段 DES 密钥来进行通讯，比如 Bob 使用 Alice 的<code>公钥</code>生成一个 DES 对称密钥，然后发送给 Alice，然后 Alice 再使用<code>密钥</code>解密得到 DES 密钥，这样双发最后实际上是通过 DES 密钥在进行通讯；</p>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title=2021-03-03&#32;13:40:25>更新于 2021-03-03</span>
+      </div>
+      <div class="post-info-license "><span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+    </div>
+    <div class="post-info-line">
+      <div class="post-info-md"><span><a
+  href="/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/index.md"
+  
+    title="阅读原始文档"
+  
+  
+  
+  
+    class="link-to-markdown"
+  
+  
+>阅读原始文档</a></span></div>
+      <div class="post-info-share">
+        <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" data-title="RSA(一) 背后的数学原理" data-hashtags="RSA"><i class="fa-brands fa-twitter fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" data-hashtag="RSA"><i class="fa-brands fa-facebook-square fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" data-title="RSA(一) 背后的数学原理" data-web><i class="fa-brands fa-whatsapp fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" data-title="RSA(一) 背后的数学原理"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" data-title="RSA(一) 背后的数学原理"><i class="fa-brands fa-weibo fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Myspace" data-sharer="myspace" data-url="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" data-title="RSA(一) 背后的数学原理" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a>
+  <a href="javascript:void(0);" title="分享到 Blogger" data-sharer="blogger" data-url="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" data-title="RSA(一) 背后的数学原理" data-description=""><i class="fa-brands fa-blogger fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Evernote" data-sharer="evernote" data-url="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" data-title="RSA(一) 背后的数学原理"><i class="fa-brands fa-evernote fa-fw"></i></a>
+  </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw"></i>&nbsp;<a href="/tags/rsa/">RSA</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div>
+
+  <div class="post-nav">
+      <a href="/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" class="next" rel="next" title="RSA(二) PKCS 公钥加密标准系列">RSA(二) PKCS 公钥加密标准系列<i class="fa-solid fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"><div id="disqus_thread" class="comment"></div><noscript>
+        Please enable JavaScript to view the comments powered by <a href="https://disqus.com/?ref_noscript" rel="external nofollow noopener noreferrer">Disqus</a>.
+      </noscript></div></article></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.101.0">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external nofollow noopener noreferrer" title="FixIt v0.2.15"><img class="fixit-icon" src="/images/fixit.svg" alt="FixIt logo" />&nbsp;FixIt</a>
+        </div><div class="footer-line copyright"><i class="fa-regular fa-copyright fa-fw"></i>
+            <span itemprop="copyrightYear">2019 - 2022</span><span class="author" itemprop="copyrightHolder">
+              <a
+  href="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RoninZc</a></span><span class="license footer-divider"><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div><div class="footer-line statistics"><span class="site-time" title='网站运行中 ...'><i class="fa-solid fa-heartbeat fa-fw animate-icon"></i>&nbsp;<span class="run-times">网站运行中 ...</span></span></div><div class="footer-line ibruce">
+          <span id="busuanzi_container_site_uv" title='总访客数'><i class="fa-regular fa-user fa-fw"></i>&nbsp;<span id="busuanzi_value_site_uv"><i class="fa fa-spinner fa-spin fa-fw"></i></span></span><span id="busuanzi_container_site_pv" class="footer-divider" title='总访问量'><i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin fa-fw"></i></span></span>
+        </div><div class="footer-line beian"><span class="icp footer-divider"><a href="https://beian.miit.gov.cn/">赣ICP备18014838号</a></span></div></div>
+  </footer></div><div class="widgets">
+  <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+      <i class="fa-solid fa-arrow-up fa-fw"></i>
+    </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+      <i class="fa-solid fa-comment fa-fw"></i>
+    </a>
+  </div><a
+  href="https://github.com/RoninZc/blog"
+  
+    title="在 GitHub 上查看源代码"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+    class="github-corner right d-none-mobile"
+  
+  
+><svg viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><div id="mask"></div>
+</div>
+  
+  
+  
+  <link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="https://ronin-zc.disqus.com/embed.js" defer></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js" defer></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js" async defer></script><script type="text/javascript" src="/lib/sharer/sharer.min.js" async defer></script><script type="text/javascript" src="/lib/typeit/typeit.min.js" defer></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/lib/pangu/pangu.min.js" defer></script><script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async defer></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"data":{"typeit-header-desktop":" RoninZc","typeit-header-subtitle-desktop":"摸鱼","typeit-header-subtitle-mobile":"摸鱼","typeit-header-title-mobile":" RoninZc"},"enablePWA":true,"enablePangu":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"},"siteTime":"2021-11-01T00:00:00+08:00","typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"typeit-header-desktop":["typeit-header-desktop"],"typeit-header-subtitle-desktop":["typeit-header-subtitle-desktop"],"typeit-header-subtitle-mobile":["typeit-header-subtitle-mobile"],"typeit-header-title-mobile":["typeit-header-title-mobile"]},"duration":-1,"speed":100}};</script><script type="text/javascript" src="/js/theme.min.js" defer></script><script type="text/javascript" src="/js/_custom.min.js" defer></script></body>
+</html>

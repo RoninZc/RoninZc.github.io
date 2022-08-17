@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <title>RSA(二) PKCS 公钥加密标准系列 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</title><meta name="author" content="RoninZc">
+<meta name="author-link" content="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg">
+<meta name="description" content="前言 本章着重描述 RSA PCKS(Public-Key Cryptography Standards Series 公钥加密标准系列)，RSA 又称为公钥加密技术，主要的使用场景是公钥加密、私钥解密（补充，当然，私钥加密，公钥机密也" /><meta name="keywords" content='RSA' /><meta itemprop="name" content="RSA(二) PKCS 公钥加密标准系列">
+<meta itemprop="description" content="前言 本章着重描述 RSA PCKS(Public-Key Cryptography Standards Series 公钥加密标准系列)，RSA 又称为公钥加密技术，主要的使用场景是公钥加密、私钥解密（补充，当然，私钥加密，公钥机密也"><meta itemprop="datePublished" content="2021-03-03T13:41:25+08:00" />
+<meta itemprop="dateModified" content="2021-03-03T13:41:25+08:00" />
+<meta itemprop="wordCount" content="5122"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
+<meta itemprop="keywords" content="RSA," /><meta property="og:title" content="RSA(二) PKCS 公钥加密标准系列" />
+<meta property="og:description" content="前言 本章着重描述 RSA PCKS(Public-Key Cryptography Standards Series 公钥加密标准系列)，RSA 又称为公钥加密技术，主要的使用场景是公钥加密、私钥解密（补充，当然，私钥加密，公钥机密也" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" /><meta property="og:image" content="https://ronin-zc.com/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-03T13:41:25+08:00" />
+<meta property="article:modified_time" content="2021-03-03T13:41:25+08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://ronin-zc.com/logo.png"/>
+
+<meta name="twitter:title" content="RSA(二) PKCS 公钥加密标准系列"/>
+<meta name="twitter:description" content="前言 本章着重描述 RSA PCKS(Public-Key Cryptography Standards Series 公钥加密标准系列)，RSA 又称为公钥加密技术，主要的使用场景是公钥加密、私钥解密（补充，当然，私钥加密，公钥机密也"/>
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#252627"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" /><link rel="prev" href="https://ronin-zc.com/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" /><link rel="next" href="https://ronin-zc.com/rsa%E4%B8%89-%E5%AF%86%E9%92%A5%E7%9A%84%E6%A0%BC%E5%BC%8F/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "RSA(二) PKCS 公钥加密标准系列",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https:\/\/ronin-zc.com\/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97\/"
+    },"genre": "posts","keywords": "RSA","wordcount":  5122 ,
+    "url": "https:\/\/ronin-zc.com\/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97\/","datePublished": "2021-03-03T13:41:25+08:00","dateModified": "2021-03-03T13:41:25+08:00","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "RoninZc"
+      },"description": ""
+  }
+  </script></head>
+  <body header-desktop="sticky" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script><div class="wrapper"><header class="desktop" id="header-desktop">
+  <div class="header-wrapper" github-corner="right">
+    <div class="header-title">
+      <a href="/" title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"><img
+    class="lazyload logo"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"
+    title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;" /><span id="typeit-header-desktop" class="typeit"></span></a><span id="typeit-header-subtitle-desktop" class="typeit header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/posts/"
+                
+                
+              ><i class="fa-solid fa-archive fa-fw fa-sm"></i> 所有文章</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/categories/"
+                
+                
+              ><i class="fa-solid fa-th fa-fw fa-sm"></i> 分类</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/tags/"
+                
+                
+              ><i class="fa-solid fa-tags fa-fw fa-sm"></i> 标签</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/about"
+                
+                
+              ><i class="fa-solid fa-info-circle fa-fw fa-sm"></i> 关于</a></li><li class="menu-item delimiter"></li><li class="menu-item search" id="search-desktop">
+            <input type="text" placeholder="这里可以搜索哦～" id="search-input-desktop">
+            <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+              <i class="fa-solid fa-search fa-fw"></i>
+            </a>
+            <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+              <i class="fa-solid fa-times-circle fa-fw"></i>
+            </a>
+            <span class="search-button search-loading" id="search-loading-desktop">
+              <i class="fa-solid fa-spinner fa-fw fa-spin"></i>
+            </span>
+          </li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw"></i>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header><header class="mobile" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"><img
+    class="lazyload logo"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    title="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" /><span id="typeit-header-title-mobile" class="typeit"></span></a><span id="typeit-header-subtitle-mobile" class="typeit header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="search-wrapper">
+            <div class="search mobile" id="search-mobile">
+              <input type="text" placeholder="这里可以搜索哦～" id="search-input-mobile">
+              <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                <i class="fa-solid fa-search fa-fw"></i>
+              </a>
+              <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                <i class="fa-solid fa-times-circle fa-fw"></i>
+              </a>
+              <span class="search-button search-loading" id="search-loading-mobile">
+                <i class="fa-solid fa-spinner fa-fw fa-spin"></i>
+              </span>
+            </div>
+            <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+              取消
+            </a>
+          </li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/posts/"
+                
+                
+              ><i class="fa-solid fa-archive fa-fw fa-sm"></i> 所有文章</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/categories/"
+                
+                
+              ><i class="fa-solid fa-th fa-fw fa-sm"></i> 分类</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/tags/"
+                
+                
+              ><i class="fa-solid fa-tags fa-fw fa-sm"></i> 标签</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/about"
+                
+                
+              ><i class="fa-solid fa-info-circle fa-fw fa-sm"></i> 关于</a></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header>
+<div class="search-dropdown desktop">
+  <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+  <div id="search-dropdown-mobile"></div>
+</div>
+<main class="container" page-style="normal"><aside class="toc" id="toc-auto"></aside>
+
+  <aside class="aside-custom">
+    
+  </aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX">
+        <span>RSA(二) PKCS 公钥加密标准系列</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><a
+  href="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+  
+    title="作者"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer author"
+  
+  
+    class="author"
+  
+  
+><img
+    class="lazyload avatar"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="RoninZc"
+    title="RoninZc" />&nbsp;RoninZc</a></span></div>
+      <div class="post-meta-line"><span title=2021-03-03&#32;13:41:25>
+            <i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2021-03-03" >2021-03-03</time>
+          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 5122 字&nbsp;
+        <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 11 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="RSA(二) PKCS 公钥加密标准系列">
+              <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
+            </span>&nbsp;</div>
+    </div><div
+      class="content"
+      id="content"
+      
+      
+    ><h1 id="前言">前言</h1>
+<p>本章着重描述 RSA PCKS(Public-Key Cryptography Standards Series 公钥加密标准系列)，RSA 又称为公钥加密技术，主要的使用场景是公钥加密、私钥解密（补充，当然，私钥加密，公钥机密也是可行的，但是这样做并不安全，因为公钥是公开的，所有拿到公钥的人都可以解密，也就失去了加密的本质；不过，可以用私钥来进行签名，后续有专门的博文对此进行描述）；</p>
+<p>为了定义 RSA 加密的标准系列，IETF 组织总共定义了 15 个子系列标准，分别用在定义标准格式、如何封装、公钥加密封装标准、私钥加密封装标准、网络传输序列化标准等等.. 具体可以参考 wikipedia PCKS 的解释: <a
+  href="https://en.wikipedia.org/wiki/PKCS"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://en.wikipedia.org/wiki/PKCS</a>；</p>
+<p>下面我就几个核心的系列标准进行描述，</p>
+<p>重要：本文为作者的原创作品，转载需注明出处；</p>
+<blockquote>
+<p>转载至<code>https://www.shangyang.me/2017/05/24/encrypt-rsa-keyformat/</code></p>
+</blockquote>
+<p>未完待续….</p>
+<h1 id="pkcs-1-rsa-cryptography-standard">PKCS #1 RSA Cryptography Standard</h1>
+<p>摘要 wikepedia 中的一段摘要，</p>
+<blockquote>
+<p>See <a
+  href="https://tools.ietf.org/html/rfc3447"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RFC 3447</a>. Defines the mathematical properties and format of RSA public and private keys (ASN.1-encoded in clear-text), and the basic algorithms and encoding/padding schemes for performing RSA encryption, decryption, and producing and verifying signatures.</p>
+</blockquote>
+<p>定义了公钥加密技术(RSA)相关的数学属性以及相关的公钥和密钥的格式标准（通过 ASN.1 的格式标准来定义并明文展示），以及为 RSA 进行加密、解密，生成和验证签名等操作定义了基本的算法和编码/补零(padding)的方案；</p>
+<p>可以看到，PCKS #1 主要定义了公钥加密技术 RSA 是如何通过计算机来来定义其编码、通讯格式包括公钥私钥的文本格式(通过 ASN.1 来定义)等一系列能够使用计算机来进行通讯和计算的方案；</p>
+<p>要注意的是，PCKS #1 定义的都是明文的格式；下面我们来看看 ASN.1 是如何定义私钥和公钥的格式的，来加深我们的认知；</p>
+<h2 id="asn1">ASN.1</h2>
+<p>ASN.1: <a
+  href="https://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://en.wikipedia.org/wiki/Abstract_Syntax_Notation_One</a></p>
+<blockquote>
+<p>Abstract Syntax Notation One (ASN.1) is an interface description language for defining data structures that can be serialized and deserialized in a standard, cross-platform way. It’s broadly used in telecommunications and computer networking, and especially in cryptography.</p>
+</blockquote>
+<p>ASN.1 是一种接口描述性语言，该语言定义了能够进行跨平台、序列化和反序列化的数据格式；它被广泛的用于电子通讯以及计算机网络中，特别是用在<code>密码学的领域</code>；由此可知，ASN.1 定义了一种专用于密码学领域的一种可以进行序列化和反序列化的数据格式；</p>
+<blockquote>
+<p>ASN.1 is used in X.509, which defines the format of certificates used in the HTTPS protocol for securely browsing the web, and in many other cryptographic systems.</p>
+</blockquote>
+<p>ASN.1 用在 X.509 中，用来定义其证书的格式，该证书用在 HTTPS 安全通讯领域；</p>
+<p>那么 RSA 是如何通过 ASN.1 来定义公钥和私钥的数据格式的；看下面的章节，主要参考，https://tools.ietf.org/html/rfc3447#appendix-A</p>
+<h3 id="rsa-public-key-syntax-公钥语法">RSA public key syntax 公钥语法</h3>
+<p><a
+  href="https://tools.ietf.org/html/rfc3447#appendix-A.1.1"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://tools.ietf.org/html/rfc3447#appendix-A.1.1</a></p>
+<blockquote>
+<p>An RSA public key should be represented with the ASN.1 type
+RSAPublicKey:</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">RSAPublicKey ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">    modulus           INTEGER,  -- n
+</span></span><span class="line"><span class="cl">    publicExponent    INTEGER   -- e
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>The fields of type RSAPublicKey have the following meanings:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">* modulus is the RSA modulus n.
+</span></span><span class="line"><span class="cl">* publicExponent is the RSA public exponent e.
+</span></span></code></pre></td></tr></table>
+</div>
+</div></blockquote>
+<p>上面通过 ASN.1 定义了公钥的格式，通过一个 ASN.1 的 SEQUENCE 元素分别定义了 modules 和 publicExponent，而 modules 正是代表的 <a
+  href="https://www.shangyang.me/2017/05/19/encrypt-rsa-math/#%e6%a8%a1-N"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>模 N</a>，而 publicExponent 正式代表的<a
+  href="https://www.shangyang.me/2017/05/19/encrypt-rsa-math/#%e9%9a%8f%e6%9c%ba%e6%95%b0-e"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>随机数 e</a>，而 {𝑁,𝑒}{N,e} 正好表示了公钥；</p>
+<p>可见，通过 ASN.1 的 <em>SEQUENCE</em> 元素<code>RSAPublicKey</code>定义了公钥的数据格式，该格式便可以在网络通讯中进行序列化和反序列化；</p>
+<h3 id="rsa-private-key-syntax-私钥语法">RSA private key syntax 私钥语法</h3>
+<p><a
+  href="https://tools.ietf.org/html/rfc3447#appendix-A.1.2"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://tools.ietf.org/html/rfc3447#appendix-A.1.2</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">RSAPrivateKey ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">          version           Version,
+</span></span><span class="line"><span class="cl">          modulus           INTEGER,  -- n
+</span></span><span class="line"><span class="cl">          publicExponent    INTEGER,  -- e
+</span></span><span class="line"><span class="cl">          privateExponent   INTEGER,  -- d
+</span></span><span class="line"><span class="cl">          prime1            INTEGER,  -- p
+</span></span><span class="line"><span class="cl">          prime2            INTEGER,  -- q
+</span></span><span class="line"><span class="cl">          exponent1         INTEGER,  -- d mod (p-1)
+</span></span><span class="line"><span class="cl">          exponent2         INTEGER,  -- d mod (q-1)
+</span></span><span class="line"><span class="cl">          coefficient       INTEGER,  -- (inverse of q) mod p
+</span></span><span class="line"><span class="cl">          otherPrimeInfos   OtherPrimeInfos OPTIONAL
+</span></span><span class="line"><span class="cl">}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可见，ASN.1 同样通过一个 <em>SEQUENCE</em> 元素<code>RSAPrivateKey</code>定义了私钥的数据格式，d 既是模反元素，p、q 两质数，exponent1 和 exponent2 分别表示 d 与 (p-1) 和 (p-2) 的余数；</p>
+<p>可以看到 ASN.1 定义了 private key 的数据格式；</p>
+<h2 id="补充">补充</h2>
+<p>要查看明文的 public key / private key 的 ASN.1 的源数据格式，可以通过工具 <a
+  href="http://phpseclib.sourceforge.net/x509/asn1parse.php"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>http://phpseclib.sourceforge.net/x509/asn1parse.php</a> 查看；</p>
+<h1 id="pkcs-7-cryptographic-message-syntax-standard">PKCS #7 Cryptographic Message Syntax Standard</h1>
+<p>Cryptographic Message Syntax Standard 被加密消息的格式标准，与 PKCS #1 不同，PKCS #7 描述的是如何对公钥和私钥 ASN.1 的文本进行加密的标准；PKCS #1 标准描述的是 RSA 加密技术相关标准的定义；先来看 Wikipedia 上的一段摘要，</p>
+<blockquote>
+<p>See <a
+  href="https://tools.ietf.org/html/rfc2315"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RFC 2315</a>. Used to sign and/or encrypt messages under a <a
+  href="https://en.wikipedia.org/wiki/Public_key_infrastructure"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>PKI</a>. Used also for certificate dissemination (for instance as a response to a PKCS #10 message). Formed the basis for S/MIME, which is as of 2010 based on RFC 5652, an updated <a
+  href="https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>Cryptographic Message Syntax Standard (CMS)</a>. Often used for single sign-on.</p>
+</blockquote>
+<p>PKCS #7 通常在一个 PKI 中用来签名或者加密信息，也通常用于证书的传递；PKCS #7 的更新版本参考<a
+  href="https://en.wikipedia.org/wiki/Cryptographic_Message_Syntax"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>Cryptographic Message Syntax Standard (CMS)</a>；</p>
+<p>从上述的描述中可以知道，PKCS #7 主要定义了消息的加密语法标准；</p>
+<p>摘要<a
+  href="https://tools.ietf.org/html/rfc5652#section-3"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>CMS</a>介绍中的相关重要部分,</p>
+<blockquote>
+<p>The CMS describes an encapsulation syntax for data protection.</p>
+<p>The CMS can support a variety of architectures for certificate-based
+key management, such as the one defined by the PKIX (Public Key
+Infrastructure using X.509) working group [PROFILE].</p>
+</blockquote>
+<p>CMS 用来描述数据加密的一种封装语法；</p>
+<p>CMS 可以用于支持多种多样的证书管理实现，比如 PKIX (X.509 中的公钥管理的内部实现)；</p>
+<p>Ok，从上述的描述中可以看到，PKCS #7 主要用在 PKI/PKIX 领域中，主要是用来进行公钥加密保存、传输等；</p>
+<h2 id="pkcs-7-format">PKCS #7 Format</h2>
+<p><a
+  href="https://crypto.stackexchange.com/questions/37084/is-pkcs7-a-signature-format-or-a-certificate-format"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://crypto.stackexchange.com/questions/37084/is-pkcs7-a-signature-format-or-a-certificate-format</a> 这篇文章对 PKCS #7 进行了比较详细的讨论；摘要部分如下，</p>
+<blockquote>
+<p>The <em>.p7b</em> or <em>.p7c</em> format is a special case of PKCS#7/CMS: a SignedData structure containing no “content” and zero SignerInfos, but one or more certificates (usually) and/or CRLs (rarely).</p>
+</blockquote>
+<p>可以知道，如果使用 PKCS#7 原生格式，将会使用 <em>.p7c</em> 后缀名，如果使用的是 CMS，那么使用的是 <em>.p7b</em> 后缀；</p>
+<p>从 <a
+  href="https://tools.ietf.org/html/rfc5652#section-12.1"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://tools.ietf.org/html/rfc5652#section-12.1</a> 可以看到详细的 ASN.1 中有关 CMS 的标准定义，</p>
+<p>摘要部分信息如下，</p>
+<ol>
+<li>
+<p>数据内容信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">ContentInfo ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">  contentType ContentType,
+</span></span><span class="line"><span class="cl">  content [0] EXPLICIT ANY DEFINED BY contentType }
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">ContentType ::= OBJECT IDENTIFIER
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>数据签名信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">SignedData ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">  version CMSVersion,
+</span></span><span class="line"><span class="cl">  digestAlgorithms DigestAlgorithmIdentifiers,
+</span></span><span class="line"><span class="cl">  encapContentInfo EncapsulatedContentInfo,
+</span></span><span class="line"><span class="cl">  certificates [0] IMPLICIT CertificateSet OPTIONAL,
+</span></span><span class="line"><span class="cl">  crls [1] IMPLICIT RevocationInfoChoices OPTIONAL,
+</span></span><span class="line"><span class="cl">  signerInfos SignerInfos }
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>签名者信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">SignerInfo ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">  version CMSVersion,
+</span></span><span class="line"><span class="cl">  sid SignerIdentifier,
+</span></span><span class="line"><span class="cl">  digestAlgorithm DigestAlgorithmIdentifier,
+</span></span><span class="line"><span class="cl">  signedAttrs [0] IMPLICIT SignedAttributes OPTIONAL,
+</span></span><span class="line"><span class="cl">  signatureAlgorithm SignatureAlgorithmIdentifier,
+</span></span><span class="line"><span class="cl">  signature SignatureValue,
+</span></span><span class="line"><span class="cl">  unsignedAttrs [1] IMPLICIT UnsignedAttributes OPTIONAL }
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>密钥加密算法信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">KeyTransRecipientInfo ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">  version CMSVersion,  -- always set to 0 or 2
+</span></span><span class="line"><span class="cl">  rid RecipientIdentifier,
+</span></span><span class="line"><span class="cl">  keyEncryptionAlgorithm KeyEncryptionAlgorithmIdentifier,
+</span></span><span class="line"><span class="cl">  encryptedKey EncryptedKey }
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>被加密数据的信息</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">EncryptedData ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">  version CMSVersion,
+</span></span><span class="line"><span class="cl">  encryptedContentInfo EncryptedContentInfo,
+</span></span><span class="line"><span class="cl">  unprotectedAttrs [1] IMPLICIT UnprotectedAttributes OPTIONAL }
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<p>可见，PKCS#7 定义完整的一整套的用于加密数据，签名，签名者，加密算法等等一系列信息；由此，奠定了其作为 PKI 的基础；</p>
+<h2 id="pkcs-7-的用途">PKCS #7 的用途</h2>
+<p><a
+  href="http://stackoverflow.com/questions/3344527/what-for-are-the-commonly-used-pkcs-standards-pkcs7-pkcs10-and-pkcs12"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>http://stackoverflow.com/questions/3344527/what-for-are-the-commonly-used-pkcs-standards-pkcs7-pkcs10-and-pkcs12</a></p>
+<p>摘抄部分如下，</p>
+<blockquote>
+<p>PKCS#7 lets you sign and encrypt generic data using X.509 certificates. Also PKCS#7 format can be used to store one or more certificates without private keys (private keys can be put as a data payload and encrypted this way).</p>
+</blockquote>
+<p>PKCS#7 使得你可以通过使用 X.509 证书对普通的数据进行签名和加密；PKCS#7 也可以用来存放不包含私钥的一个或者多个证书；</p>
+<h2 id="pki">PKI</h2>
+<p>前文提到了，PKCS#7 用来保证 PKI 的加密格式标准，保证公钥证书的安全性；</p>
+<p>Public key infrastructure：https://en.wikipedia.org/wiki/Public_key_infrastructure</p>
+<p>公钥基础设施，基础设施包含 CA(certificate authority)、RA、VA 等，从 wikipedia 的描述上来看，主要是为了保证公钥证书颁发途径中的安全性、保密性.. 等等相关措施，目的就是为了在公钥证书传递过程中，避免公钥被串改以后信息的不安全性..</p>
+<p>TODO，将来准备单独写一章关于 PKI 的博文来详细的描述此类相关内容。</p>
+<h1 id="pkcs-8-private-key-information-syntax-standard">PKCS #8 Private-Key Information Syntax Standard</h1>
+<p>Private-Key Information Syntax Standard 私钥信息格式标准，看 Wikipedia 的描述，</p>
+<blockquote>
+<p>See <a
+  href="https://tools.ietf.org/html/rfc5958"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RFC 5958</a>. Used to carry private certificate keypairs (encrypted or unencrypted).</p>
+</blockquote>
+<p>用来携带<code>加密</code>的或者<code>未加密</code>的私钥证书；也就是说，PKCS#8 定义了私钥的加密和未加密的格式；</p>
+<p>备注，最开始 PKCS#8 标准是由 RFC5208 标准定义，但是后来为了更好的支持 PKI 基础设施，由新的标准 RFC 5958 替换了原来的 RFC5208 标准，这部分内容可以从后续部分 <a
+  href="https://www.shangyang.me/2017/05/21/encrypt-rsa-pkcs/#RFC5958-Asymmetric-Key-Packages"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RFC5958 Asymmetric Key Packages</a>中了解；但因为 RFC5208 更简明，所以，这里首先介绍 RFC5208 的标准内容；</p>
+<h2 id="rfc5208-private-key-information-syntax-specification">RFC5208 Private-Key Information Syntax Specification</h2>
+<p>该文档中主要包含了两个部分，private key 的原始格式 <a
+  href="https://www.shangyang.me/2017/05/21/encrypt-rsa-pkcs/#private-key-info"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>private key info</a> 和 private key 的加密格式 <a
+  href="https://www.shangyang.me/2017/05/21/encrypt-rsa-pkcs/#encrypted-private-key-info"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>encrypted private key info</a>；</p>
+<p><a
+  href="https://tools.ietf.org/html/rfc5208"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://tools.ietf.org/html/rfc5208</a></p>
+<h3 id="private-key-info">private key info</h3>
+<p>Private-key information shall have ASN.1 type PrivateKeyInfo:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PrivateKeyInfo ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">  version                   Version,
+</span></span><span class="line"><span class="cl">  privateKeyAlgorithm       PrivateKeyAlgorithmIdentifier,
+</span></span><span class="line"><span class="cl">  privateKey                PrivateKey,
+</span></span><span class="line"><span class="cl">  attributes           [0]  IMPLICIT Attributes OPTIONAL }
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Version ::= INTEGER
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PrivateKeyAlgorithmIdentifier ::= AlgorithmIdentifier
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">PrivateKey ::= OCTET STRING
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">Attributes ::= SET OF Attribute
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到，通过 ASN.1 格式封装了私钥，重要的有两个字段，privateKeyAlgorithm 和 privateKey；</p>
+<ul>
+<li>
+<p>privateKeyAlgorithm
+表示采用的是什么算法，可以是 RSA，也可以是其它的算法，比如 DES、AES 等对称加密算法等。</p>
+</li>
+<li>
+<p>privateKey
+通过其类型可以知道，是一个</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PrivateKey ::= OCTET STRING
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可见，其由一个八位字节字符串组成；这就是私钥的内容，如果采用的是 RSA，那么自然存储的就是 {N,d} 等相关的私钥信息，详情参考<a
+  href="https://www.shangyang.me/2017/05/21/encrypt-rsa-pkcs/#RSA-private-key-syntax-%e7%a7%81%e9%92%a5%e8%af%ad%e6%b3%95"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RSA private key syntax</a>，如果采用的是 DES 算法呢，那么存储的就是 DES key 相关的信息…</p>
+</li>
+</ul>
+<p>摘抄两端核心的内容如下</p>
+<blockquote>
+<p><strong>privateKeyAlgorithm</strong> identifies the private-key algorithm. One example of a private-key algorithm is PKCS #1’s rsaEncryption [PKCS#1].</p>
+</blockquote>
+<p>privateKeyAlgorithm 表示私钥所使用的算法，一个例子就是 PKCS#1 所表述的 PKCS#1 的 rsa 加密技术；</p>
+<blockquote>
+<p><strong>privateKey</strong> is an octet string whose contents are the value of the private key. The interpretation of the contents is defined in the registration of the private-key algorithm. For an RSA private key, for example, the contents are a BER encoding of a value of type RSAPrivateKey.</p>
+</blockquote>
+<p>privateKey 是一个包含私钥内容的八位字节字符串 octet string，该内容由其加密算法所描述和解释；比如 RSA 私钥，其内容表示一个通过 BER 编码的私钥；</p>
+<p>总结一下，</p>
+<p>可以看到，PKCS #8 在原来私钥的格式上做了一层抽象封装，这样使得它可以兼容任何的私钥格式；使得 PKCS 的私钥标准可以使用到任何加密算法，这个同 PKCS#1 中定义的 RSA <a
+  href="https://www.shangyang.me/2017/05/21/encrypt-rsa-pkcs/#RSA-private-key-syntax-%e7%a7%81%e9%92%a5%e8%af%ad%e6%b3%95"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>私钥语法</a>是不同的，PKCS #1 定义的只是特定的 RSA 私钥的语法格式；</p>
+<p>Ok，从这里就可以清晰的看到 PKCS 的发展方向了，PKCS 体系已经突破了单纯的 RSA 加密算法，而是扩展到了可以适配任何的加密算法，所以，PKCS 已经成为了一种通用的密码学格式标准。当然，CMS 在此基础上更进一步，建立了 PKI 体系中所需的其它类型信息，包括加密数据，签名，签名者，加密算法等等公钥加密技术基础设施相关的东西，详情参考<a
+  href="https://www.shangyang.me/2017/05/21/encrypt-rsa-pkcs/#PKCS-7-Format"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>PKCS #7 Format</a>部分，而这部分正是 RFC5958 标准淘汰当前 RFC5208 标准的地方，不过精华其实还是在 RFC5208；</p>
+<h3 id="encrypted-private-key-info">encrypted private key info</h3>
+<p><a
+  href="https://tools.ietf.org/html/rfc5208#section-6"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://tools.ietf.org/html/rfc5208#section-6</a></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">EncryptedPrivateKeyInfo ::= SEQUENCE {
+</span></span><span class="line"><span class="cl">  encryptionAlgorithm  EncryptionAlgorithmIdentifier,
+</span></span><span class="line"><span class="cl">  encryptedData        EncryptedData }
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">EncryptionAlgorithmIdentifier ::= AlgorithmIdentifier
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>相关核心内容摘抄如下，</p>
+<blockquote>
+<p>The fields of type EncryptedPrivateKeyInfo have the following meanings:</p>
+</blockquote>
+<p><strong>encryptionAlgorithm</strong> identifies the algorithm under which the private-key information is encrypted. Two examples are <em>PKCS #5’s pbeWithMD2AndDES-CBC</em> and <em>pbeWithMD5AndDES-CBC [PKCS#5]</em>.</p>
+<p><strong>encryptionAlgorithm</strong> 字段表示私钥使用什么算法进行加密的；通常使用 PKCS#5 的 <em>MD2AndDES</em> 或者 <em>MD5AndDES</em> 两种加密算法；</p>
+<blockquote>
+<p><strong>encryptedData</strong> is the result of encrypting the private-key information.</p>
+</blockquote>
+<p><strong>encryptedData</strong> 是私钥通过加密算法 <strong>encryptionAlgorithm</strong> 加密以后的内容；</p>
+<blockquote>
+<p>The encryption process involves the following two steps:</p>
+<ol>
+<li>The private-key information is BER encoded, yielding an octet string.</li>
+<li>The result of step 1 is encrypted with the secret key to give an octet string, the result of the encryption process.</li>
+</ol>
+</blockquote>
+<p>加密过程包含两个步骤，</p>
+<ol>
+<li>私钥的内容通过 BER 编码，并产生相关的八位字节字符串 octet string</li>
+<li>第一步产生的结果将会通过密钥(secret key)进行加密并再产生一个 octet string，该 octet string 便是这个加密过程的结果；</li>
+</ol>
+<p>可以看到，私钥的整个内容都被 <em>encryptionAlgorithm</em> 所指明的加密算法进行了加密；</p>
+<h2 id="rfc5958-asymmetric-key-packages">RFC5958 Asymmetric Key Packages</h2>
+<p>看看 RFC5958 的 Introduction 章节，</p>
+<blockquote>
+<p>This document defines the syntax for private-key information and a
+Cryptographic Message Syntax (CMS) [RFC5652] content type for it. Private-key information includes a private key for a specified public-key algorithm and a set of attributes. The CMS can be used to digitally sign, digest, authenticate, or encrypt the asymmetric key format content type. This document obsoletes PKCS #8 v1.2 [RFC5208].</p>
+</blockquote>
+<p>可见 RFC5958 定义了不但私钥的语法还定义了相关的 CMS 的文本类型(content type)；Private-key information 包含了一个特定公钥算法的私钥以及一些列的属性；CMS 可以用来进行数字签名，digest，验证或者用来加密非对称密钥的内容和格式；该文档淘汰了过时的 PKCS #8 v1.2 [RFC5208]；</p>
+<p>RFC5958 Asymmetric Key Packages: <a
+  href="https://tools.ietf.org/html/rfc5958"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://tools.ietf.org/html/rfc5958</a> 淘汰了过时的 RFC5208 PKCS #8: Private-Key Information Syntax Specification Version 1.2 <a
+  href="https://tools.ietf.org/html/rfc5208"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>https://tools.ietf.org/html/rfc5208</a>；</p>
+<p>虽然是淘汰了 RFC5208，不过笔者在阅览完 RFC5208 以后，发现 RFC5208 内容更为清晰易懂，所以，还是打算从 RFC5208 入手进行梳理；这部分内容参考 <a
+  href="https://www.shangyang.me/2017/05/21/encrypt-rsa-pkcs/#RFC5208-Private-Key-Information-Syntax-Specification"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RFC5208 Private-Key Information Syntax Specification</a></p>
+<p>后续 RFC5958 非常详细的描述了有关 CMS 的内容定义，以及私钥加密 ASN.1 格式的定义，这里就不再一一赘述了；</p>
+<h3 id="私钥文件的格式">私钥文件的格式</h3>
+<p>RFC5958 用不多的篇幅来描述了私钥的文件存储格式；不过以下内容比较零散，主要是翻译官方文档并做一些个人的理解；</p>
+<p>该小节主要来讲解私钥的存储格式，看下 RFC5958 中的一段<a
+  href="https://tools.ietf.org/html/rfc5958#section-5"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>描述</a>，</p>
+<blockquote>
+<p>To extract the private-key information from the AsymmetricKeyPackage, the encapsulating layers need to be removed. At a minimum, the outer ContentInfo [RFC5652] layer needs to be removed. If the AsymmetricKeyPackage is encapsulated in a SignedData [RFC5652], then the SignedData and EncapsulatedContentInfo layers [RFC5652] also need to be removed. The same is true for EnvelopedData, EncryptedData, and AuthenticatedData all from [RFC5652] as well as AuthEnvelopedData from [RFC5083].</p>
+</blockquote>
+<p>这段话的意思就是说，要提取通过 AsymmetricKeyPackage 格式所封装的私钥，必须剥离其外部的封装层；至少，外部的 ContentInfo[RFC5652] 是需要被剥离出去的；如果封装了签名，同样该签名需要被剥离；同样的，如果有其它的封装数据，比如加密的数据，验证的数据等同样需要剥离出去；</p>
+<blockquote>
+<p>Once all the outer layers are removed, there are as many sets of private-key information as there are OneAsymmetricKey structures. OneAsymmetricKey and PrivateKeyInfo are the same structure; therefore, either can be saved as a <code>.p8</code> file or copied in to the <code>P12</code> KeyBag BAG-TYPE. Removing encapsulating security layers will invalidate any signature and may expose the key to unauthorized disclosure.</p>
+</blockquote>
+<p>当所有的外部层次都被剥离以后，所剩下的也就是最终私钥的信息结构了；该私钥的信息可以通过<code>.p8</code>格式文件或者是通过<code>P12</code> KeyBag BAG-TYPE 格式进行存储；不过注意的是，通过之前的步骤层层剥离，若将安全层也剥离以后，将会使得任何签名无效并且会将私钥暴露给非授权机构；</p>
+<p>下面这段有意思了，基本上阐述了通过<code>.p8</code>格式存储的私钥的格式，不过就是不够细致，也不够生动形象，官网的内容就是这样，点到为止，看得人痛不欲生；</p>
+<blockquote>
+<p><code>.p8</code> files are sometimes <code>PEM</code>-encoded. When .p8 files are <code>PEM</code> encoded they use the <code>.pem</code> file extension. <code>PEM</code> encoding is</p>
+<ul>
+<li>either the <code>Base64</code> encoding, from Section 4 of [RFC4648], of the <code>DER</code>-encoded <code>EncryptedPrivateKeyInfo</code> sandwiched between:</li>
+</ul>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-----BEGIN ENCRYPTED PRIVATE KEY-----
+</span></span><span class="line"><span class="cl">-----END ENCRYPTED PRIVATE KEY-----
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ul>
+<li>
+<p>or the Base64 encoding, see Section 4 of [RFC4648], of the</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">DER
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>-encoded</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">PrivateKeyInfo
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>sandwiched between:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-----BEGIN PRIVATE KEY-----
+</span></span><span class="line"><span class="cl">-----END PRIVATE KEY-----
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+</blockquote>
+<p>上面这段比较重要了，阐述了密钥通过<code>.p8</code>加密存储的格式，<code>.p8</code>文件是一种通过<code>PEM</code>编码的文件，当<code>.p8</code>文件通过<code>PEM</code>进行编码的时候，它们的文件后缀为<code>.pem</code>；<code>PEM</code>编码格式有两种方式</p>
+<ol>
+<li>
+<p>使用<code>DER</code>编码的<code>EncryptedPrivateKeyInfo</code>通过<code>Base64</code>转码后被包裹下面的两段标识符中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-----BEGIN ENCRYPTED PRIVATE KEY-----
+</span></span><span class="line"><span class="cl">-----END ENCRYPTED PRIVATE KEY-----
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>看过官网解释，你此时的状态应该是云里雾里的；这里作者想表达的是什么意思呢… 这里就是表示的如果私钥本身是经过加密存储的，既是 RFC5208 中所定义的 <a
+  href="https://www.shangyang.me/2017/05/21/encrypt-rsa-pkcs/#encrypted-private-key-info"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>EncryptedPrivateKeyInfo</a> 所表述的信息，那么会使用如上的格式来进行存储；</p>
+</li>
+<li>
+<p>使用<code>DER</code>编码的<code>PrivateKeyInfo</code>通过<code>Base64</code>转码后被包裹下面的两段标识符中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">-----BEGIN PRIVATE KEY-----
+</span></span><span class="line"><span class="cl">-----END PRIVATE KEY-----
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>PrivateKeyInfo</code>这里表示的就是明文，既是密钥没有经过加密，是通过<code>Base64</code>所存储的明文格式；</p>
+</li>
+</ol>
+<p>更多有关此部分的介绍查看 <a
+  href="https://www.shangyang.me/2017/05/24/encrypt-rsa-keyformat/"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RSA(三) 密钥的格式</a>部分内容；</p>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title=2021-03-03&#32;13:41:25>更新于 2021-03-03</span>
+      </div>
+      <div class="post-info-license "><span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+    </div>
+    <div class="post-info-line">
+      <div class="post-info-md"><span><a
+  href="/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/index.md"
+  
+    title="阅读原始文档"
+  
+  
+  
+  
+    class="link-to-markdown"
+  
+  
+>阅读原始文档</a></span></div>
+      <div class="post-info-share">
+        <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" data-title="RSA(二) PKCS 公钥加密标准系列" data-hashtags="RSA"><i class="fa-brands fa-twitter fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" data-hashtag="RSA"><i class="fa-brands fa-facebook-square fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" data-title="RSA(二) PKCS 公钥加密标准系列" data-web><i class="fa-brands fa-whatsapp fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" data-title="RSA(二) PKCS 公钥加密标准系列"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" data-title="RSA(二) PKCS 公钥加密标准系列"><i class="fa-brands fa-weibo fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Myspace" data-sharer="myspace" data-url="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" data-title="RSA(二) PKCS 公钥加密标准系列" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a>
+  <a href="javascript:void(0);" title="分享到 Blogger" data-sharer="blogger" data-url="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" data-title="RSA(二) PKCS 公钥加密标准系列" data-description=""><i class="fa-brands fa-blogger fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Evernote" data-sharer="evernote" data-url="https://ronin-zc.com/rsa%E4%BA%8C-pkcs-%E5%85%AC%E9%92%A5%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86%E7%B3%BB%E5%88%97/" data-title="RSA(二) PKCS 公钥加密标准系列"><i class="fa-brands fa-evernote fa-fw"></i></a>
+  </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw"></i>&nbsp;<a href="/tags/rsa/">RSA</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div>
+
+  <div class="post-nav"><a href="/rsa%E4%B8%80-%E8%83%8C%E5%90%8E%E7%9A%84%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/" class="prev" rel="prev" title="RSA(一) 背后的数学原理"><i class="fa-solid fa-angle-left fa-fw"></i>RSA(一) 背后的数学原理</a>
+      <a href="/rsa%E4%B8%89-%E5%AF%86%E9%92%A5%E7%9A%84%E6%A0%BC%E5%BC%8F/" class="next" rel="next" title="RSA(三) 密钥的格式">RSA(三) 密钥的格式<i class="fa-solid fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"><div id="disqus_thread" class="comment"></div><noscript>
+        Please enable JavaScript to view the comments powered by <a href="https://disqus.com/?ref_noscript" rel="external nofollow noopener noreferrer">Disqus</a>.
+      </noscript></div></article></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.101.0">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external nofollow noopener noreferrer" title="FixIt v0.2.15"><img class="fixit-icon" src="/images/fixit.svg" alt="FixIt logo" />&nbsp;FixIt</a>
+        </div><div class="footer-line copyright"><i class="fa-regular fa-copyright fa-fw"></i>
+            <span itemprop="copyrightYear">2019 - 2022</span><span class="author" itemprop="copyrightHolder">
+              <a
+  href="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RoninZc</a></span><span class="license footer-divider"><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div><div class="footer-line statistics"><span class="site-time" title='网站运行中 ...'><i class="fa-solid fa-heartbeat fa-fw animate-icon"></i>&nbsp;<span class="run-times">网站运行中 ...</span></span></div><div class="footer-line ibruce">
+          <span id="busuanzi_container_site_uv" title='总访客数'><i class="fa-regular fa-user fa-fw"></i>&nbsp;<span id="busuanzi_value_site_uv"><i class="fa fa-spinner fa-spin fa-fw"></i></span></span><span id="busuanzi_container_site_pv" class="footer-divider" title='总访问量'><i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin fa-fw"></i></span></span>
+        </div><div class="footer-line beian"><span class="icp footer-divider"><a href="https://beian.miit.gov.cn/">赣ICP备18014838号</a></span></div></div>
+  </footer></div><div class="widgets">
+  <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+      <i class="fa-solid fa-arrow-up fa-fw"></i>
+    </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+      <i class="fa-solid fa-comment fa-fw"></i>
+    </a>
+  </div><a
+  href="https://github.com/RoninZc/blog"
+  
+    title="在 GitHub 上查看源代码"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+    class="github-corner right d-none-mobile"
+  
+  
+><svg viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><div id="mask"></div>
+</div>
+  
+  
+  
+  <link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="https://ronin-zc.disqus.com/embed.js" defer></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js" defer></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js" async defer></script><script type="text/javascript" src="/lib/sharer/sharer.min.js" async defer></script><script type="text/javascript" src="/lib/typeit/typeit.min.js" defer></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/lib/pangu/pangu.min.js" defer></script><script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async defer></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"data":{"typeit-header-desktop":" RoninZc","typeit-header-subtitle-desktop":"摸鱼","typeit-header-subtitle-mobile":"摸鱼","typeit-header-title-mobile":" RoninZc"},"enablePWA":true,"enablePangu":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"},"siteTime":"2021-11-01T00:00:00+08:00","typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"typeit-header-desktop":["typeit-header-desktop"],"typeit-header-subtitle-desktop":["typeit-header-subtitle-desktop"],"typeit-header-subtitle-mobile":["typeit-header-subtitle-mobile"],"typeit-header-title-mobile":["typeit-header-title-mobile"]},"duration":-1,"speed":100}};</script><script type="text/javascript" src="/js/theme.min.js" defer></script><script type="text/javascript" src="/js/_custom.min.js" defer></script></body>
+</html>

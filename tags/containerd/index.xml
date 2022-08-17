@@ -1,0 +1,167 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>containerd - 标签 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</title>
+    <link>https://ronin-zc.com/tags/containerd/</link>
+    <description>containerd - 标签 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</description>
+    <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Sat, 14 May 2022 16:45:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/containerd/" rel="self" type="application/rss+xml" /><item>
+  <title>K8Sv1.24.0 containerd 安装教程</title>
+  <link>https://ronin-zc.com/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</link>
+  <pubDate>Sat, 14 May 2022 16:45:00 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</guid>
+  <description><![CDATA[<h3 id="1卸载旧版本">1、卸载旧版本</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt remove docker docker-engine docker.io containerd runc
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2安装相关依赖包">2、安装相关依赖包</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3添加证书镜像">3、添加证书&amp;镜像</h3>
+<ul>
+<li>
+<p>官方镜像</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 官方镜像</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://download.docker.com/linux/ubuntu/gpg <span class="p">|</span> sudo apt-key add -
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果你使用的是 Ubuntu 22.04 请使用</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://download.docker.com/linux/ubuntu/gpg <span class="p">|</span> sudo gpg --dearmor -o /usr/share/keyrings/aliyun-docker-archive-keyring.gpg
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo add-apt-repository <span class="s2">&#34;deb [arch=arm64] https://download.docker.com/linux/ubuntu </span><span class="k">$(</span>lsb_release -cs<span class="k">)</span><span class="s2"> stable&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>阿里云镜像</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg <span class="p">|</span> sudo apt-key add -
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果你使用的是 Ubuntu 22.04 请使用</span>
+</span></span><span class="line"><span class="cl">curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg ｜ sudo gpg --dearmor -o /usr/share/keyrings/aliyun-docker-archive-keyring.gpg
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo add-apt-repository <span class="s2">&#34;deb [arch=arm64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu </span><span class="k">$(</span>lsb_release -cs<span class="k">)</span><span class="s2"> stable&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<blockquote>
+<p>如果卡住不动的话，可以先 wget 下载文件，直接导入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">wget http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg
+</span></span><span class="line"><span class="cl">sudo apt-key add ./gpg
+</span></span></code></pre></td></tr></table>
+</div>
+</div></blockquote>
+<h3 id="4安装">4、安装</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt install -y containerd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="5生成配置文件">5、生成配置文件</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">mkdir -p /etc/containerd <span class="o">&amp;&amp;</span> containerd config default <span class="p">|</span> sudo tee /etc/containerd/config.toml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 修改配置文件</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 老版本需要手动添加 `SystemdCgroup = true`</span>
+</span></span><span class="line"><span class="cl">sudo sed -i <span class="s1">&#39;s/SystemdCgroup = false/SystemdCgroup = true/&#39;</span> /etc/containerd/config.toml <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">grep <span class="s1">&#39;SystemdCgroup&#39;</span> -B <span class="m">11</span> /etc/containerd/config.toml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="6配置镜像加速官方链接httpscrconsolealiyuncomcn-shenzheninstancesmirrors">6、配置镜像加速<a
+  href="https://cr.console.aliyun.com/cn-shenzhen/instances/mirrors"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>官方链接</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 这里需要替换为自己阿里云的镜像加速器地址</span>
+</span></span><span class="line"><span class="cl">sudo sed -i <span class="s1">&#39;s#endpoint = &#34;&#34;#endpoint = &#34;https://xxxxxx.mirror.aliyuncs.com&#34;#g&#39;</span> /etc/containerd/config.toml <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">grep <span class="s1">&#39;endpoin&#39;</span> -B <span class="m">5</span> /etc/containerd/config.toml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -i <span class="s1">&#39;s#sandbox_image = &#34;k8s.gcr.io/pause#sandbox_image = &#34;registry.aliyuncs.com/google_containers/pause#g&#39;</span> /etc/containerd/config.toml <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">grep <span class="s1">&#39;sandbox_image&#39;</span> /etc/containerd/config.toml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="7重载服务器配置">7、重载服务器配置</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">systemctl daemon-reload <span class="o">&amp;&amp;</span> systemctl restart containerd.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="8检查运行情况">8、检查运行情况</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">systemctl status containerd
+</span></span></code></pre></td></tr></table>
+</div>
+</div>]]></description>
+</item></channel>
+</rss>

@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <title>MySQL动态存储方案对比「转」 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</title><meta name="author" content="RoninZc">
+<meta name="author-link" content="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg">
+<meta name="description" content="此文章为转载，原文章链接动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone 一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简" /><meta name="keywords" content='MySQL, JSON' /><meta itemprop="name" content="MySQL动态存储方案对比「转」">
+<meta itemprop="description" content="此文章为转载，原文章链接动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone 一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简"><meta itemprop="datePublished" content="2022-05-17T11:00:00+08:00" />
+<meta itemprop="dateModified" content="2022-05-17T11:00:00+08:00" />
+<meta itemprop="wordCount" content="6404"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
+<meta itemprop="keywords" content="MySQL,JSON," /><meta property="og:title" content="MySQL动态存储方案对比「转」" />
+<meta property="og:description" content="此文章为转载，原文章链接动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone 一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" /><meta property="og:image" content="https://ronin-zc.com/logo.png"/><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2022-05-17T11:00:00+08:00" />
+<meta property="article:modified_time" content="2022-05-17T11:00:00+08:00" />
+
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="https://ronin-zc.com/logo.png"/>
+
+<meta name="twitter:title" content="MySQL动态存储方案对比「转」"/>
+<meta name="twitter:description" content="此文章为转载，原文章链接动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone 一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简"/>
+<meta name="application-name" content="FixIt">
+<meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#252627"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" /><link rel="prev" href="https://ronin-zc.com/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/" /><link rel="next" href="https://ronin-zc.com/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" /><link rel="stylesheet" href="/lib/normalize/normalize.min.css"><link rel="stylesheet" href="/css/style.min.css"><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"><link rel="stylesheet" href="/lib/animate/animate.min.css"><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "MySQL动态存储方案对比「转」",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https:\/\/ronin-zc.com\/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD\/"
+    },"genre": "posts","keywords": "MySQL, JSON","wordcount":  6404 ,
+    "url": "https:\/\/ronin-zc.com\/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD\/","datePublished": "2022-05-17T11:00:00+08:00","dateModified": "2022-05-17T11:00:00+08:00","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "RoninZc"
+      },"description": ""
+  }
+  </script></head>
+  <body header-desktop="sticky" header-mobile="auto"><script type="text/javascript">(window.localStorage && localStorage.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('theme', 'dark');</script><div class="wrapper"><header class="desktop" id="header-desktop">
+  <div class="header-wrapper" github-corner="right">
+    <div class="header-title">
+      <a href="/" title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"><img
+    class="lazyload logo"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"
+    title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;" /><span id="typeit-header-desktop" class="typeit"></span></a><span id="typeit-header-subtitle-desktop" class="typeit header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/posts/"
+                
+                
+              ><i class="fa-solid fa-archive fa-fw fa-sm"></i> 所有文章</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/categories/"
+                
+                
+              ><i class="fa-solid fa-th fa-fw fa-sm"></i> 分类</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/tags/"
+                
+                
+              ><i class="fa-solid fa-tags fa-fw fa-sm"></i> 标签</a></li><li
+              class="menu-item"
+              
+            >
+              <a
+                class="menu-link"
+                href="/about"
+                
+                
+              ><i class="fa-solid fa-info-circle fa-fw fa-sm"></i> 关于</a></li><li class="menu-item delimiter"></li><li class="menu-item search" id="search-desktop">
+            <input type="text" placeholder="这里可以搜索哦～" id="search-input-desktop">
+            <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-desktop" title="搜索">
+              <i class="fa-solid fa-search fa-fw"></i>
+            </a>
+            <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-desktop" title="清空">
+              <i class="fa-solid fa-times-circle fa-fw"></i>
+            </a>
+            <span class="search-button search-loading" id="search-loading-desktop">
+              <i class="fa-solid fa-spinner fa-fw fa-spin"></i>
+            </span>
+          </li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw"></i>
+        </li>
+      </ul>
+    </nav>
+  </div>
+</header><header class="mobile" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="&lt;p&gt;RoninZc 的个人博客&lt;/p&gt;"><img
+    class="lazyload logo"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    title="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" /><span id="typeit-header-title-mobile" class="typeit"></span></a><span id="typeit-header-subtitle-mobile" class="typeit header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="search-wrapper">
+            <div class="search mobile" id="search-mobile">
+              <input type="text" placeholder="这里可以搜索哦～" id="search-input-mobile">
+              <a href="javascript:void(0);" class="search-button search-toggle" id="search-toggle-mobile" title="搜索">
+                <i class="fa-solid fa-search fa-fw"></i>
+              </a>
+              <a href="javascript:void(0);" class="search-button search-clear" id="search-clear-mobile" title="清空">
+                <i class="fa-solid fa-times-circle fa-fw"></i>
+              </a>
+              <span class="search-button search-loading" id="search-loading-mobile">
+                <i class="fa-solid fa-spinner fa-fw fa-spin"></i>
+              </span>
+            </div>
+            <a href="javascript:void(0);" class="search-cancel" id="search-cancel-mobile">
+              取消
+            </a>
+          </li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/posts/"
+                
+                
+              ><i class="fa-solid fa-archive fa-fw fa-sm"></i> 所有文章</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/categories/"
+                
+                
+              ><i class="fa-solid fa-th fa-fw fa-sm"></i> 分类</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/tags/"
+                
+                
+              ><i class="fa-solid fa-tags fa-fw fa-sm"></i> 标签</a></li><li
+              class="menu-item"
+            ><a
+                class="menu-link"
+                href="/about"
+                
+                
+              ><i class="fa-solid fa-info-circle fa-fw fa-sm"></i> 关于</a></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header>
+<div class="search-dropdown desktop">
+  <div id="search-dropdown-desktop"></div>
+</div>
+<div class="search-dropdown mobile">
+  <div id="search-dropdown-mobile"></div>
+</div>
+<main class="container" page-style="normal"><aside class="toc" id="toc-auto"></aside>
+
+  <aside class="aside-custom">
+    
+  </aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX">
+        <span>MySQL动态存储方案对比「转」</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><a
+  href="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+  
+    title="作者"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer author"
+  
+  
+    class="author"
+  
+  
+><img
+    class="lazyload avatar"
+    src="/svg/loading.min.svg"
+    data-src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+    data-srcset="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 1.5x, https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg 2x"
+    data-sizes="auto"
+    alt="RoninZc"
+    title="RoninZc" />&nbsp;RoninZc</a></span></div>
+      <div class="post-meta-line"><span title=2022-05-17&#32;11:00:00>
+            <i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2022-05-17" >2022-05-17</time>
+          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 6404 字&nbsp;
+        <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 13 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="MySQL动态存储方案对比「转」">
+              <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
+            </span>&nbsp;</div>
+    </div><div
+      class="content"
+      id="content"
+      
+      
+    ><blockquote>
+<p>此文章为转载，原文章链接<a
+  href="http://jintang.zone/2021/08/31/%e5%8a%a8%e6%80%81%e5%ad%97%e6%ae%b5%e5%ad%98%e5%82%a8%e6%96%b9%e6%a1%88%e5%af%b9%e6%af%94.html"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone</a></p>
+</blockquote>
+<h2 id="一前言">一、前言</h2>
+<p>最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，后端接口能够在不增加新的表字段且基本不需要修改代码的方式存储起来。</p>
+<p>我们都知道，关系型数据库MySQL的数据表在修改表字段时，代价比较大，甚至出现锁表导致服务奔溃。有什么好的办法呢？下面我仍然基于MySQL，对比了两种可行的方法，希望对你有帮助。</p>
+<h2 id="二动态结构">二、动态结构</h2>
+<p>关系数据库非常适合具有大量关系的结构化数据，它所存储的数据都是预先能够定义出清晰的结构，并且短期或更长的时间内结构不会发生变化。但是业务总是不断在变化的，业务在扩展，存储的信息必然更多更广，表结构发生变化几乎是不可避免。</p>
+<p>为了解决”动态结构”的问题也有不少轻易能够想到的方法：</p>
+<ol>
+<li><strong>列模型</strong>：就是常说的”宽表”，为了应对表结构的改变，我们可以在设计表结构的时候，预留多一些空白字段，简单好理解，但是容易造成数据的”稀疏性”，同时长远看来宽表太宽存储性能很差，太窄会满足不了业务变化。</li>
+<li><strong>行模型</strong>：就是以key-value结构作为一行存储到表中，每增加一个字段就新增一行数据，兼顾灵活性，问题在于value定义类型只能是varchar，大小也需要做限制。</li>
+<li><strong>NoSQL</strong>：利用NoSQL基于document类型的特性，可以很方便地存储动态结构并且查询效率高，但问题在于业务改造成本大，同时需要ACID事务的场景支持度不够。</li>
+</ol>
+<p>还有一种模型，目前在诸如医疗数据库、犯罪数据库和大型电商类数据等有着广泛应用的成熟模型：<strong>EAV模型</strong>，也即是以”实体-属性-值”来组织数据。</p>
+<h3 id="eav模型">EAV模型</h3>
+<p>在开源和php社区，最著名的EAV实现是Magento，一个电子商务平台。EAV模型，就是把实体-属性-值（Entity-Attribute-Value）分开表进行存储。实体表存储对象的ID和主要属性，属性表存储需要扩展的属性，值表由不同类型的表组成一个集合，一个值需要由实体ID+属性ID来确定。</p>
+<p>为了方便查找某一个实体具备哪些属性，可以增加实体类型（type_id），基于实体的类型，可以通过查找eav_attribute来找到要设置产品的那一属性。当需要操作某一个实体的属性时，就可以先把实体拥有的属性先查出来，再对属性进行操作，设置属性值时，先判断属性的类型是什么，再找到对应类型的值表，然后更新改属性的值。</p>
+<p>虽然EAV模型能够解决以上三种模型的缺点，有着灵活性强，完美解决<strong>数据稀疏性</strong>，但是它也因为太过于复杂，有着明显的学习曲线，查询性能也相对低下，必须为其提升性能做大量的辅助工作。</p>
+<p>我的目标是寻找一种动态结构的数据的模型性能可与文档数据库相媲美，结构更简单比EAV更具可读性。那就是MySQL5.7以后支持的<strong>JSON类型</strong>，也就表字段类型为JSON，用于存储动态扩展字段。</p>
+<h3 id="json模型">JSON模型</h3>
+<p>JSON模型，比较MySQL5.7以前使用text类型来存文本JSON的方式，JSON模型兼顾了性能及易用性，在操作和性能上都得到很大的提升。JSON类型是以二进制方式存储的，要比字符串更加高效，再也不用json序列化近文本字段，查询之后还要解析，同时还要兼顾json的合法性。</p>
+<p>在MySQL 5.7.8中，MySQL支持由RFC 7159定义的本地JSON数据类型，它支持对JSON(JavaScript对象标记)文档中的数据进行有效访问. 有如下几个特性：</p>
+<ul>
+<li>MySQL会对DML JSON数据自动验证。无效的DML JSON数据操作会产生错误.</li>
+<li>优化的存储格式。存储在JSON列中的JSON文档转换为一种内部格式，允许对Json元素进行快速读取访问.</li>
+<li>MySQL Json类型支持建立索引增加查询性能提升.</li>
+</ul>
+<p>另外有还有一种我认为收益比较大的是：<strong>虚拟列 Virtual Column</strong></p>
+<p>在MySQL 5.7中，支持两种Generated Column，即Virtual Generated Column和Stored Generated Column，前者只将Generated Column保存在数据字典中（表的元数据），并不会将这一列数据持久化到磁盘上；后者会将Generated Column持久化到磁盘上，而不是每次读取的时候计算所得。很明显，后者存放了可以通过已有数据计算而得的数据，需要更多的磁盘空间，与Virtual Column相比并没有优势，因此，MySQL 5.7中，不指定Generated Column的类型，默认是Virtual Column。</p>
+<p>有了虚拟列，在select子句和where子句中，查询虚拟列与普通的列没有不同，查询用法上可以基本不需要变化。同时由于虚拟列的特性，只是与json中的属性key的一种映射关系，所以虚拟列的增删性能是非常好的。</p>
+<p>另外，在建立了虚拟列之后，可以继续对虚拟列建立索引，可以提升查询性能，有了索引，性能几乎跟普通没有区别。</p>
+<p>下面的第五节的<strong>模型操作对比</strong>中会给出一些JSON操作的实例，更多参考官方文档：https://dev.mysql.com/doc/refman/5.7/en/json.html</p>
+<p>下面给出列模型、行模型、EAV模型和JSON模型的优缺点及表结构对比：</p>
+<p><img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631206917512.png"
+    data-srcset="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631206917512.png, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631206917512.png 1.5x, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631206917512.png 2x"
+    data-sizes="auto"
+    alt="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631206917512.png"
+    title="youque" /></p>
+<p><strong>由于列模型、行模型和NoSQL都是比较容易理解和常见，所以下文重点只对EAV模型和JSON模型进行分析和对比</strong></p>
+<h2 id="三性能测试结果对比">三、性能测试结果对比</h2>
+<p>下面是两种模型参与性能测试的SQL，包括查询，更新和插入数据，可以对比观察一下不同模型SQL的复杂度：</p>
+<p><img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631216179938.png"
+    data-srcset="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631216179938.png, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631216179938.png 1.5x, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631216179938.png 2x"
+    data-sizes="auto"
+    alt="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631216179938.png"
+    title="sql" /></p>
+<p>下面为SQL在不同量级的数据量时，从查询、更新、插入、建立字段和索引等操作维度，对比了EAV模型、MySQL5.7的JSON模型 和 MySQL8.0的JSON模型 的性能，另外对比了磁盘空间占用和数据导入性能</p>
+<p><img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237540600.png"
+    data-srcset="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237540600.png, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237540600.png 1.5x, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237540600.png 2x"
+    data-sizes="auto"
+    alt="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237540600.png"
+    title="table" /></p>
+<p>图表展示，方便查看趋势</p>
+<p><img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631214527159.png"
+    data-srcset="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631214527159.png, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631214527159.png 1.5x, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631214527159.png 2x"
+    data-sizes="auto"
+    alt="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631214527159.png"
+    title="对比1" /></p>
+<p><img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237502264.png"
+    data-srcset="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237502264.png, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237502264.png 1.5x, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237502264.png 2x"
+    data-sizes="auto"
+    alt="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237502264.png"
+    title="索引" /></p>
+<p>结论：</p>
+<ol>
+<li>两种模型从操作的复杂度比较，EAV模型要复杂得多，查询不宜联查这么多的表，所以每次都必须分步骤，查询有哪些属性并拿到属性ID（当然可以利用缓存来优化），JSON模型只要有虚拟列，查询时与普通的方式没有却别，插入或更新时需要利用函数；</li>
+<li>从查询性能来看，JSON模型明显优于EAV模型。不过虽然这样，EAV只要做好适当的缓存优化，其实是可以满足一定的场景并被接受；</li>
+<li>无论在那个数量级下，JSON模型操作虚拟列时的消耗都是极快，而对于给虚拟列添加索引，性能会随着数据量级的增大而增加，毕竟需要建立索引树，也是正常操作了，与普通列的索引差不多；</li>
+<li>MySQL8.0对JSON类型也做了增强，对比MySQL5.7，在添加/删除索引的性能上，性能提升了接近一倍，虚拟列的操作性能在不同数据量级下，更加稳定；</li>
+</ol>
+<p>由于测试用例还是比较粗略，所以不一定100%精准，发现哪里有问题，欢迎指正。</p>
+<p><strong>对EAV模型和JSON模型的表结构和增删改查等操作感兴趣的，请看第五节”动态存储模型实际案例”</strong></p>
+<h2 id="四总结">四、总结</h2>
+<p>本篇为你介绍了动态结构的场景，并且列举了几个可行的存储模型：列模型（宽表），行模型，EAV模型和JSON模型，并且分析了各种模型的优缺点，通过实际的案例来对比分析了EAV模型和JSON模型，了解了这两种模型的实际操作的SQL语句，展示了不同的数据量级下的查询、插入和更新性能。</p>
+<p>经过一番对比，相信你已经面对”动态结构”的场景时候，已经有据可依了，希望对你有帮助。</p>
+<p>肝文章不易，点个赞再走。感谢！！</p>
+<h2 id="五附加动态存储模型实际案例">五、附加：动态存储模型实际案例</h2>
+<h3 id="1-eav模型entity-attribute-value-model">1. EAV模型（Entity-Attribute-Value Model）</h3>
+<p><img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208435800.png"
+    data-srcset="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208435800.png, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208435800.png 1.5x, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208435800.png 2x"
+    data-sizes="auto"
+    alt="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208435800.png"
+    title="eav" /></p>
+<h4 id="表结构">表结构</h4>
+<p>属性表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">eav_attribute</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="w">   </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="n">auto_increment</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">entity_type_id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;实体类型ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">attribute_code</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性Code&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">attribute_name</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">128</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性名称&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">attribute_type</span><span class="o">`</span><span class="w"> </span><span class="n">enum</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;int&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;text&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;decimal&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;datetime&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性类型&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_ENTITY_TYPE_ID</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">entity_type_id</span><span class="o">`</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_TYPE</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">attribute_type</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;eav属性表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>用户实体表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">user_entity</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">id</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">auto_increment</span><span class="w"> </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户实体ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">type_id</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;实体类型ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">username</span><span class="w">  </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户名&#39;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户实体表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>用户整型值表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">user_int</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="w">    </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;实体ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="w">        </span><span class="nb">int</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;整型值&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_VALUE</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;user整型值表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>用户字符串值表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">user_varchar</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="w">    </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;实体ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="w">        </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;字符值&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_VALUE</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;user字符值表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>用户文本值表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">user_text</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="w">    </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;实体ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="w">        </span><span class="nb">text</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;文本值&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;user文本值表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>用户浮点型值表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">user_decimal</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="w">    </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;实体ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="w">        </span><span class="nb">decimal</span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;浮点值&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_VALUE</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;user浮点值表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>用户日期型值表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">user_datetime</span><span class="o">`</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="w">    </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;实体ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;属性ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="w">        </span><span class="n">datetime</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;日期值&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">entity_id</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">attribute_id</span><span class="o">`</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_VALUE</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;user日期值表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="插入属性数据">插入属性数据</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="o">`</span><span class="n">eav_attribute</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">entity_type_id</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_code</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_name</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_type</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;姓名&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;年龄&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;gender&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;性别&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;phone&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;电话&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;mobile&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;移动电话&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;address&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;家庭住址&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;height&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;身高(cm)&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;decimal&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;weight&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;体重(kg)&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;decimal&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;profile&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;简介&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;text&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">       </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;birthday&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;出生年月&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;datetime&#39;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2-json模型">2. JSON模型</h3>
+<h4 id="表结构-1">表结构</h4>
+<p><img
+    class="lazyload"
+    src="/svg/loading.min.svg"
+    data-src="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208484836.png"
+    data-srcset="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208484836.png, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208484836.png 1.5x, http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208484836.png 2x"
+    data-sizes="auto"
+    alt="http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208484836.png"
+    title="doc" /></p>
+<p>用户表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="k">user</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="n">auto_increment</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">username</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;账号&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="p">(</span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户主表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>用户源数据表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">user_metadata</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="n">auto_increment</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户元数据&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">field_code</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;字段code&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">field_name</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;字段名&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">field_type</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;字段类型&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="p">(</span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_FIELD</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">field_name</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">field_type</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户元数据表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>用户扩展字段表</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">create</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="o">`</span><span class="n">user_extra_field</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="n">auto_increment</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;字段id&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">user_id</span><span class="o">`</span><span class="w"> </span><span class="nb">int</span><span class="w"> </span><span class="n">unsigned</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户ID&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="o">`</span><span class="n">properties</span><span class="o">`</span><span class="w"> </span><span class="n">json</span><span class="w"> </span><span class="k">default</span><span class="w"> </span><span class="k">null</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;扩展字段&#39;</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">primary</span><span class="w"> </span><span class="k">key</span><span class="p">(</span><span class="o">`</span><span class="n">id</span><span class="o">`</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_USER_ID</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">user_id</span><span class="o">`</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="n">engine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">innodb</span><span class="w"> </span><span class="n">charset</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">utf8mb4</span><span class="w"> </span><span class="k">comment</span><span class="w"> </span><span class="s1">&#39;用户扩展字段表&#39;</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="元数据">元数据</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="o">`</span><span class="n">user_metadata</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">field_code</span><span class="p">,</span><span class="w"> </span><span class="n">field_name</span><span class="p">,</span><span class="w"> </span><span class="n">field_type</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;姓名&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;年龄&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;int&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;gender&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;性别&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;phone&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;电话&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;mobile&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;移动电话&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;address&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;家庭住址&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;height&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;身高(cm)&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;decimal&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">8</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;weight&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;体重(kg)&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;decimal&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;profile&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;简介&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;text&#39;</span><span class="p">),</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="s1">&#39;birthday&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;出生年月&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;datetime&#39;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>说明：由于json类型里的数据类型也是只有字符串、数字、对象（JSON 对象）、数组、布尔和Null，所以使用元数据表把属性的具体类型存储起来，可以在必要时可以在代码层做类型转换逻辑。</p>
+<h2 id="模型操作对比">模型操作对比</h2>
+<h3 id="1-字段操作">1. 字段操作</h3>
+<h4 id="增加一个edu学历字段">增加一个”edu”学历字段</h4>
+<p><strong>EAV模型</strong></p>
+<p>只需要在属性表eav_attribute中增加一行即可</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="p">(</span><span class="n">entity_type_id</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_code</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_name</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_type</span><span class="p">)</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;edu&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;学历&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;varchar&#39;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>JSON</strong></p>
+<p>需要在元数据表user_metadata增加一行，并且增加<strong>虚拟列</strong>edu以及其索引</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">alter</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="o">`</span><span class="n">edu</span><span class="o">`</span><span class="w"> </span><span class="nb">varchar</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span><span class="w"> </span><span class="k">GENERATED</span><span class="w"> </span><span class="n">ALWAYS</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="p">(</span><span class="n">json_extract</span><span class="p">(</span><span class="o">`</span><span class="n">properties</span><span class="o">`</span><span class="p">,</span><span class="s1">&#39;$.edu&#39;</span><span class="p">))</span><span class="w"> </span><span class="n">VIRTUAL</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">alter</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="k">add</span><span class="w"> </span><span class="k">index</span><span class="w"> </span><span class="o">`</span><span class="n">IDX_EDU</span><span class="o">`</span><span class="w"> </span><span class="p">(</span><span class="o">`</span><span class="n">edu</span><span class="o">`</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="删除mobile字段">删除mobile字段</h4>
+<p><strong>EAV模型</strong></p>
+<p>需要三步：</p>
+<ol>
+<li>查询mobile属性</li>
+<li>删除属性记录</li>
+<li>删除属性值</li>
+</ol>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- step1: 查询属性信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">entity_type_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step2: 删除字段
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">delete</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step3: 删除值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">delete</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_varchar</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">5</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>JSON模型</strong></p>
+<p>利用json_remove()方法，可以直接删除json字段对应的属性</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- step1: 删除字段
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">delete</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_metadata</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">field_code</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;mobile&#39;</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step2: 删除值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">update</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json_remove</span><span class="p">(</span><span class="n">properties</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;$.mobile&#39;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step3: 删除虚拟列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">alter</span><span class="w"> </span><span class="k">table</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="k">drop</span><span class="w"> </span><span class="k">column</span><span class="w"> </span><span class="o">`</span><span class="n">mobile</span><span class="o">`</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意，第2、3步可以根据业务自身考虑是否有必要，为了节省空间，那些确定不再使用的属性字段可以考虑删除，缩小json体积。</p>
+<h3 id="2-查询操作">2. 查询操作</h3>
+<h4 id="查询身高高于170cm年满18岁的男性用户">查询身高高于170cm，年满18岁的男性用户</h4>
+<p><strong>EAV模型</strong></p>
+<p>需要分三步进行查询，每一步的结果传递需要代码逻辑层实现，此处直接贴出所有的查询SQL</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- step1: 查询所有属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">entity_type_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step2: 根据条件过滤出用户ID
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="n">i</span><span class="p">.</span><span class="n">entity_id</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="n">user_int</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">i</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">join</span><span class="w"> </span><span class="n">user_varchar</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">v</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">i</span><span class="p">.</span><span class="n">entity_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">entity_id</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;男&#39;</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">join</span><span class="w"> </span><span class="n">user_decimal</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">d</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">v</span><span class="p">.</span><span class="n">entity_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">entity_id</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">170</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">d</span><span class="p">.</span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">where</span><span class="w"> </span><span class="n">i</span><span class="p">.</span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">i</span><span class="p">.</span><span class="n">value</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">18</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step3: 根据用户ID与属性，查询满足条件的实体信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">attribute_code</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_int</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span><span class="w"> </span><span class="k">union</span><span class="w"> </span><span class="k">all</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_varchar</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span><span class="w"> </span><span class="k">union</span><span class="w"> </span><span class="k">all</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_datetime</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span><span class="w"> </span><span class="k">union</span><span class="w"> </span><span class="k">all</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_decimal</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">7</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">13</span><span class="p">,</span><span class="mi">17</span><span class="p">,</span><span class="mi">18</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：查出来的结果，还需要进行key-value的转换</p>
+<p><strong>JSON模型</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">json_unquote</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s1">&#39;$.name&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">json_unquote</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s1">&#39;$.gender&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">gender</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">f</span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s1">&#39;$.height&#39;</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">height</span><span class="p">,</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="n">json_unquote</span><span class="p">(</span><span class="n">f</span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s1">&#39;$.birthday&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">birthday</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">u</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">join</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">f</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">on</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">user_id</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s1">&#39;$.age&#39;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">18</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s1">&#39;$.height&#39;</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">170</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">and</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="s1">&#39;$.gender&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;男&#39;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在建立了虚拟列的前提下，查询与传统的方式没有区别</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="n">f</span><span class="p">.</span><span class="n">name</span><span class="p">,</span><span class="n">f</span><span class="p">.</span><span class="n">gender</span><span class="p">,</span><span class="n">f</span><span class="p">.</span><span class="n">height</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">birthday</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">from</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">u</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">join</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">age</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">18</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">height</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">170</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">gender</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;男&#39;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="查询用户详情查询用户id为3的用户信息">查询用户详情：查询用户ID为3的用户信息</h4>
+<p><strong>EAV模型</strong> 需要分两步：1. 查询所有的属性，2.根据属性ID和用户ID，查询属性值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- step1: 查询所有属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">entity_type_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step2: 根据属性及id，查询id为3的用户信息
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">attribute_code</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_int</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">union</span><span class="w"> </span><span class="k">all</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_varchar</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">union</span><span class="w"> </span><span class="k">all</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_decimal</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="p">(</span><span class="mi">7</span><span class="p">,</span><span class="w"> </span><span class="mi">8</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">union</span><span class="w"> </span><span class="k">all</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_text</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">9</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">union</span><span class="w"> </span><span class="k">all</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">select</span><span class="w"> </span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="o">`</span><span class="n">value</span><span class="o">`</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">user_datetime</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">)</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">a</span><span class="p">.</span><span class="n">id</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>JSON模型</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">select</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">properties</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">u</span><span class="w"> </span><span class="k">join</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="n">f</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">f</span><span class="p">.</span><span class="n">user_id</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">u</span><span class="p">.</span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3-插入数据">3. 插入数据</h3>
+<h4 id="新增一条数据">新增一条数据</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">name</span><span class="p">,</span><span class="w"> </span><span class="n">age</span><span class="p">,</span><span class="w"> </span><span class="n">gender</span><span class="p">,</span><span class="w"> </span><span class="n">phone</span><span class="p">,</span><span class="w"> </span><span class="n">address</span><span class="p">,</span><span class="w"> </span><span class="n">profile</span><span class="p">,</span><span class="w"> </span><span class="n">birthday</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;jayzone&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;张三&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">22</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;男&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;13722211133&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;广东省深圳市宝安区西乡街道华泰大厦101&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;我很好，你呢？&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;1994-01-11&#39;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>EAV模型</strong> 分两步操作: 1.查询所有属性，2.根据属性ID和值，插入到对应的表中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- step1: 查询所有属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">entity_type_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step2: 把值插入到对应的表
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">user_entity</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">,</span><span class="w"> </span><span class="n">type_id</span><span class="p">)</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;jayzone&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">user_int</span><span class="w"> </span><span class="p">(</span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w"> </span><span class="mi">22</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">user_varchar</span><span class="w"> </span><span class="p">(</span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;张三&#39;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;男&#39;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;13722211133&#39;</span><span class="p">),</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;广东省深圳市宝安区西乡街道华泰大厦101&#39;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">user_text</span><span class="w"> </span><span class="p">(</span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;我很好，你呢？&#39;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">user_datetime</span><span class="w"> </span><span class="p">(</span><span class="n">entity_id</span><span class="p">,</span><span class="w"> </span><span class="n">attribute_id</span><span class="p">,</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;1994-01-11 00:00:00&#39;</span><span class="p">);</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>JSON模型</strong> 需要使用**json_object()**方法构建json对象，在存入JSON字段中</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="k">user</span><span class="w"> </span><span class="p">(</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">username</span><span class="p">)</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;jayzone&#39;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">insert</span><span class="w"> </span><span class="k">into</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span><span class="w"> </span><span class="n">properties</span><span class="p">)</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">values</span><span class="w"> </span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="w"> </span><span class="n">json_object</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;张三&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;age&#39;</span><span class="p">,</span><span class="w"> </span><span class="mi">22</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;gender&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;男&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;phone&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;13722211133&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;address&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;广东省深圳市宝安区西乡街道华泰大厦101&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;profile&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;我很好,你呢？&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;birthday&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;1994-01-11&#39;</span><span class="p">));</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="4-更新数据">4. 更新数据</h3>
+<h4 id="新增一个字段-并且更新用户id3的用户学历为本科">新增一个字段, 并且更新用户ID=3的用户学历为本科</h4>
+<p><strong>EAV模型</strong> 需要在eav_attribute表中增加一行记录，然后更新对应的值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="c1">-- step1: 查询属性
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">select</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">from</span><span class="w"> </span><span class="n">eav_attribute</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">entity_type_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="c1">-- step2: 更新对应属性的值
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="k">update</span><span class="w"> </span><span class="n">user_varchar</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="n">value</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;本科&#39;</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">entity_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="n">attribute_id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">11</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>JSON模型</strong> 利用json_insert/json_set方法更新对应字段的值</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-sql" data-lang="sql"><span class="line"><span class="cl"><span class="k">update</span><span class="w"> </span><span class="n">user_extra_field</span><span class="w"> </span><span class="k">set</span><span class="w"> </span><span class="n">properties</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">json_set</span><span class="p">(</span><span class="n">properties</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;$.phone&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;15016716555&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">where</span><span class="w"> </span><span class="n">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div></div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title=2022-05-17&#32;11:00:00>更新于 2022-05-17</span>
+      </div>
+      <div class="post-info-license "><span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div>
+    </div>
+    <div class="post-info-line">
+      <div class="post-info-md"><span><a
+  href="/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/index.md"
+  
+    title="阅读原始文档"
+  
+  
+  
+  
+    class="link-to-markdown"
+  
+  
+>阅读原始文档</a></span></div>
+      <div class="post-info-share">
+        <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」" data-hashtags="MySQL,JSON"><i class="fa-brands fa-twitter fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-hashtag="MySQL"><i class="fa-brands fa-facebook-square fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」" data-web><i class="fa-brands fa-whatsapp fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」"><i class="fa-brands fa-weibo fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Myspace" data-sharer="myspace" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a>
+  <a href="javascript:void(0);" title="分享到 Blogger" data-sharer="blogger" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」" data-description=""><i class="fa-brands fa-blogger fa-fw"></i></a>
+  <a href="javascript:void(0);" title="分享到 Evernote" data-sharer="evernote" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」"><i class="fa-brands fa-evernote fa-fw"></i></a>
+  </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw"></i>&nbsp;<a href="/tags/mysql/">MySQL</a>,&nbsp;<a href="/tags/json/">JSON</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div>
+
+  <div class="post-nav"><a href="/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/" class="prev" rel="prev" title="K8Sv1.24.0 containerd 安装教程"><i class="fa-solid fa-angle-left fa-fw"></i>K8Sv1.24.0 containerd 安装教程</a>
+      <a href="/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/" class="next" rel="next" title="K8S学习笔记">K8S学习笔记<i class="fa-solid fa-angle-right fa-fw"></i></a></div>
+</div>
+<div id="comments"><div id="disqus_thread" class="comment"></div><noscript>
+        Please enable JavaScript to view the comments powered by <a href="https://disqus.com/?ref_noscript" rel="external nofollow noopener noreferrer">Disqus</a>.
+      </noscript></div></article></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.101.0">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external nofollow noopener noreferrer" title="FixIt v0.2.15"><img class="fixit-icon" src="/images/fixit.svg" alt="FixIt logo" />&nbsp;FixIt</a>
+        </div><div class="footer-line copyright"><i class="fa-regular fa-copyright fa-fw"></i>
+            <span itemprop="copyrightYear">2019 - 2022</span><span class="author" itemprop="copyrightHolder">
+              <a
+  href="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>RoninZc</a></span><span class="license footer-divider"><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div><div class="footer-line statistics"><span class="site-time" title='网站运行中 ...'><i class="fa-solid fa-heartbeat fa-fw animate-icon"></i>&nbsp;<span class="run-times">网站运行中 ...</span></span></div><div class="footer-line ibruce">
+          <span id="busuanzi_container_site_uv" title='总访客数'><i class="fa-regular fa-user fa-fw"></i>&nbsp;<span id="busuanzi_value_site_uv"><i class="fa fa-spinner fa-spin fa-fw"></i></span></span><span id="busuanzi_container_site_pv" class="footer-divider" title='总访问量'><i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_site_pv"><i class="fa fa-spinner fa-spin fa-fw"></i></span></span>
+        </div><div class="footer-line beian"><span class="icp footer-divider"><a href="https://beian.miit.gov.cn/">赣ICP备18014838号</a></span></div></div>
+  </footer></div><div class="widgets">
+  <div id="fixed-buttons"><a href="#" id="back-to-top" class="fixed-button" title="回到顶部">
+      <i class="fa-solid fa-arrow-up fa-fw"></i>
+    </a><a href="#" id="view-comments" class="fixed-button" title="查看评论">
+      <i class="fa-solid fa-comment fa-fw"></i>
+    </a>
+  </div><a
+  href="https://github.com/RoninZc/blog"
+  
+    title="在 GitHub 上查看源代码"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+    class="github-corner right d-none-mobile"
+  
+  
+><svg viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><div id="mask"></div>
+</div>
+  
+  
+  
+  <link rel="stylesheet" href="/lib/katex/katex.min.css"><link rel="stylesheet" href="/lib/katex/copy-tex.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="https://ronin-zc.disqus.com/embed.js" defer></script><script type="text/javascript" src="/lib/autocomplete/autocomplete.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.stemmer.support.min.js" defer></script><script type="text/javascript" src="/lib/lunr/lunr.zh.min.js" defer></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js" async defer></script><script type="text/javascript" src="/lib/sharer/sharer.min.js" async defer></script><script type="text/javascript" src="/lib/typeit/typeit.min.js" defer></script><script type="text/javascript" src="/lib/katex/katex.min.js" defer></script><script type="text/javascript" src="/lib/katex/auto-render.min.js" defer></script><script type="text/javascript" src="/lib/katex/copy-tex.min.js" defer></script><script type="text/javascript" src="/lib/katex/mhchem.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/lib/pangu/pangu.min.js" defer></script><script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async defer></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"data":{"typeit-header-desktop":" RoninZc","typeit-header-subtitle-desktop":"摸鱼","typeit-header-subtitle-mobile":"摸鱼","typeit-header-title-mobile":" RoninZc"},"enablePWA":true,"enablePangu":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"search":{"highlightTag":"em","lunrIndexURL":"/index.json","lunrLanguageCode":"zh","lunrSegmentitURL":"/lib/lunr/lunr.segmentit.js","maxResultLength":10,"noResultsFound":"没有找到结果","snippetLength":50,"type":"lunr"},"siteTime":"2021-11-01T00:00:00+08:00","typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"typeit-header-desktop":["typeit-header-desktop"],"typeit-header-subtitle-desktop":["typeit-header-subtitle-desktop"],"typeit-header-subtitle-mobile":["typeit-header-subtitle-mobile"],"typeit-header-title-mobile":["typeit-header-title-mobile"]},"duration":-1,"speed":100}};</script><script type="text/javascript" src="/js/theme.min.js" defer></script><script type="text/javascript" src="/js/_custom.min.js" defer></script></body>
+</html>

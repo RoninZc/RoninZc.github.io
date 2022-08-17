@@ -1,0 +1,748 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>LeetCode - 标签 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</title>
+    <link>https://ronin-zc.com/tags/leetcode/</link>
+    <description>LeetCode - 标签 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</description>
+    <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Fri, 05 Mar 2021 14:58:29 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/leetcode/" rel="self" type="application/rss+xml" /><item>
+  <title>LeetCode 232:用栈实现队列</title>
+  <link>https://ronin-zc.com/leetcode-232%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</link>
+  <pubDate>Fri, 05 Mar 2021 14:58:29 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/leetcode-232%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</guid>
+  <description><![CDATA[<h3 id="题目">题目</h3>
+<p>请你仅使用两个栈实现先入先出队列。队列应当支持一般队列的支持的所有操作（push、pop、peek、empty）：</p>
+<p>实现 MyQueue 类：</p>
+<ul>
+<li>void push(int x) 将元素 x 推到队列的末尾</li>
+<li>int pop() 从队列的开头移除并返回元素</li>
+<li>int peek() 返回队列开头的元素</li>
+<li>boolean empty() 如果队列为空，返回 true ；否则，返回 false</li>
+</ul>
+<p>说明：</p>
+<ul>
+<li>你只能使用标准的栈操作 —— 也就是只有 push to top, peek/pop from top, size, 和 is empty 操作是合法的。</li>
+<li>你所使用的语言也许不支持栈。你可以使用 list 或者 deque（双端队列）来模拟一个栈，只要是标准的栈操作即可。</li>
+</ul>
+<p>进阶：</p>
+<ul>
+<li>你能否实现每个操作均摊时间复杂度为 O(1) 的队列？换句话说，执行 n 个操作的总时间复杂度为 O(n) ，即使其中一个操作可能花费较长时间。</li>
+</ul>
+<p>示例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">输入：
+</span></span><span class="line"><span class="cl">[&#34;MyQueue&#34;, &#34;push&#34;, &#34;push&#34;, &#34;peek&#34;, &#34;pop&#34;, &#34;empty&#34;]
+</span></span><span class="line"><span class="cl">[[], [1], [2], [], [], []]
+</span></span><span class="line"><span class="cl">输出：
+</span></span><span class="line"><span class="cl">[null, null, null, 1, 1, false]
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>解释：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">MyQueue myQueue = new MyQueue();
+</span></span><span class="line"><span class="cl">myQueue.push(1); // queue is: [1]
+</span></span><span class="line"><span class="cl">myQueue.push(2); // queue is: [1, 2] (leftmost is front of the queue)
+</span></span><span class="line"><span class="cl">myQueue.peek(); // return 1
+</span></span><span class="line"><span class="cl">myQueue.pop(); // return 1, queue is [2]
+</span></span><span class="line"><span class="cl">myQueue.empty(); // return false
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>提示：</p>
+<p>1 &lt;= x &lt;= 9
+最多调用 100 次 push、pop、peek 和 empty
+假设所有操作都是有效的 （例如，一个空的队列不会调用 pop 或者 peek 操作）</p>
+<blockquote>
+<p>来源：力扣（LeetCode）
+链接：https://leetcode-cn.com/problems/implement-queue-using-stacks
+著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</p>
+</blockquote>
+<h3 id="思路">思路</h3>
+<p>这题比较简单，主要是实现队列的基本功能，即先进先出。而我们知道栈是先进后出的，这就需要我们额外的操作了。</p>
+<p>题目提示的比较明显，使用两个栈来实现。我们可以做出如下模型：</p>
+<ul>
+<li>两个栈分别为输入栈和输出栈</li>
+<li>输入栈负责接收 push 的内容</li>
+<li>输出栈负责 pop 和 peek 的内容</li>
+<li>当执行 pop 或者 peek 时，当输出栈为空时，将输入栈的内容输出到输入栈中</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">in : []
+</span></span><span class="line"><span class="cl">out: []
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">--push(1) 
+</span></span><span class="line"><span class="cl">in : [1]
+</span></span><span class="line"><span class="cl">out: []
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">--push(2)
+</span></span><span class="line"><span class="cl">in : [2,1]
+</span></span><span class="line"><span class="cl">out: []
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">--peek
+</span></span><span class="line"><span class="cl">in : []
+</span></span><span class="line"><span class="cl">out: [1,2]
+</span></span><span class="line"><span class="cl">peek = 1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">--pop
+</span></span><span class="line"><span class="cl">in : []
+</span></span><span class="line"><span class="cl">out: [2]
+</span></span><span class="line"><span class="cl">pop = 1
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">--isEmpty
+</span></span><span class="line"><span class="cl">isEmpty(in) &amp;&amp; isEmpty(out)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="代码">代码</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span><span class="lnt">53
+</span><span class="lnt">54
+</span><span class="lnt">55
+</span><span class="lnt">56
+</span><span class="lnt">57
+</span><span class="lnt">58
+</span><span class="lnt">59
+</span><span class="lnt">60
+</span><span class="lnt">61
+</span><span class="lnt">62
+</span><span class="lnt">63
+</span><span class="lnt">64
+</span><span class="lnt">65
+</span><span class="lnt">66
+</span><span class="lnt">67
+</span><span class="lnt">68
+</span><span class="lnt">69
+</span><span class="lnt">70
+</span><span class="lnt">71
+</span><span class="lnt">72
+</span><span class="lnt">73
+</span><span class="lnt">74
+</span><span class="lnt">75
+</span><span class="lnt">76
+</span><span class="lnt">77
+</span><span class="lnt">78
+</span><span class="lnt">79
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// MyQueue 队列
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">MyQueue</span> <span class="kd">struct</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">in</span>  <span class="nx">Stack</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">out</span> <span class="nx">Stack</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Constructor MyQueue构造方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">()</span> <span class="nx">MyQueue</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">in</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">Stack</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">out</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">Stack</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">MyQueue</span><span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">in</span><span class="p">:</span>  <span class="o">*</span><span class="nx">in</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">out</span><span class="p">:</span> <span class="o">*</span><span class="nx">out</span><span class="p">,</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">in2out</span><span class="p">()</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">mq</span><span class="p">.</span><span class="nx">in</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">mq</span><span class="p">.</span><span class="nx">in</span><span class="p">.</span><span class="nf">Pop</span><span class="p">())</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Push Push
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">Push</span><span class="p">(</span><span class="nx">x</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">mq</span><span class="p">.</span><span class="nx">in</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Pop Pop
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">Pop</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">mq</span><span class="p">.</span><span class="nf">in2out</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Pop</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Peek Peek
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">Peek</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">mq</span><span class="p">.</span><span class="nf">in2out</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Top</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Empty Empty
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">Empty</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">in</span><span class="p">.</span><span class="nf">IsEmpty</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">IsEmpty</span><span class="p">()</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// -------------------------------------------------------
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// Stack 栈
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Stack</span> <span class="p">[]</span><span class="kt">int</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Len 获取栈的长度
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">Len</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Push push
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">Push</span><span class="p">(</span><span class="nx">value</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Top 获取栈的第一个
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">Top</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)[</span><span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// Pop 弹出最后一个
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">Pop</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">value</span> <span class="o">:=</span> <span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)[</span><span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="nx">stack</span> <span class="p">=</span> <span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)[:</span><span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">value</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// IsEmpty 判断是否为空
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">IsEmpty</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div>]]></description>
+</item><item>
+  <title>LeetCode 354:俄罗斯信封套娃问题</title>
+  <link>https://ronin-zc.com/leetcode-354%E4%BF%84%E7%BD%97%E6%96%AF%E5%A5%97%E5%A8%83%E4%BF%A1%E5%B0%81%E9%97%AE%E9%A2%98/</link>
+  <pubDate>Fri, 05 Mar 2021 09:26:34 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/leetcode-354%E4%BF%84%E7%BD%97%E6%96%AF%E5%A5%97%E5%A8%83%E4%BF%A1%E5%B0%81%E9%97%AE%E9%A2%98/</guid>
+  <description><![CDATA[<h3 id="题目">题目</h3>
+<p>给定一些标记了宽度和高度的信封，宽度和高度以整数对形式 (w, h) 出现。当另一个信封的宽度和高度都比这个信封大的时候，这个信封就可以放进另一个信封里，如同俄罗斯套娃一样。</p>
+<p>请计算最多能有多少个信封能组成一组“俄罗斯套娃”信封（即可以把一个信封放到另一个信封里面）。</p>
+<p>说明:
+不允许旋转信封。</p>
+<p>示例:</p>
+<blockquote>
+<p>输入: envelopes = [[5,4],[6,4],[6,7],[2,3]]
+输出: 3
+解释: 最多信封的个数为 3, 组合为: [2,3] =&gt; [5,4] =&gt; [6,7]。</p>
+</blockquote>
+<h3 id="思路">思路</h3>
+<blockquote>
+<p>来源：<a
+  href="https://labuladong.gitbook.io/algo/"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>labuladong</a></p>
+</blockquote>
+<p>这道题目其实是最长递增子序列 (Longes Increasing Subsequence, 简写为 LIS) 的一个变种，因为很显然，每次合法的嵌套都是大的套小的，相当于找一个最长递增的子序列，其长度就是最多能嵌套的信封个数。</p>
+<p>但是难点在于，标准的LIS算法只能在数组中寻找最长子序列，而我们的信封是由<code>[w, h]</code>这样的二维数对形式表示的，如何把LIS算法运用过来呢？</p>
+<p><code>w * h</code>计算面积的形式是行不通的，<code>1 * 10</code> 大于 <code>3 * 3</code>，但是明显这样的两个信封是无法相互嵌套的。</p>
+<h3 id="解法">解法</h3>
+<p>这道题的解法是比较巧妙的：</p>
+<p>先对宽度 w 进行升序排列，如果遇到 w 相同的情况，则按照高度 h 降序排列。之后把所有的 h 取出，填入一个数组，在这个数组上计算 LIS 的长度就是我们的答案。</p>
+<p>示例：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">|  宽度w   高度h
+</span></span><span class="line"><span class="cl">|  [ 1  ,  8 ] 
+</span></span><span class="line"><span class="cl">|  [ 2  ,  3 ]
+</span></span><span class="line"><span class="cl">|  [ 5  ,  4 ]|降
+</span></span><span class="line"><span class="cl">|  [ 5  ,  2 ]|序
+</span></span><span class="line"><span class="cl">|  [ 6  ,  7 ]|降
+</span></span><span class="line"><span class="cl">|  [ 6  ,  4 ]|序
+</span></span><span class="line"><span class="cl">升
+</span></span><span class="line"><span class="cl">序  
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>很明显，高度 h 组成的数组中 <code>3 -&gt; 4 -&gt; 7 </code>，就是我们要找的LIS，其最大长度为3</p>
+<p>这个解法的关键在于，对于宽度 w 相同的数对，要对其高度 h 进行降序排序。因为两个宽度相同的信封不能相互包含的，逆序排序保证 w 相同的数对中最多只选取一个。</p>
+<h3 id="代码">代码</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">maxEnvelopes</span><span class="p">(</span><span class="nx">envelopes</span> <span class="p">[][]</span><span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">count</span> <span class="o">:=</span> <span class="nb">len</span><span class="p">(</span><span class="nx">envelopes</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// 快速排序
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">sort</span><span class="p">.</span><span class="nf">Slice</span><span class="p">(</span><span class="nx">envelopes</span><span class="p">,</span> <span class="kd">func</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">j</span> <span class="kt">int</span><span class="p">)</span> <span class="kt">bool</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">envelopes</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="nx">envelopes</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="k">return</span> <span class="nx">envelopes</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="p">&gt;</span> <span class="nx">envelopes</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">return</span> <span class="nx">envelopes</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="p">&lt;</span> <span class="nx">envelopes</span><span class="p">[</span><span class="nx">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="p">})</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// 取出h
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="nx">height</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">count</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">count</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">height</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">envelopes</span><span class="p">[</span><span class="nx">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="c1">// 计算LIS
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">return</span> <span class="nf">lengthOfLIS</span><span class="p">(</span><span class="nx">height</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1">// LIS 计算
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">lengthOfLIS</span><span class="p">(</span><span class="nx">nums</span> <span class="p">[]</span><span class="kt">int</span><span class="p">)</span> <span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">piles</span><span class="p">,</span> <span class="nx">count</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="nx">nums</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">top</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">count</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="p">&lt;</span> <span class="nx">count</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">num</span> <span class="o">:=</span> <span class="nx">nums</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">left</span><span class="p">,</span> <span class="nx">right</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">,</span> <span class="nx">piles</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">		<span class="k">for</span> <span class="nx">left</span> <span class="p">&lt;</span> <span class="nx">right</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">mid</span> <span class="o">:=</span> <span class="p">(</span><span class="nx">left</span> <span class="o">+</span> <span class="nx">right</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+</span></span><span class="line"><span class="cl">			<span class="k">if</span> <span class="nx">top</span><span class="p">[</span><span class="nx">mid</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="nx">num</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="nx">right</span> <span class="p">=</span> <span class="nx">mid</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">				<span class="nx">left</span> <span class="p">=</span> <span class="nx">mid</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">			<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="k">if</span> <span class="nx">left</span> <span class="o">==</span> <span class="nx">piles</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">piles</span><span class="o">++</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">top</span><span class="p">[</span><span class="nx">left</span><span class="p">]</span> <span class="p">=</span> <span class="nx">num</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">piles</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="wiki">wiki</h3>
+<blockquote>
+<p><a
+  href="https://leetcode-cn.com/problems/russian-doll-envelopes/solution/zui-chang-di-zeng-zi-xu-lie-kuo-zhan-dao-er-wei-er/"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>最长递增子序列扩展到二维而已</a></p>
+<p><a
+  href="https://leetcode-cn.com/problems/russian-doll-envelopes/solution/zui-chang-di-zeng-zi-xu-lie-kuo-zhan-dao-er-wei-er/"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>动态规划设计方法&amp;&amp;纸牌游戏讲解二分解法</a></p>
+</blockquote>
+]]></description>
+</item><item>
+  <title>LeetCode 338:比特位计数</title>
+  <link>https://ronin-zc.com/leetcode-338%E6%AF%94%E7%89%B9%E4%BD%8D%E8%AE%A1%E6%95%B0/</link>
+  <pubDate>Wed, 03 Mar 2021 16:36:09 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/leetcode-338%E6%AF%94%E7%89%B9%E4%BD%8D%E8%AE%A1%E6%95%B0/</guid>
+  <description><![CDATA[<h3 id="题目">题目</h3>
+<p>给定一个非负整数 <strong>num</strong>。对于 <strong>0 ≤ i ≤ num</strong> 范围中的每个数字 <strong>i</strong> ，计算其二进制数中的 1 的数目并将它们作为数组返回</p>
+<p>示例1:</p>
+<blockquote>
+<p>输入: 2
+输出: [0, 1, 1]</p>
+</blockquote>
+<p>示例2:</p>
+<blockquote>
+<p>输入: 5
+输出: [0, 1, 1, 2, 1, 2]</p>
+</blockquote>
+<p>进阶:</p>
+<ul>
+<li>给出时间复杂度为 O(n * sizeof(integer)) 的解答非常容易. 但你可以在线性时间 O(n) 内用一趟扫描做到吗?</li>
+<li>要求算法的空间复杂度为 O(n)</li>
+<li>你能进一步完善解法吗？要求在C++或任何其他语言中不使用任何内置函数（如 C++ 中的 <strong>__builtin_popcount</strong>）来执行此操作</li>
+</ul>
+<h3 id="开始的思路">开始的思路</h3>
+<p>先不考虑进阶, 使用语言自带的函数进行解答，Golang中可以使用<code>bits.OnesCount()</code>函数来计算</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">countBits</span><span class="p">(</span><span class="nx">num</span> <span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">nums</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">num</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">num</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">nums</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">bits</span><span class="p">.</span><span class="nf">OnesCount</span><span class="p">(</span><span class="nb">uint</span><span class="p">(</span><span class="nx">i</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">nums</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>这种解答十分简单，我们来尝试一下手写一个 OneCount()</p>
+<p>leetcode 官方解答内提到有一个位运算的小技巧</p>
+<blockquote>
+<p>对于任意整数x, 令 x = x &amp; (x - 1) , 该运算将 x 的二进制表示的最后一个1变成0. 因此, 对x重复该操作, 直到x变成0, 则操作次数即为x的「一比特数」</p>
+</blockquote>
+<p>我们来实际操作一下试试</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 8的二进制为 1000
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 7的二进制为 0111
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 我们进行 &amp; 操作
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="mi">1000</span> <span class="o">&amp;</span> <span class="mo">0111</span> <span class="p">=</span> <span class="mo">0000</span> 
+</span></span><span class="line"><span class="cl"><span class="c1">// x 变成了 0 , 8的二进制数为1, 这符合我们的答案
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 让我们再来一个
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 6的二进制为 0110
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 5的二进制为 0101
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 4的二进制为 0100
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 3的二进制为 0011
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="mo">0111</span> <span class="o">&amp;</span> <span class="mo">0110</span> <span class="p">=</span> <span class="mo">0110</span> <span class="c1">// ones + 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="mo">0110</span> <span class="o">&amp;</span> <span class="mo">0101</span> <span class="p">=</span> <span class="mo">0100</span> <span class="c1">// ones + 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="mo">0101</span> <span class="o">&amp;</span> <span class="mo">0100</span> <span class="p">=</span> <span class="mo">0100</span> <span class="c1">// ones + 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="mo">0100</span> <span class="o">&amp;</span> <span class="mo">0011</span> <span class="p">=</span> <span class="mo">0000</span> <span class="c1">// ones = 3 
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 对此我只能发出咸鱼的声音，妙啊
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>对此技巧，我们可以写出:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">onesCount</span><span class="p">(</span><span class="nx">x</span> <span class="kt">int</span><span class="p">)</span> <span class="p">(</span><span class="nx">ones</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="p">;</span> <span class="nx">x</span> <span class="p">&gt;</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">x</span> <span class="o">&amp;=</span> <span class="nx">x</span> <span class="o">-</span> <span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="nx">ones</span><span class="o">++</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>但是这依然不满足进阶解答的需求，所以我们继续</p>
+<h3 id="进阶">进阶</h3>
+<p>要给出时间复杂度为 O(n) 的解法, 代表我们不能使用系统的内置函数, 且不能进入循环. 我们必须进行逻辑梳理</p>
+<p>官方给出的解答: 动态规划&ndash;最高有效位 有些晦涩难懂</p>
+<blockquote>
+<p>需要对每个数遍历其二进制表示的每一位。可以换一个思路，当计算 i 的「一比特数」时，如果存在 0 ≤ j &lt; i，j 的「一比特数」已知，且 i 和 j 相比，i 的二进制表示只多了一个 1，则可以快速得到 i 的「一比特数」。</p>
+<p>令 bits[i] 表示 i 的「一比特数」，则上述关系可以表示成：bits[i] = bits[j] + 1。</p>
+<p>对于正整数 x，如果可以知道最大的正整数 y，使得 y ≤ x 且 y 是 2 的整数次幂，则 y 的二进制表示中只有最高位是 1，其余都是 0，此时称 y 为 x 的「最高有效位」。令 z = x − y，显然 0 ≤ z &lt; x，则 bits[x] = bits[z] + 1。</p>
+<p>为了判断一个正整数是不是 2 的整数次幂，可以利用方法一中提到的按位与运算的性质。如果正整数 y 是 2 的整数次幂，则 y 的二进制表示中只有最高位是 1，其余都是 0，因此 y &amp; ( y − 1 ) = 0。由此可见，正整数 y 是 2 的整数次幂，当且仅当 y &amp; ( y − 1 ) = 0。</p>
+<p>显然，0 的「一比特数」为 0。使用 highBit 表示当前的最高有效位，遍历从 1 到 num 的每个正整数 i，进行如下操作。</p>
+<p>如果 i&amp;(i−1)=0，则令 highBit = i，更新当前的最高有效位。</p>
+<p>i 比 i−highBit 的「一比特数」多 1，由于是从小到大遍历每个数，因此遍历到 i 时，i−highBit 的「一比特数」已知，令 bits[i] = bits[i−highBit] + 1。</p>
+<p>最终得到的数组 bits 即为答案。</p>
+<p>作者：LeetCode-Solution
+链接：https://leetcode-cn.com/problems/counting-bits/solution/bi-te-wei-ji-shu-by-leetcode-solution-0t1i/
+来源：力扣（LeetCode）
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。</p>
+</blockquote>
+<p>我这尝试做出自己的解释：</p>
+<ul>
+<li>当一个数是 2 的整数次幂时, 它的二进制中1的数量只会是1</li>
+<li>当一个数不是2的整数次幂时，它的二进制中1的数量为 <em><strong>(它 与 它上次为2的整数次幂的数的差值)的「一比特数」+ 1</strong></em></li>
+</ul>
+<p>我们可以来实际试试:</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// 8的二进制为 1000 它是2的整数次幂 所以它的二进制中1的数量只会是1
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 那 9 呢？根据上面的总结 它的上次2的整数次幂的数为 8,9-8=1(0001) 的「一比特数」为1
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 9 的二进制位是 1001 ,「一比特数」为 2, 完美
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 那 10 呢？它的上次2的整数次幂的数依然为 8, 10-8=2(0010) 的「一比特数」为1
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 10 的二进制位为 1010, 「一比特数」为 2
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 继续 11 二进制为 1011, 11-8=3 , 3(0011)的「一比特数」为2 
+</span></span></span><span class="line"><span class="cl"><span class="c1">// 对此我只能发出咸鱼的声音，妙啊
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
+</span></span><span class="line"><span class="cl"><span class="c1">// 所以我们能写出下面的方法
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">countBits</span><span class="p">(</span><span class="nx">num</span> <span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">bits</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">num</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">highBit</span> <span class="o">:=</span> <span class="mi">0</span> <span class="c1">// 最高比特位 即 上次为2的整数次幂的数
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1">// 0的「一比特数」为 0，不需要进入循环
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">num</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 这里是根据上面的位运算的技巧，判断是否为2的整数次幂，因为2的整数次幂只有一个1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  	<span class="k">if</span> <span class="nx">i</span><span class="o">&amp;</span><span class="p">(</span><span class="nx">i</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">highBit</span> <span class="p">=</span> <span class="nx">i</span> <span class="c1">// 更新最高比特位
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">		<span class="c1">// 它与它上次为2的整数次幂的数的差值 的「一比特数」+ 1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="nx">bits</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">bits</span><span class="p">[</span><span class="nx">i</span><span class="o">-</span><span class="nx">highBit</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">bits</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>应该还是有些晦涩难懂，但是我也没得办法，这太抽象了，官方解答的其他动态规划思想就不继续了，我们还有新办法。</p>
+<h3 id="新的办法">新的办法</h3>
+<p>对于所有的数字，只有两类 奇数|偶数:</p>
+<ol>
+<li>
+<p>奇数: 在二进制中表示，奇数一定比前面的那个偶数多一个1，多的就是最低位的1</p>
+<blockquote>
+<p>举例：</p>
+<p>0 = 0000    1 = 0001</p>
+<p>2 = 0010    3 = 0011</p>
+</blockquote>
+<p>发现了没有，偶数的最低位总是0，奇数的最低位总是1，我们再考虑偶数</p>
+</li>
+<li>
+<p>偶数: 二进制中，偶数中的1一定和除以2之后的那个数一样多，因为偶数的最低位总是0</p>
+<p>除以2就只是右移一位，把最低位的0去掉而已，所以1的数量是不变的</p>
+<blockquote>
+<p>举例:</p>
+<p>0 = 0000    1 = 0001 // 0不算, 1的「一比特数」= 0 + 1</p>
+<p>2 = 0010    3 = 0011 // 2 / 2 = 1, 1的「一比特数」= 1 &hellip;</p>
+<p>4 = 0100    5 = 0101</p>
+<p>6 = 0110    7 = 0111</p>
+</blockquote>
+</li>
+</ol>
+<p>我们能根据上面的规律来写出以下代码</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="nf">countBits</span><span class="p">(</span><span class="nx">num</span> <span class="kt">int</span><span class="p">)</span> <span class="p">[]</span><span class="kt">int</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">	<span class="nx">nums</span> <span class="o">:=</span> <span class="nb">make</span><span class="p">([]</span><span class="kt">int</span><span class="p">,</span> <span class="nx">num</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nx">i</span> <span class="o">:=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;=</span> <span class="nx">num</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">// 判断是否为偶数，奇数的最后一位永远是1
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span>		<span class="k">if</span> <span class="nx">i</span><span class="o">&amp;</span><span class="mi">1</span> <span class="o">==</span> <span class="mi">1</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">nums</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">nums</span><span class="p">[</span><span class="nx">i</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">			<span class="nx">nums</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="p">=</span> <span class="nx">nums</span><span class="p">[</span><span class="nx">i</span><span class="o">/</span><span class="mi">2</span><span class="p">]</span>
+</span></span><span class="line"><span class="cl">		<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="p">}</span>
+</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">nums</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>以上思路来自:</p>
+<p>作者：duadua
+链接：https://leetcode-cn.com/problems/counting-bits/solution/hen-qing-xi-de-si-lu-by-duadua/
+来源：力扣（LeetCode）</p>
+</blockquote>
+]]></description>
+</item></channel>
+</rss>

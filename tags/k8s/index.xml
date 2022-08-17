@@ -1,0 +1,2057 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>k8s - 标签 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</title>
+    <link>https://ronin-zc.com/tags/k8s/</link>
+    <description>k8s - 标签 - &lt;p&gt;RoninZc 的个人博客&lt;/p&gt;</description>
+    <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Tue, 07 Jun 2022 10:45:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/k8s/" rel="self" type="application/rss+xml" /><item>
+  <title>K8S学习笔记</title>
+  <link>https://ronin-zc.com/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+  <pubDate>Tue, 07 Jun 2022 10:45:00 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+  <description><![CDATA[<blockquote>
+<p>这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频</p>
+<p><a
+  href="https://www.bilibili.com/video/BV1Hq4y1y7rL"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili</a></p>
+<p>本文章为本人学习所用，如需转载请注明出处</p>
+</blockquote>
+<h2 id="1基础概念">1、基础概念</h2>
+<p></p>
+<ul>
+<li>基础组件
+<ol>
+<li>kubectl</li>
+<li>api server</li>
+<li>scheduler</li>
+<li>replication controller</li>
+<li>etcd</li>
+<li>kubelet</li>
+<li>kube proxy</li>
+<li>firewall</li>
+</ol>
+</li>
+<li>插件
+<ol>
+<li>CoreDNS 负责为整个集群提供 DNS 服务</li>
+<li>Ingress Controller 为 k8s 中的服务提供外网入口</li>
+<li>Prometheus 为整个集群提供资源监控能力，时序数据库</li>
+<li>Dashboard 提供 B/S 的访问体系，允许用户通过 web 进行集群管理和设置，比较常用的如：rancher</li>
+<li>Federation 提供跨可用区的集群，提供不同数据中心的 K8S 集群的管理能力</li>
+</ol>
+</li>
+</ul>
+<h2 id="2pod">2、Pod</h2>
+<p>在下达创建 pod 的时候，第一个被初始化的容器为<code>pause</code>，作用为初始化网络栈，挂载存储卷等。后续继续创建对应的 container，这些创建的 container 都会与初始容器<code>pause</code> 共享网络栈和存储等，类似 docker 中的<code>--net</code>和<code>--volumes-from</code>。这样在一个 Pod 中的 container 可以直接通过回环接口相互访问。</p>
+<h3 id="pod种类">Pod种类</h3>
+<ol>
+<li>
+<p>自主式 Pod</p>
+</li>
+<li>
+<p>控制器管理的 Pod（推荐）</p>
+<ul>
+<li>ReplicationController &amp; ReplicaSet &amp; Deployment
+<ul>
+<li>HPA（HorizontalPodAutoScale）</li>
+</ul>
+</li>
+<li>StatefullSet</li>
+<li>DarmonSet</li>
+<li>Job &amp; Cronjob</li>
+<li>自定义控制器&hellip; 不做讨论</li>
+</ul>
+</li>
+</ol>
+<h3 id="控制器种类">控制器种类</h3>
+<h4 id="replication-controller-rc-replicasetrs--deployment">Replication Controller （RC）&amp; ReplicaSet（RS） &amp; Deployment</h4>
+<p>用来确保容器应用的副本数始终保持在用户定义的副本数，即如果有容器异常退出，会自动创建新的 Pod 来替代，而如果异常多出的容器也会自动回收。</p>
+<p>在新版本的 K8S 中建议使用 RS 来取代 RC。</p>
+<p>RS 的本质和 RC 没有本质区别，只是名字不一样，并且 RS 支持集合式的标签选择器（tag selector）。</p>
+<p>虽然 RS 可以独立使用，但是一般建议使用 Deployment 来自动管理 RS，这样可以无需担心和其他机制不兼容的问题。比如 RS 不支持滚动更新（rolling-update）但 Deployment 支持。</p>
+<h5 id="滚动更新">滚动更新</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 更新前</span>
+</span></span><span class="line"><span class="cl">Deployment「Pod模板:v1，副本数量：3」
+</span></span><span class="line"><span class="cl">└─ RS「副本数量：3」
+</span></span><span class="line"><span class="cl">		├─ Pod:v1
+</span></span><span class="line"><span class="cl">		├─ Pod:v1
+</span></span><span class="line"><span class="cl">		└─ Pod:v1
+</span></span><span class="line"><span class="cl"><span class="c1"># 更新Pod模板:v2</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 更新中：</span>
+</span></span><span class="line"><span class="cl">Deployment「Pod模板:v1，副本数量：3」
+</span></span><span class="line"><span class="cl">├─ RS「副本数量：2」
+</span></span><span class="line"><span class="cl">│  ├── Pod:v1
+</span></span><span class="line"><span class="cl">│  └── Pod:v1
+</span></span><span class="line"><span class="cl">└─ RS「副本数量：1」
+</span></span><span class="line"><span class="cl">	 └─ Pod:v2
+</span></span><span class="line"><span class="cl"><span class="c1"># 更新完毕：</span>
+</span></span><span class="line"><span class="cl">Deployment「Pod模板:v1，副本数量：3」
+</span></span><span class="line"><span class="cl">├─ RS「副本数量：0」
+</span></span><span class="line"><span class="cl">└─ RS「副本数量：3」
+</span></span><span class="line"><span class="cl">		├─ Pod:v2
+</span></span><span class="line"><span class="cl">		├─ Pod:v2
+</span></span><span class="line"><span class="cl">		└─ Pod:v2
+</span></span><span class="line"><span class="cl">	 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>滚动更新会创建一个新的 RS 控制器，以此来创建新版本的 Pod，此时把老版本的 RS 控制器的期望数量一个个调整至0，这样就完成了滚动更新。</p>
+<h5 id="hpahorizontalpodautoscale自动扩缩容">HPA（HorizontalPodAutoScale）自动扩缩容</h5>
+<p>可以根据 Pod 的资源使用情况，调整副本数量，依赖于 RC、RS、Deployment 之上</p>
+<h4 id="statefulset">StatefulSet</h4>
+<blockquote>
+<p>服务分类</p>
+<ul>
+<li>有状态的服务</li>
+<li>无状态服务</li>
+<li>中心化服务</li>
+<li>去中心化服务</li>
+</ul>
+</blockquote>
+<p>为了解决有状态服务的问题而设计出来，可用来有序扩容缩，其应用场景包括：</p>
+<ul>
+<li>稳定的持久化存储，即 Pod 重新调度后还是能访问到相同的持久化数据，基于 PVC 实现</li>
+<li>稳定的网络标志，即 Pod 重新调度后，其 PodName 和 HostName 不变，基于 Headless Service（即没有 Cluster IP 的 Service）实现</li>
+<li>有序部署，有序扩展，即 Pod 是有顺序的，在部署或者扩展的时候要依据定义的顺序依次进行（即从 0 到 N-1，在下一个 Pod 运行之前，所有之前的 Pod 必须都是 Running 和 Ready 状态），基于 init containers 来实现</li>
+<li>有序收缩，有序删除（即 N-1到 0）</li>
+</ul>
+<h4 id="daemonset">DaemonSet</h4>
+<p>确保全部（或者一些）Node 上运行一个 Pod 的副本。当有 Node 加入集群时，也会为他们新增一个 Pod。当有 Node 从集群移除时，这些 Pod 也会被回收。删除 DaemonSet 将会删除所有由它创建的 Pod</p>
+<p>经典用法：</p>
+<ul>
+<li>运行集群存储 daemon，例如在每个 Node 上运行 glusterd，ceph</li>
+<li>在每个 Node 上运行日志手机 deamon，例如 fluentd，logstash</li>
+<li>在每个 Node 上运行监控 deamon，例如 Prometheus Node Exporter</li>
+</ul>
+<h4 id="job--cronjob">Job &amp; cronJob</h4>
+<p>Job 负责批处理任务，即仅执行一次的任务，它保证批处理任务的一个或多个 Pod 成功结束</p>
+<p>Cron Job 管理基于时间的 Job，即：</p>
+<ul>
+<li>在给定时间点只运行一次</li>
+<li>周期性的在给定时间点运行</li>
+</ul>
+<h3 id="网络模型">网络模型</h3>
+<p>K8S 的网络模型假定了所有 Pod 都在一个可以直接连通的扁平的网络空间中，这在 GCE（Google Compute Engine）里面是现成的网络模型，K8S 假定这个网络已经存在。而在私有云里搭建 K8S 集群，就不能假定这个网络已经存在了。我们需要<strong>自己实现</strong>这个网络假设，将不同节点上的 Docker 容器之间的互相访问先打通，然后运行 K8S。</p>
+<h4 id="flannel">Flannel</h4>
+<p>Flannel 是 CoreOS 团队针对 Kubernetes 设计的一个网络规划服务，简单来说，它的功能是让集群中的不同节点主机创建的 Docker 容器都具有<strong>全集群唯一</strong>的虚拟 IP 地址。而且它还能在这些 IP 地址之间建立一个覆盖网络（Overlay Network），通过这个覆盖网络，将数据包原封不动地传输到目标容器内。基于 etcd 实现。</p>
+<p></p>
+<p>实现步骤：</p>
+<ol>
+<li>Flanneld 向 etcd 申请当前 Pod 的网段，修改当前 Docker0 的IP
+<ul>
+<li>会带上当前机器的物理网卡地址，这样就在 etcd 里标识了虚拟网段与真实IP之间的关系</li>
+<li>当一个 Pod 发送网络数据的时候，通过对方的虚拟IP就可以找到真实IP了</li>
+</ul>
+</li>
+<li>请求流转（根据图观察）
+<ol>
+<li>app2 发送一个数据包给<code>10.1.20.3</code>，发现无法直接访问，数据包传递给网关</li>
+<li>此时数据包被 Flanneld 所捕获（Flannel0 监听的为 10.1.15.0，注意这个0）传递给对应的另外一个 Flanneld（从etcd获取）
+<ul>
+<li>此时 Flanneld 会对数据包进行二次封装，类似一个快递里是另外一个快递</li>
+</ul>
+</li>
+<li>接收到数据包后进行拆包，在对应的 Docker0 中广播，这样也就能收到了</li>
+</ol>
+</li>
+<li>回应同理</li>
+</ol>
+<h4 id="网络通讯模式">网络通讯模式</h4>
+<ul>
+<li>同 Pod 间不同容器间的网络通讯：本地回环</li>
+<li>不同 Pod 间的通讯
+<ul>
+<li>同物理机：Docker0 网桥实现报文转发</li>
+<li>不同物理机：flannel UDP 数据包二次封装</li>
+</ul>
+</li>
+<li>svc 网络与 Pod 间的通讯</li>
+<li>隔离：namespace network</li>
+</ul>
+<h2 id="3k8s安装">3、K8S安装</h2>
+<h3 id="前置准备">前置准备</h3>
+<ol>
+<li>
+<p>安装配置</p>
+<ul>
+<li>推荐安装在单网卡机器</li>
+<li>CPU &gt;= 2，内存 3G 以上，磁盘 100G</li>
+<li>关闭 SWAP</li>
+<li>分区
+<ul>
+<li>/boot 800m</li>
+<li>/ 全部</li>
+</ul>
+</li>
+<li>seliunx，firewall stop，iptable none</li>
+</ul>
+</li>
+<li>
+<p>K8S安装3个节点，可以配置一个软路由，双网卡</p>
+<ul>
+<li>网卡1: 仅主机</li>
+<li>网卡2: NAT 上网</li>
+</ul>
+</li>
+<li>
+<p>安装工具包（可选）</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt-get install -y conntrack ntpdate ntp ipvsadm ipset iptables curl sysstat  wget net-tools git
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>同步时区</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt install ntpdate
+</span></span><span class="line"><span class="cl">sudo ntpdate ntp.aliyun.com
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>关闭<code>swap</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo swapoff -a <span class="c1"># 临时关闭</span>
+</span></span><span class="line"><span class="cl">sed -ri <span class="s1">&#39;s/.swap./#&amp;/&#39;</span> /etc/fstab <span class="c1"># 永久关闭</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>允许 iptables 桥接流量</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOF | sudo tee /etc/modules-load.d/k8s.conf
+</span></span></span><span class="line"><span class="cl"><span class="s">br_netfilter
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">cat <span class="s">&lt;&lt;EOF | sudo tee /etc/sysctl.d/k8s.conf
+</span></span></span><span class="line"><span class="cl"><span class="s">net.bridge.bridge-nf-call-ip6tables = 1
+</span></span></span><span class="line"><span class="cl"><span class="s">net.bridge.bridge-nf-call-iptables = 1
+</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 设置网卡允许转发 ipv4 流量</span>
+</span></span><span class="line"><span class="cl">sudo sysctl -w net.ipv4.ip_forward<span class="o">=</span><span class="m">1</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo sysctl --system
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ol>
+<h3 id="安装-kubernetes">安装 Kubernetes</h3>
+<ul>
+<li>源码包编译安装（难度过高）
+<ul>
+<li>可参考<a
+  href="https://cloudmessage.top/archives/2kubernetes%e5%ae%89%e8%a3%85md"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>Kubernetes - 二进制版本安装 - v1.18 (cloudmessage.top)</a></li>
+</ul>
+</li>
+<li>容器化安装
+<ul>
+<li>kubeadm 官方
+<ul>
+<li>证书有效期 1 年（需要修改源码，设置生成证书有效时间）</li>
+</ul>
+</li>
+<li>rancher</li>
+<li>sealos</li>
+</ul>
+</li>
+</ul>
+<h4 id="1安装容器组件">1、安装容器组件</h4>
+<ul>
+<li>docker
+<ul>
+<li><a
+  href="../ubuntu-arm-docker-%e5%ae%89%e8%a3%85/"
+  
+  
+  
+  
+  
+>ARM 系统安装</a></li>
+<li>X86_64 可参考上文，注意修改对应系统架构即可</li>
+</ul>
+</li>
+<li>containerd k8s v1.24.0后 <a
+  href="../k8sv1.24.0-containerd%e5%ae%89%e8%a3%85%e6%95%99%e7%a8%8b"
+  
+  
+  
+  
+  
+>K8Sv1.24.0-containerd安装教程</a></li>
+</ul>
+<h4 id="2安装-kubeadm-主从配置">2、安装 Kubeadm （主从配置）</h4>
+<blockquote>
+<p>Kubeadm 启动流程</p>
+<p>Master
+Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
+<p>容器组件在 k8s v1.24.0 版本已弃用 Docker shim
+使用了新组件 CRI DOCKERD</p>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 添加阿里云镜像源</span>
+</span></span><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt install -y apt-transport-https
+</span></span><span class="line"><span class="cl">sudo curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg <span class="p">|</span> sudo apt-key add - 
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 添加阿里云或者官方 api 源</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 阿里云</span>
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main&#34;</span> <span class="p">|</span> sudo tee /etc/apt/sources.list.d/kubernetes.list
+</span></span><span class="line"><span class="cl"><span class="c1"># 官方</span>
+</span></span><span class="line"><span class="cl">sudo curl -o /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg 
+</span></span><span class="line"><span class="cl"><span class="nb">echo</span> <span class="s2">&#34;deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main&#34;</span> <span class="p">|</span> sudo tee /etc/apt/sources.list.d/kubernetes.list
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 安装软件</span>
+</span></span><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt install -y kubelet kubeadm kubectl
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 开机自启</span>
+</span></span><span class="line"><span class="cl">systemctl <span class="nb">enable</span> kubelet.service
+</span></span><span class="line"><span class="cl"><span class="c1"># 注意，此时可能 kublet 没正常运行，不用管继续往下走</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3初始化主节点">3、初始化主节点</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span><span class="lnt">24
+</span><span class="lnt">25
+</span><span class="lnt">26
+</span><span class="lnt">27
+</span><span class="lnt">28
+</span><span class="lnt">29
+</span><span class="lnt">30
+</span><span class="lnt">31
+</span><span class="lnt">32
+</span><span class="lnt">33
+</span><span class="lnt">34
+</span><span class="lnt">35
+</span><span class="lnt">36
+</span><span class="lnt">37
+</span><span class="lnt">38
+</span><span class="lnt">39
+</span><span class="lnt">40
+</span><span class="lnt">41
+</span><span class="lnt">42
+</span><span class="lnt">43
+</span><span class="lnt">44
+</span><span class="lnt">45
+</span><span class="lnt">46
+</span><span class="lnt">47
+</span><span class="lnt">48
+</span><span class="lnt">49
+</span><span class="lnt">50
+</span><span class="lnt">51
+</span><span class="lnt">52
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 打印 kubeadm 默认配置</span>
+</span></span><span class="line"><span class="cl">sudo kubeadm config print init-defaults &gt; kubeadm-config.yaml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 修改：`localAPIEndpoint.advertiseAddress`的值为当前主节点的 ip 地址</span>
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">localAPIEndpoint:
+</span></span><span class="line"><span class="cl">  advertiseAddress: 1.2.3.4 <span class="c1"># 这里</span>
+</span></span><span class="line"><span class="cl">  bindPort: <span class="m">6443</span>
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 修改：`nodeRegistration.name` 的值为当前主节点名称</span>
+</span></span><span class="line"><span class="cl">···
+</span></span><span class="line"><span class="cl">nodeRegistration:
+</span></span><span class="line"><span class="cl">  criSocket: unix:///var/run/containerd/containerd.sock
+</span></span><span class="line"><span class="cl">  imagePullPolicy: IfNotPresent
+</span></span><span class="line"><span class="cl">  name: k8s-master01 <span class="c1"># 这里</span>
+</span></span><span class="line"><span class="cl">  taints: null
+</span></span><span class="line"><span class="cl">···
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 添加 Pod 网段，Flannel 需要工作在指定的网段</span>
+</span></span><span class="line"><span class="cl">...
+</span></span><span class="line"><span class="cl">networking:
+</span></span><span class="line"><span class="cl">  dnsDomain: cluster.local
+</span></span><span class="line"><span class="cl">  serviceSubnet: 10.96.0.0/12
+</span></span><span class="line"><span class="cl">  podSubnet: 10.244.0.0/16 <span class="c1"># 新增该行</span>
+</span></span><span class="line"><span class="cl">···
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 设置负载均衡方式为 ipvs（可选），下列配置添加到末尾，注意 --- 也需要添加</span>
+</span></span><span class="line"><span class="cl">···
+</span></span><span class="line"><span class="cl">---
+</span></span><span class="line"><span class="cl">apiVersion: kubeproxy.config.k8s.io/v1alpha1
+</span></span><span class="line"><span class="cl">kind: KubeProxyConfiguration
+</span></span><span class="line"><span class="cl">featureGates:
+</span></span><span class="line"><span class="cl">	SupportIPVSProxyMode: <span class="nb">true</span>
+</span></span><span class="line"><span class="cl">mode: ipvs
+</span></span><span class="line"><span class="cl">···
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># k8s.gcr.io 国内无法直接访问，所以替换为阿里云镜像地址</span>
+</span></span><span class="line"><span class="cl">sed -i <span class="s1">&#39;s/k8s.gcr.io/registry.cn-hangzhou.aliyuncs.com\/google_containers/g&#39;</span> kubeadm-config.yaml
+</span></span><span class="line"><span class="cl"><span class="c1"># 配置文件准备完毕，开始初始化</span>
+</span></span><span class="line"><span class="cl">sudo kubeadm init --config<span class="o">=</span>kubeadm-config.yaml --ignore-preflight-errors<span class="o">=</span>all --v<span class="o">=</span><span class="m">5</span> <span class="p">|</span> tee kubeadm-init.log
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 初始化成功根据页面提示</span>
+</span></span><span class="line"><span class="cl">  <span class="c1"># 非 root 用户</span>
+</span></span><span class="line"><span class="cl">  mkdir -p <span class="nv">$HOME</span>/.kube
+</span></span><span class="line"><span class="cl">  sudo cp -i /etc/kubernetes/admin.conf <span class="nv">$HOME</span>/.kube/config
+</span></span><span class="line"><span class="cl">  sudo chown <span class="k">$(</span>id -u<span class="k">)</span>:<span class="k">$(</span>id -g<span class="k">)</span> <span class="nv">$HOME</span>/.kube/config
+</span></span><span class="line"><span class="cl">  <span class="c1"># root 用户</span>
+</span></span><span class="line"><span class="cl">  <span class="nb">export</span> <span class="nv">KUBECONFIG</span><span class="o">=</span>/etc/kubernetes/admin.conf
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看集群信息</span>
+</span></span><span class="line"><span class="cl">kubectl cluster-info
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="4工作节点加入">4、工作节点加入</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 在初始化主节点成功后，打印出的日志内的最后一段，告诉了我们应该如何加入一个主节点</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 也可以 cat kubeadm-init.log 查看</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 加入前查看当前主机名称 hostnamectl，可以修改为自己便于识别的名称</span>
+</span></span><span class="line"><span class="cl">sudo hostnamectl set-hostname k8s-node01 --static
+</span></span><span class="line"><span class="cl"><span class="c1"># 加入节点</span>
+</span></span><span class="line"><span class="cl">sudo kubeadm join 192.168.31.100:6443 --token xxx.xxx <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span>        --discovery-token-ca-cert-hash sha256:xxx
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果提示 unable to fetch the kubeadm-config ConfigMap: faild to get config map: Unauthorized</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 这个代表 token 过期，重新生成即可</span>
+</span></span><span class="line"><span class="cl">sudo kubeadm token create --ttl <span class="m">0</span> --print-join-command
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果提示</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># [kubelet-check] Initial timeout of 40s passed.</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># error execution phase kubelet-start: error uploading crisocket: timed out waiting for the condition</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># To see the stack trace of this error execute with --v=5 or higher</span>
+</span></span><span class="line"><span class="cl">sudo kubeadm reset -f
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="5工作节点退出">5、工作节点退出</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 1、将节点设置为维护模式</span>
+</span></span><span class="line"><span class="cl">kubectl drain k8s-node01 --delete-local-data --force --ignore-daemonsets node/k8s-node01
+</span></span><span class="line"><span class="cl"><span class="c1"># 2、删除节点</span>
+</span></span><span class="line"><span class="cl">kubectl delete node k8s-node01
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 登陆上节点机器</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 3、停止 kubelet</span>
+</span></span><span class="line"><span class="cl">systemctl stop kubelet
+</span></span><span class="line"><span class="cl"><span class="c1"># 4、k8s 重置</span>
+</span></span><span class="line"><span class="cl">sudo kubeadm reset -f
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="6创建网络flannel">6、创建网络「flannel」</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 拷贝配置文件</span>
+</span></span><span class="line"><span class="cl">sudo mkdir -p /usr/local/kubernetes/cni/flannel/
+</span></span><span class="line"><span class="cl"><span class="nb">cd</span> /usr/local/kubernetes/cni/flannel/
+</span></span><span class="line"><span class="cl">wget https://raw.githubusercontent.com/flannel-io/flannel/master/Documentation/kube-flannel.yml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 应用配置</span>
+</span></span><span class="line"><span class="cl">kubectl apply -f kube-flannel.yml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 等待2～3分钟，查看是否成功</span>
+</span></span><span class="line"><span class="cl">kubectl get nodes
+</span></span><span class="line"><span class="cl"><span class="c1"># 可以看到所有节点都显示 ready</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="7集群测试">7、集群测试</h4>
+<h5 id="71创建pod">7.1、创建pod</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 创建一个 deployment 任务 指定镜像</span>
+</span></span><span class="line"><span class="cl">kubectl create deployment nginx --image<span class="o">=</span>nginx
+</span></span><span class="line"><span class="cl"><span class="c1"># 获取 pod 列表</span>
+</span></span><span class="line"><span class="cl">kubectl get po -o wide
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p></p>
+<h5 id="72创建-svc-网络">7.2、创建 svc 网络</h5>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 创建一个 svc 网络</span>
+</span></span><span class="line"><span class="cl">kubectl create svc clusterip nginx --tcp<span class="o">=</span>80:80
+</span></span><span class="line"><span class="cl"><span class="c1"># 查看当前 svc 网络</span>
+</span></span><span class="line"><span class="cl">kubectl get svc
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p></p>
+<h2 id="4资源清单">4、资源清单</h2>
+<blockquote>
+<p>在 k8s 中所有的内容都是资源，资源实例化之后，叫做对象</p>
+<p>资源：</p>
+<ul>
+<li>命名空间级别
+<ul>
+<li>工作负载型资源：Pod、ReplicaSet、Deployment 等</li>
+<li>服务发现及负载均衡型资源：Service、Ingress 等</li>
+<li>配置与存储型资源：Volume、CSI 等</li>
+<li>特殊类型的存储卷：ConfigMap、Secre 等</li>
+</ul>
+</li>
+<li>集群级资源
+<ul>
+<li>Namespace、Node、ClusterRole、ClusterRoleBinding</li>
+</ul>
+</li>
+<li>元数据类型资源
+<ul>
+<li>HPA、PodTemplate、LimitRange</li>
+</ul>
+</li>
+</ul>
+<p>在 k8s 中，一般使用 yaml 格式的文件来创建符合我们预期期望的对象，这样的 yaml 文件我们一般称为资源清单</p>
+</blockquote>
+<h3 id="格式">格式</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">group/apiversion</span><span class="w"> </span><span class="c"># 如果没有给定 group 名称，那么默认为 core，可以使用 kubectl apt-versions 获取当前 k8s 版本上所有的 apiVersion 版本信息（每个版本可能不同）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="c"># 资源类别</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadate</span><span class="p">:</span><span class="w"> </span><span class="c"># 资源元数据</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="l">name</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="l">namespace</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="l">lables</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="l">annotations</span><span class="w"> </span><span class="c"># 主要目的是方便用户阅读查找</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w"> </span><span class="c"># 期望的状态 （disired state）</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">status</span><span class="p">:</span><span class="w"> </span><span class="c"># 当前状态，本字段由 kubernetes 自身维护，用户不能定义</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="常用命令">常用命令</h3>
+<p>必须记住的命令 <code>kubectl explain xxx.xxx</code>
+必须记住的命令 <code>kubectl explain xxx.xxx</code>
+必须记住的命令 <code>kubectl explain xxx.xxx</code></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 查询</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># -n 指定命名空间，默认为 default</span>
+</span></span><span class="line"><span class="cl">kuebctl get pod -o wide -l <span class="o">[</span>key/key<span class="o">=</span>values<span class="o">]</span> <span class="c1"># 获取 pod 列表</span>
+</span></span><span class="line"><span class="cl">kubectl get pod podName -o json/yaml <span class="c1"># 获取 pod 详细信息</span>
+</span></span><span class="line"><span class="cl">kubectl log podName <span class="c1"># 获取 pod 日志</span>
+</span></span><span class="line"><span class="cl">kubectl describe pod podName <span class="c1"># 获取 pod 事件信息</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 操作</span>
+</span></span><span class="line"><span class="cl">kubectl create -f filename <span class="c1"># 创建资源</span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">exec</span> -it podName -c containerName -- <span class="o">[</span>script<span class="o">]</span> <span class="c1"># 在某个容器内执行脚本</span>
+</span></span><span class="line"><span class="cl">kubectl delete <span class="o">[</span>res<span class="o">]</span> <span class="o">[</span>--all <span class="p">|</span> name<span class="o">]</span> <span class="c1"># 删除资源</span>
+</span></span><span class="line"><span class="cl">kubectl scale --replicas<span class="o">=[</span>num<span class="o">]</span> <span class="o">[</span>controllerKind<span class="o">]</span>/<span class="o">[</span>resName<span class="o">]</span> <span class="c1"># 修改某个控制器的副本数量</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="获取-apiversion-版本信息">获取 apiversion 版本信息</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl api-versions
+</span></span><span class="line"><span class="cl"><span class="c1"># output:</span>
+</span></span><span class="line"><span class="cl">admissionregistration.k8s.io/v1
+</span></span><span class="line"><span class="cl">apiextensions.k8s.io/v1
+</span></span><span class="line"><span class="cl">apiregistration.k8s.io/v1
+</span></span><span class="line"><span class="cl">apps/v1
+</span></span><span class="line"><span class="cl">...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="字段配置格式">字段配置格式</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">apiVersion &lt;string&gt;        <span class="c1"># 表示字符串类型</span>
+</span></span><span class="line"><span class="cl">metadata &lt;object&gt;          <span class="c1"># 表示需要嵌套多层字段</span>
+</span></span><span class="line"><span class="cl">labels &lt;map<span class="o">[</span>string<span class="o">]</span>string&gt; <span class="c1"># 表示由 k:v 组成的映射</span>
+</span></span><span class="line"><span class="cl">finalizers &lt;<span class="o">[]</span>string&gt;      <span class="c1"># 表示字符串列表</span>
+</span></span><span class="line"><span class="cl">ownerReferences &lt;<span class="o">[]</span>object&gt; <span class="c1"># 表示对象列表</span>
+</span></span><span class="line"><span class="cl">hostPID &lt;boolean&gt;          <span class="c1"># true | flase</span>
+</span></span><span class="line"><span class="cl">priority &lt;integer&gt;         <span class="c1"># 整型</span>
+</span></span><span class="line"><span class="cl">name &lt;string&gt; -required-   <span class="c1"># 如果类型后面接 required，表示为必填字段</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="通过定义清单文件创建-pod">通过定义清单文件创建 Pod</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadate</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">pod-demo</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="nt">lables</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">		</span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">myPod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">myPod-1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">	  </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">myPod-2</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybos:1.34.1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="s2">&#34;/bin/sh&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="s2">&#34;-c&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="s2">&#34;sleep 3600&#34;</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 使用 -o 选项加 yaml，可以将资源的配置以 yaml 的格式输出，也可以使用 json</span>
+</span></span><span class="line"><span class="cl">kubectl get pod xxx.xxx.xxx -o yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="5pod-生命周期">5、Pod 生命周期</h2>
+<h3 id="执行流程">执行流程</h3>
+<p></p>
+<ol>
+<li>Pause：在一个 Pod 启动前，会先启动一个 Pause 容器。它会初始化相应的网络栈，同时把自身的网络卷共享给 Pod 内的容器</li>
+<li>初始化容器「initC」，可以有0到无限个
+<ul>
+<li>它是批处理类型的任务</li>
+<li>它的运行是有序的，第一个不运行成功，第二个不会运行</li>
+<li>如果执行失败，会直接重载整个 Pod，直到 Init 容器成功为止。然而，如果 Pod 对应的 restartPolicy 为 Never 则不会重启</li>
+</ul>
+</li>
+<li>主容器「mainC」，至少存在一个
+<ul>
+<li>多个 mainC 并行启动</li>
+<li>多个 mainC 共享同一个网络卷，绑定的端口不能重复</li>
+<li>hook
+<ul>
+<li>启动前「和主进程同时运行，不一定在主进程运行前执行完成」</li>
+<li>关闭前「可以保证在关闭前执行完成」</li>
+</ul>
+</li>
+<li>探针「tcp｜http｜script」
+<ul>
+<li>可以进行就绪、存活探测探针：判断是否可以进行后续探针，新版本才存在</li>
+<li>就绪探针：判断一个 mainC 是否已经准备好提供服务，可以定义探测间隔</li>
+<li>存活探针：判断一个 mainC 是否存活，如无响应则重启容器</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="init-容器">init 容器</h3>
+<p>因为 Init 容器具有与应用容器分离的单独镜像，所以它们的启动相关代码具有如下优势：</p>
+<ul>
+<li>它们可以包含并运行实用工具，但是出于安全考虑，不建议在应用容器镜像中包含这些工具</li>
+<li>应用程序镜像可以分离出创建和部署的角色，而没有必要联合它们构建一个单独的镜像</li>
+<li>Init 容器使用 Linux Namespace，所以相对于应用容器来说具有不同的文件系统视图。因此，他们能够具有访问 Secret 的权限，而应用程序则不能</li>
+<li>他们必须在应用容器启动之前运行完成，而应用容器是并行运行的，所以 Init 容器能够提供一种简单的阻塞或延迟应用容器启动的方法，直到满足啦一组先决条件</li>
+<li>Init 容器具有应用容器的所有字段。除了 readinessProbe，因为 Init 容器无法定义不同于完成和就绪之外的其他状态，这会在验证过程中强制执行</li>
+<li>在 Pod 中的每个 app 和 init 容器的名称必须唯一；与其他任何容器共享同一个名称，会在验证时抛出错误</li>
+</ul>
+<h3 id="简单实操">简单实操</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># testpod.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-nginx-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">my-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">initContainers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">init-my-service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;-c&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;until nslookup my-service; do echo waiting for my-service; sleep 2; done;&#39;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">init-my-db</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;-c&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;until nslookup my-db; do echo waiting for my-db; sleep 2; done;&#39;</span><span class="p">]</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># init-testpod.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">9376</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nn">---</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">my-db</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">protocol</span><span class="p">:</span><span class="w"> </span><span class="l">TCP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">9377</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>先创建 init 模板</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl create -f init-pod.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看 Pod 状态</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl get po
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p></p>
+<p>查看初始化容器日志</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl logs my-nginx-pod -c init-my-service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p></p>
+<p>发现一直在解析域名，这时我们创建响应的 service</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl create -f init-test-pod.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p></p>
+<p>然后我们再去查看容器的状态，可能需要等待一定的时间</p>
+<p></p>
+<h3 id="探针">探针</h3>
+<p>探针是由 kubelet 对容器执行的定期诊断，要执行诊断，kubelet 调用容器实现的 Handler。有三种类型的处理程序：</p>
+<ul>
+<li>ExecAction：在容器内执行指定命令。如果命令退出时返回码为 0 则认为诊断成功</li>
+<li>TCPSocketAction：对指定端口上的容器 IP 地址进行 TCP 检查。如果端口打开，则诊断被任务时成功的</li>
+<li>HTTPGetAction：对指定的端口和路径上的容器 IP 地址执行 HTTP Get 请求。如果响应的状态码大于等于 200 且小于 400，则诊断被认为是成功的</li>
+</ul>
+<p>每次探测都将获得以下三种结果：</p>
+<ul>
+<li>成功：容器通过诊断</li>
+<li>失败：容器未通过诊断</li>
+<li>未知：诊断失败，但不会采取任何行动</li>
+</ul>
+<h4 id="readinessprobe就绪探针"><strong>readinessProbe「就绪探针」</strong></h4>
+<p>指示容器是否准备好服务请求。如果就绪探测失败，端点控制器将从与 Pod 匹配的所有 Service 的端点中删除该 Pod 的 IP 地址。初始延迟前的就绪状态默认为 Failure。如果容器不提供就绪探针，则默认状态为 SUCCESS</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># readinessProbe-httpget</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">reaadiness-httpget-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">myapp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">readiness-httpget-container</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">imagePullPolice</span><span class="p">:</span><span class="w"> </span><span class="l">IfNotPresent</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">readinessProbe</span><span class="p">:</span><span class="w"> </span><span class="c"># 配置就绪探针</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">httpGet</span><span class="p">:</span><span class="w"> </span><span class="c"># 探针类型，请求端口和 path</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">readiness.html</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">initialDelaySeconds</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="c"># 开始探测延迟</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">periodSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c"># 探测间隔</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>创建该 Pod 后，会发现 Pod 处于运行状态，但是 READY 却是 <code>0/1</code>。这时我们查看容器日志，发现探针返回为 404，此时表示探针正常生效。</p>
+<p>我们进入容器，在 nginx 的根目录下创建<code>readiness.html</code>文件，退出后发现容器已处于就绪状态。</p>
+<h4 id="livenessprobe存活探针"><strong>livenessProbe「存活探针」</strong></h4>
+<p>指示容器是否正在运行。如果存活探测失败，则 kubelet 会杀死容器，并且容器将根据重启策略来判断是否重新拉起。如果容器不提供存活探针，则默认状态为 SUCCESS</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># livenessProbe-exec</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">liveness-exec-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">liveness-exec-container</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">IfNotPresent</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;/bin/sh&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;-c&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;touch /tmp/live; sleep 60; rm -rf /tmp/live; sleep 3600&#34;</span><span class="p">]</span><span class="w"> </span><span class="c"># 运行脚本</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">livenessProbe</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">exec</span><span class="p">:</span><span class="w"> </span><span class="c"># exec 类型探针</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;test&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;-e&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;/tmp/live&#34;</span><span class="p">]</span><span class="w"> </span><span class="c"># 执行脚本</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">initialDelaySeconds</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="c"># 开始探测延迟</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">periodSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c"># 探测间隔</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>创建该 Pod 后，在前 60 秒内正常运行，之后发现 Pod 被杀死并重新创建。</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># livenessProbe-httpget</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">liveness-httpget-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">liveness-httpget-container</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">IfNotPresent</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">http</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">livenessProbe</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">httpGet</span><span class="p">:</span><span class="w"> </span><span class="c"># 探针类型，请求端口和 path</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l">index.html</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">initialDelaySeconds</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c"># 开始探测延迟</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">periodSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c"># 探测间隔</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">timeoutSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c"># 超时时间</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># livenessProbe-tcp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">liveness-tcp-pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">liveness-tcp-container</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">imagePullPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">IfNotPresent</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">tcp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">livenessProbe</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">tcpSocket</span><span class="p">:</span><span class="w"> </span><span class="c"># 探针类型，请求端口</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">initialDelaySeconds</span><span class="p">:</span><span class="w"> </span><span class="m">5</span><span class="w"> </span><span class="c"># 开始探测延迟</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">timeoutSeconds</span><span class="p">:</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="c"># 超时时间</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="启动退出动作hook">启动、退出动作「hook」</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">lifecycle-demo</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">lifecycle-demo-container</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">lifecycle</span><span class="p">:</span><span class="w"> </span><span class="c"># 生命周期</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">postStart</span><span class="p">:</span><span class="w"> </span><span class="c"># 启动前</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">exec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;/bin/sh&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;-c&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;echo postStart &gt; /usr/share/message&#34;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">preStart</span><span class="p">:</span><span class="w"> </span><span class="c"># 关闭前</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">exec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">          </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&#34;/bin/sh&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;-c&#34;</span><span class="p">,</span><span class="w"> </span><span class="s2">&#34;echo preStart &gt; /usr/share/message&#34;</span><span class="p">]</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在进入容器后，就可以看到<code>/usr/share/message</code>存在，并且内容是我们自定义的<code>postStart</code>。我们进去容器死循环打印文件</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="k">while</span> true<span class="p">;</span> <span class="k">do</span> cat /usr/share/message<span class="p">;</span> <span class="k">done</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在外部关闭容器后，发现打印变成了<code>preStart</code></p>
+<h2 id="6控制器详解">6、控制器详解</h2>
+<h3 id="rc-控制器">RC 控制器</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># file: rc.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ReplicationController</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">frontend</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c"># 副本数量</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w"> </span><span class="c"># 标签选择器，寻找 app=nginx 的 Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="c"># 创建 Pod 模板</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>在创建上述文件后，我们执行</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl create -f rc.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>然后我们查看对应 Pod：</p>
+<p></p>
+<p>这也就是 RC 控制器的功能，我们可以尝试删除其中一个 Pod 会发现又被重新创建</p>
+<p></p>
+<h3 id="rs-控制器">RS 控制器</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ReplicaSet</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">frontend</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="c"># 副本数量</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w"> </span><span class="c"># 标签选择器，寻找 app=nginx 的 Pod</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">nginx1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="c"># matchExpressions: 可选</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w"> </span><span class="c"># 创建 Pod 模板</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">nginx1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>RS 控制器相比 RC 控制器，只是多了一种标签选择器，我们可以通过下面的命令查看对应的文档：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl explain rs.spec.selector
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>可以看到除了和 RC 控制器功能一致的<code>matchLabels</code>，还多了一种<code>matchExpressions</code>可选择。</p>
+<p><code>matchExpressions</code>目前能支持的操作包括：</p>
+<ul>
+<li>In：label 的值在某个列表中</li>
+<li>NotIn：label 的值不在某一个列表中</li>
+<li>Exists：某个 label 存在</li>
+<li>DoesNotExist：某个 label 不存在</li>
+</ul>
+<h4 id="示例">示例</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># selector exists demo</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ReplicaSet</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">rs-demo</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">matchExpressions</span><span class="p">:</span><span class="w"> </span><span class="c"># 这里</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">app</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l">Exists</span><span class="w"> </span><span class="c"># label 中 key 为 app 存在即可</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span><span class="lnt">19
+</span><span class="lnt">20
+</span><span class="lnt">21
+</span><span class="lnt">22
+</span><span class="lnt">23
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># selector In demo</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">ReplicaSet</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">rs-demo</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">matchExpressions</span><span class="p">:</span><span class="w"> </span><span class="c"># 这里</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">key</span><span class="p">:</span><span class="w"> </span><span class="l">app</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">operator</span><span class="p">:</span><span class="w"> </span><span class="l">In</span><span class="w"> </span><span class="c"># label 中 key 对应的 value 在枚举的 values 中即可</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">values</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="l">nginx1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="deployment-控制器">Deployment 控制器</h3>
+<blockquote>
+<p>命令的定义方式</p>
+<ul>
+<li>命令式定义 kubectl create -f xxxxx</li>
+<li>声明式定义 kubectl apply -f xxxxx</li>
+</ul>
+<p>区别：声明式命令可以重复使用，系统会自动判断当前操作是修改还是创建</p>
+<p>推荐直接使用 apply，在遇到命令式资源时会自动降级成命令式</p>
+</blockquote>
+<p>Deployment 为 Pod 和 ReplicaSet 提供来一个声明式定义方法，用来代替之前的 ReplicationController 来方便管理应用。典型的应用场景包括：</p>
+<ul>
+<li>定义 Deployment 来创建 Pod 和 ReplicaSet</li>
+<li>滚动升级和回滚应用</li>
+<li>扩容和缩容</li>
+<li>暂停和继续 Deployment</li>
+</ul>
+<h4 id="1部署一个简单的-nginx-应用">1、部署一个简单的 Nginx 应用</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">extensions/v1beta1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Deployment</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx-deployment</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">replicas</span><span class="p">:</span><span class="w"> </span><span class="m">3</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadate</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span>- <span class="nt">containerPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl apply -f https://kubernetes.io/docs/user-guide/nginx-deployment.yaml --record
+</span></span><span class="line"><span class="cl"><span class="c1"># --record 可以记录当前命令到 deployment 到历史记录中</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="2扩容">2、扩容</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 修改副本数量为 10，不会影响 deployment 已经创建的 rs</span>
+</span></span><span class="line"><span class="cl">kubectl scale deployment nginx-deployment --replicas <span class="m">10</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>如果集群支持 horizontal pod autoscaling 的话，还可以为 Deployment 设置自动扩展</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl autoscale deployment nginx-deployment --min<span class="o">=</span><span class="m">10</span> --max<span class="o">=</span><span class="m">15</span> --cpu-percent<span class="o">=</span><span class="m">80</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="3更新镜像">3、更新镜像</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl <span class="nb">set</span> image deployment/nginx-deployment <span class="nv">nginx</span><span class="o">=</span>nginx:1.9.1
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="4回滚">4、回滚</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">kubectl rollout undo deployment/nginx-deployment
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>假如当前有4个版本 v1、v2、v3、v4，目前的版本为 v4，使用上述命令回滚之后回滚到 v3 版本，再次使用上述命令，此时回重新回滚到 v4 版本，因为当前的上一个版本为 v4，如果想指定版本可以使用下述命令：</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 查看历史版本记录，如果使用了 --replicas 会显示当时的命令</span>
+</span></span><span class="line"><span class="cl">kubectl rollout <span class="nb">history</span> deployment/nginx-deployment
+</span></span><span class="line"><span class="cl"><span class="c1"># 回滚到指定版本</span>
+</span></span><span class="line"><span class="cl">kubectl rollout undo deployment/nginx-deployment --to-revision<span class="o">=</span><span class="m">2</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 暂停 deployment 的更新</span>
+</span></span><span class="line"><span class="cl">kubectl rollout pause deployment/nginx-deployment
+</span></span><span class="line"><span class="cl"><span class="c1"># 可以使用 kubectl rollout status 查看回滚是否完成，同时命令返回 code 为 0，可以使用脚本来判断</span>
+</span></span><span class="line"><span class="cl">kubectl rollout status depoyment/nginx-deployment
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>限制版本数量</strong></p>
+<p>可以设置<code>.spec.revisionHistoryLimit</code>来设置保留的版本数量，这个数量也就是 deployment 管理的历史 rs 数量</p>
+<p><strong>多个 rollout 并行</strong></p>
+<p>假设当前有 10 个 Pod 正在从 v1 版本升级至 v2 版本，此时 v1 : 5、v2 : 5。</p>
+<p>这时我们再升级至 v3 版本，此时升级的 5 个 v2 版本的 Pod 会直接被杀死，然后直接创建 v3 版本的 Pod。</p>
+<p><strong>常用回滚策略</strong></p>
+<p>一般在企业中不会使用 revision 这种回滚方式，而是会复制最近版本的配置文件，修改名称后直接进行 apply 操作，比如<code>nginx-deployment-2022-06-06 12:00:00.yaml</code>。这样的话出现问题可以直接 apply 至上一个配置文件即可。</p>
+<h4 id="5更新策略">5、更新策略</h4>
+<p>Deployment 可以保证在升级时只有一定数量的 Pod 是 down 的。默认它会确保至少有比期望的副本数量少一个为 up 状态，也就是最多一个不可用</p>
+<p>同时也可以确保只创建出超过期望一定数量的 Pod，默认会比期望的副本数量多一个是 up 状态</p>
+<p>未来的 kuberentes 版本中，将从 1-1 变成 25%-25%</p>
+<p>当然，也支持自定义更新策略</p>
+<blockquote>
+<p>kubectl explain deploy.spec.strategy.type</p>
+<ul>
+<li>Recreate：重新创建</li>
+<li>rollingUpdate：滚动更新（推荐）
+<ul>
+<li>maxSurge：指定超出副本数有几个，两种方式：1、指定数量 2、百分比</li>
+<li>maxUnavailable：指定副本数量最多有几个不可用</li>
+</ul>
+</li>
+</ul>
+</blockquote>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 查询当前更新策略</span>
+</span></span><span class="line"><span class="cl">kubectl describe deployments <span class="o">{</span>控制器名称<span class="o">}</span> <span class="c1"># 找到 RollingUpdateStrategy</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 修改当前更新策略</span>
+</span></span><span class="line"><span class="cl">kubectl edit deployment <span class="o">{</span>控制器名称<span class="o">}</span> <span class="c1"># 找到 rollingUpdate</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 或者使用 patch 打补丁</span>
+</span></span><span class="line"><span class="cl">kubectl patch deployment nginx-deployment -p <span class="s1">&#39;{&#34;spec&#34;: {&#34;strategy&#34;: {&#34;rollingUpdate&#34;: {&#34;maxSurge&#34;:1, &#34;maxUnavailable&#34;: 0}}}}&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="6金丝雀部署">6、金丝雀部署</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 需要设置当前更新策略为 maxSurge:1 maxUnavailable:0</span>
+</span></span><span class="line"><span class="cl">kubectl patch deployment nginx-deployment -p <span class="s1">&#39;{&#34;spec&#34;: {&#34;strategy&#34;: {&#34;rollingUpdate&#34;: {&#34;maxSurge&#34;:1, &#34;maxUnavailable&#34;: 0}}}}&#39;</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 开始更新后直接暂停，此时只会新建一个新版本的 Pod，旧版本的 Pod 不会进行删除</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 此时 svc 网络会将流量负载均衡至当前全部 Pod，就可以测试新版本了</span>
+</span></span><span class="line"><span class="cl">kubectl <span class="nb">set</span> image deployment nginx-deployment <span class="nv">nginx</span><span class="o">=</span>nginx:1.9.1 <span class="se">\
+</span></span></span><span class="line"><span class="cl"><span class="se"></span><span class="o">&amp;&amp;</span> kubectl rollout pause deployment nginx-deployment
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 等待测试结束后，继续更新</span>
+</span></span><span class="line"><span class="cl">kubectl rollout resume deployment nginx-deployment
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="daemonset-1">DaemonSet</h3>
+<p>DaemonSet 确保全部（或者一些）Node 上运行一个 Pod 的副本。当有 Node 假如集群时，也会为他们新增一个 Pod。当有 Node 从集群移除时，这些 Pod 也会被回收。删除 DaemonSet 将会删除它创建的所有 Pod</p>
+<p>使用 DaemonSet 的一些典型用法：</p>
+<ul>
+<li>运行集群存储 daemon，例如在每个 Node 上运行<code>glusterd</code>、<code>ceph</code></li>
+<li>在每个 Node 上运行日志收集 daemon，例如<code>fluentd</code>、<code>logstash</code></li>
+<li>在每个 Node 上运行监控 darmon，例如<code>Promentheus Node Exproter</code>、<code>collectd</code>、<code>Datadog代理</code>、<code>New Relic 代理</code>或者<code>Ganglia gmond</code></li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span><span class="lnt">17
+</span><span class="lnt">18
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">apps/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">DaemonSet</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">daemonset-example</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">daemonset</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">matchLabels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">daemonset-example</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">labels</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">daemonset-example</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">daemonset-example</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">nginx</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="job">Job</h3>
+<p>Job 负责批处理任务，即仅执行一次的任务，它保证批处理任务的一个或多个 Pod 成功结束</p>
+<p>特殊说明</p>
+<ul>
+<li><code>.spec.template</code>格式同 Pod</li>
+<li>RestartPolicy 仅支持 Never 或者 OnFailure</li>
+<li>当个 Pod 时，默认 Pod 运行成功后 Job 即结束</li>
+<li><code>.spec.completions</code>标志 Job 结束需要成功运行的 Pod 个数，默认为 1</li>
+<li><code>.spec.parallelism</code>标志并行运行的 Pod 个数，默认为 1</li>
+<li><code>spec.activeDeadlineSecods</code>标志失败 Pod 的重试最大时间，超过这个时间不会继续重试</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">batch/v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Job</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">job</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">template</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">job</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">containers</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">job</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">image</span><span class="p">:</span><span class="w"> </span><span class="l">busybox</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="nt">command</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;echo&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;this is a job container&#39;</span><span class="p">]</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="nt">restartPolicy</span><span class="p">:</span><span class="w"> </span><span class="l">Never</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="cronjob">CronJob</h3>
+<p>CronJob 基于时间管理的 Job，即：</p>
+<ul>
+<li>在给定的时间点只运行一次</li>
+<li>周期性的在给定时间点运行</li>
+</ul>
+<p>使用条件：当前使用 k8s 集群，版本 &gt;= 1.8</p>
+<p>典型用法：</p>
+<ul>
+<li>在给定的时间点调度 Job 运行</li>
+<li>创建周期性运行的 Job，例如：数据库备份、发送邮件</li>
+</ul>
+<p>Spec</p>
+<ul>
+<li>
+<p><code>.spec.schedule</code>：调度，必须字段，指定任务运行周期，格式同 Cron</p>
+</li>
+<li>
+<p><code>.spec.jobTemplate</code>：Job 模板，必须字段，指定需要运行的任务，格式同 Job</p>
+</li>
+<li>
+<p><code>.spec.startingDeadlineSeconds</code>：启动 Job 的时间（秒），选填，超出该时间未启动认定为失败，默认没有期限</p>
+</li>
+<li>
+<p><code>.spce.concurrencyPolicy</code>：并发策略，选填，指定 Job 的并发执行，只允许以下策略：</p>
+<ul>
+<li>Allow （默认）：允许并发运行</li>
+<li>Forbid： 禁止并发运行，如果前一个还没有完成，则跳过</li>
+<li>Replace：取消当前正在运行的 Job，用一个新的替换</li>
+</ul>
+<p>以上策略只能应用于同一个 CronJob 创建的 Job，如果存在多个 CronJob，它们之间总是互不干涉的</p>
+</li>
+</ul>
+<h2 id="7service">7、Service</h2>
+<blockquote>
+<p>Kubernetes Service 定义了这样一种抽象：</p>
+<p>一个 Pod 的逻辑分组，一种可以访问它们的策略，通常称为 微服务</p>
+<p>这一组 Pod 能够被 Service 访问到，通常是通过 Label Selector</p>
+</blockquote>
+<h3 id="核心迭代">核心迭代</h3>
+<p>在 Kubernetes 集群中，每一个 Node 运行一个 <code>kube-proxy</code>进程。<code>kube-proxy</code> 负责为 <code>Service</code>实现一种 VIP（虚拟IP）的形式，而不是<code>ExternalName</code>的形式。在 Kubernetes v1.0 版本，代理完全在 userspace。在 Kubernetes v1.1 版本，增加了 iptables 代理，但并不是默认的运行模式。从 Kubernetes v1.2 起，默认就是 iptables 代理。在 Kubernetes v1.8.0-beta.0 中，添加了 ipvs 代理。在 Kubernetes v1.14 版本开始默认使用 ipvs 代理。</p>
+<p>在 Kubernetes v1.0 版本，Service 是 4层（TCP/UDP over IP）概念。在 Kubernetes v1.1 版本，新增了 Ingress API（beta 版），用来表示 7层（HTTP）服务。</p>
+<h4 id="1userspace-代理模式">1、userspace 代理模式</h4>
+<p></p>
+<h4 id="2iptables-代理模式">2、iptables 代理模式</h4>
+<p></p>
+<h4 id="3ipvs-代理模式">3、ipvs 代理模式</h4>
+<p>注意：ipvs 模式假定运行 kube-proxy 之前在节点上都已经安装了 IPVS 内核模块。当 kube-proxy以 ipvs 代理模式启动时，kube-proxy 将验证节点是否安装 IPVS 模块，如果未安装，则回退到 iptables 代理模式</p>
+<p></p>
+<h3 id="限制">限制</h3>
+<p>Service 能够提供负载均衡的能力，但是在使用上有以下限制：</p>
+<ul>
+<li>只提供 4 层负载均衡能力，没有 7 层的功能，但有时我们需要更多的匹配规则来转发请求，这点 4 层负载均衡是不支持的</li>
+</ul>
+<h3 id="类型">类型</h3>
+<ul>
+<li>ClusterIP：默认类型，自动分配一个仅 Cluster 内部可以访问的虚拟 IP</li>
+<li>NodePort：在 Cluster Ip 基础上为 Service 在每台机器上绑定一个端口，这样就可以通过 <nodeIP>:<nodePort> 来访问服务</li>
+<li>LoadBalancer：在 NodePort 的基础上，结束 cloud provider 创建一个外部负载均衡器，并将请求转发到 <nodeIP>:<nodePort></li>
+<li>ExternalName：把集群外部的服务引入到集群内部来，在集群内部直接使用。没有任何类型代理被创建，这自由 Kubernetes 1.7 或更高版本的 kube-dns 才支持</li>
+</ul>
+<h4 id="1clusterip">1、ClusterIP</h4>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="c"># temp-service.yaml</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">myapp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w"> </span><span class="l">default</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l">ClusterIP</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">myapp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">relese</span><span class="p">:</span><span class="w"> </span><span class="l">stable</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">http</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>Headless Service</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l">v1</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l">Service</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">metadata</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l">myapp-headless</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">namespace</span><span class="p">:</span><span class="w">  </span><span class="l">default</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">spec</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">selector</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">app</span><span class="p">:</span><span class="w"> </span><span class="l">myapp</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">clusterIP</span><span class="p">:</span><span class="w"> </span><span class="s2">&#34;None&#34;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="nt">ports</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">targetPort</span><span class="p">:</span><span class="w"> </span><span class="m">80</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>]]></description>
+</item><item>
+  <title>K8Sv1.24.0 containerd 安装教程</title>
+  <link>https://ronin-zc.com/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</link>
+  <pubDate>Sat, 14 May 2022 16:45:00 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</guid>
+  <description><![CDATA[<h3 id="1卸载旧版本">1、卸载旧版本</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt remove docker docker-engine docker.io containerd runc
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="2安装相关依赖包">2、安装相关依赖包</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="3添加证书镜像">3、添加证书&amp;镜像</h3>
+<ul>
+<li>
+<p>官方镜像</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 官方镜像</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://download.docker.com/linux/ubuntu/gpg <span class="p">|</span> sudo apt-key add -
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果你使用的是 Ubuntu 22.04 请使用</span>
+</span></span><span class="line"><span class="cl">curl -fsSL https://download.docker.com/linux/ubuntu/gpg <span class="p">|</span> sudo gpg --dearmor -o /usr/share/keyrings/aliyun-docker-archive-keyring.gpg
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo add-apt-repository <span class="s2">&#34;deb [arch=arm64] https://download.docker.com/linux/ubuntu </span><span class="k">$(</span>lsb_release -cs<span class="k">)</span><span class="s2"> stable&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+<li>
+<p>阿里云镜像</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg <span class="p">|</span> sudo apt-key add -
+</span></span><span class="line"><span class="cl"><span class="c1"># 如果你使用的是 Ubuntu 22.04 请使用</span>
+</span></span><span class="line"><span class="cl">curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg ｜ sudo gpg --dearmor -o /usr/share/keyrings/aliyun-docker-archive-keyring.gpg
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sudo add-apt-repository <span class="s2">&#34;deb [arch=arm64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu </span><span class="k">$(</span>lsb_release -cs<span class="k">)</span><span class="s2"> stable&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div></li>
+</ul>
+<blockquote>
+<p>如果卡住不动的话，可以先 wget 下载文件，直接导入</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">wget http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg
+</span></span><span class="line"><span class="cl">sudo apt-key add ./gpg
+</span></span></code></pre></td></tr></table>
+</div>
+</div></blockquote>
+<h3 id="4安装">4、安装</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> sudo apt install -y containerd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="5生成配置文件">5、生成配置文件</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">mkdir -p /etc/containerd <span class="o">&amp;&amp;</span> containerd config default <span class="p">|</span> sudo tee /etc/containerd/config.toml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="c1"># 修改配置文件</span>
+</span></span><span class="line"><span class="cl"><span class="c1"># 老版本需要手动添加 `SystemdCgroup = true`</span>
+</span></span><span class="line"><span class="cl">sudo sed -i <span class="s1">&#39;s/SystemdCgroup = false/SystemdCgroup = true/&#39;</span> /etc/containerd/config.toml <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">grep <span class="s1">&#39;SystemdCgroup&#39;</span> -B <span class="m">11</span> /etc/containerd/config.toml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="6配置镜像加速官方链接httpscrconsolealiyuncomcn-shenzheninstancesmirrors">6、配置镜像加速<a
+  href="https://cr.console.aliyun.com/cn-shenzhen/instances/mirrors"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+  
+>官方链接</a></h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="c1"># 这里需要替换为自己阿里云的镜像加速器地址</span>
+</span></span><span class="line"><span class="cl">sudo sed -i <span class="s1">&#39;s#endpoint = &#34;&#34;#endpoint = &#34;https://xxxxxx.mirror.aliyuncs.com&#34;#g&#39;</span> /etc/containerd/config.toml <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">grep <span class="s1">&#39;endpoin&#39;</span> -B <span class="m">5</span> /etc/containerd/config.toml
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">sed -i <span class="s1">&#39;s#sandbox_image = &#34;k8s.gcr.io/pause#sandbox_image = &#34;registry.aliyuncs.com/google_containers/pause#g&#39;</span> /etc/containerd/config.toml <span class="o">&amp;&amp;</span>
+</span></span><span class="line"><span class="cl">grep <span class="s1">&#39;sandbox_image&#39;</span> /etc/containerd/config.toml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="7重载服务器配置">7、重载服务器配置</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">systemctl daemon-reload <span class="o">&amp;&amp;</span> systemctl restart containerd.service
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="8检查运行情况">8、检查运行情况</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">systemctl status containerd
+</span></span></code></pre></td></tr></table>
+</div>
+</div>]]></description>
+</item></channel>
+</rss>
