@@ -5,4 +5,4 @@ toc: false
 images:
 ---
 
-个人博客，瞎写写。OTG
+个人博客，瞎写写 OTG
