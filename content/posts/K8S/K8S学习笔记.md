@@ -1166,7 +1166,6 @@ Service 能够提供负载均衡的能力，但是在使用上有以下限制：
 #### 1、ClusterIP
 
 ```yaml
-# temp-service.yaml
 apiVersion: v1
 kind: Service
 metadata:
@@ -1199,4 +1198,162 @@ spec:
   - port: 80
     targetPort: 80
 ```
+
+#### 2、NodePort
+
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: myapp-nodeport
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    app: myapp
+    relese: stable
+  ports:
+  - name: http
+    port: 80
+    targetPort: 80
+    nodePort: 30000 # 可指定
+```
+
+#### 3、LoadBalancer
+
+loadBalacer 和 nodePort 其实是同一种方式，区别在于 loadBalancer 比 nodePort 多了一步，就是可以调用 cloud provider 去创建 LB 来向节点导流
+
+![image-20220823134223567](https://lsky.ronin-zc.com/i/2022/08/23/630468c085d19.png)
+
+#### 4、ExternalName
+
+可以将服务映射到 ExternalName 字段的内容（例如：myapp.otherNS）。ExternalName Service 是 Service 的特例，它没有 selector，也没有定义任何的端口和 Endpoint。相反的、对于运行在集群外部的服务，它通过返回外部服务的别名这种方式来提供服务
+
+```yaml
+kind: Service
+apiVersion: v1
+metadata:
+  name: my-service
+  namespace: default
+spec:
+  type: ExternalName
+  externalName: myapp.otherNS
+```
+
+但查询主机`my-service.default.svc.cluster.local`（SVC NAME.NAMESPACE.svc.cluster.local）时，集群的 coreDNS 服务将返回一个值 `my.database.example.com` 的 CANEM 记录。访问这个服务的工作方式和其他的相同，唯一不同的事重定向发生在 DNS 层，而且不会进行代理和转发
+
+## 8、Ingress
+
+Ingress 的功能与 service 大致相似，不同的是 ingerss 提供了7层的代理，而 service 只提供了 4 层代理，如果希望实现 https 的访问则可以使用 Ingress
+
+### 实现原理
+
+![image-20220823162854855](https://lsky.ronin-zc.com/i/2022/08/23/63048fc767815.png)
+
+在 k8s 环境下创建一个 nginx pod，在内编写配置文件去反向代理 svc，同时提供 https 服务。其中的 nginx 在修改配置文件的状态下可能会造成服务的不稳定，所以 ingress 的 nginx 版本是不同的，具体逻辑见下图：
+
+![image-20220823144927462](https://lsky.ronin-zc.com/i/2022/08/23/630478781b03f.png)
+
+### 示例
+
+#### http代理：
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: myapp
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        name: app
+      spec:
+        containers:
+          - name: nginx
+            image: myapp:v1
+            imagePullPolicy: IfNotPresent
+            ports:
+              - containerPort: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-svc
+spec:
+  ports:
+    - port: 80
+      targetPort: 80
+      protocol: TCP
+  selector:
+    name: app
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  rules:
+    - host: test.localhost
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: app-svc
+              servicePort: 80
+
+```
+
+可以发现 Ingress 依赖与 svc，避免依赖动态的服务副本数量频繁重启 Ingress 
+
+#### https代理：
+
+创建 https 证书，以及创建 secret 对象进行存储
+
+```shell
+# 创建证书
+openssl req -x509 -sha256 -nodes -days 365 -newkey rsa:2048 -keyout tls.key -out tls.crt -subj "/CN=nginxsvc /O=nginxsvc"
+kubectl create secret tls tls-secret --key tls.key --cert tls.crt
+```
+
+配置文件
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: app-ingress
+spec:
+  tls:
+    - hosts:
+      - test.localhost
+      secretName: tls-secret
+  rules:
+    - host: test.localhost
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: app-svc
+              servicePort: 80
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
