@@ -1334,6 +1334,38 @@ spec:
               servicePort: 80
 ```
 
+#### BasicAuth
+
+创建密钥对
+
+```shell
+yum -y install httpd-tools
+htpasswd -c auth foo
+kubectl create secret generic basic-auth --form-file=auth
+```
+
+配置文件
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-with-auth
+  anntations:
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - foo'
+spec:
+  rules:
+    - host: test.localhost
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: app-svc
+              servicePort: 80 
+```
+
 
 
 
