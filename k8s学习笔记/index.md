@@ -1385,7 +1385,7 @@ spec:
 > 3. Volume: 卷，可以保障 Pod 级别的文件存储
 > 4. Persistent Volume: 持久卷
 
-### 一、configMap
+### configMap
 
 #### 1、描述
 

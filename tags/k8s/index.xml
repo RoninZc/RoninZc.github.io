@@ -2214,7 +2214,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 <li>Persistent Volume: 持久卷</li>
 </ol>
 </blockquote>
-<h3 id="一configmap">一、configMap</h3>
+<h3 id="configmap">configMap</h3>
 <h4 id="1描述">1、描述</h4>
 <p>ConfigMap 功能在 Kubernetes 1.2 版本中引入，许多应用程序会从配置文件、命令行参数或环境变量中读取配置信息。ConfigMap 可以被用来保存单个属性，也可以用来保存整个配置文件或者 JSON 二进制等对象</p>
 <h4 id="2创建">2、创建</h4>
