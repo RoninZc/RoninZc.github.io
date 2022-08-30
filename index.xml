@@ -2028,7 +2028,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 <p>在 k8s 环境下创建一个 nginx pod，在内编写配置文件去反向代理 svc，同时提供 https 服务。其中的 nginx 在修改配置文件的状态下可能会造成服务的不稳定，所以 ingress 的 nginx 版本是不同的，具体逻辑见下图：</p>
 <p></p>
 <h3 id="示例-1">示例</h3>
-<h4 id="http代理">http代理：</h4>
+<h4 id="http代理">http代理</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -2122,7 +2122,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>可以发现 Ingress 依赖与 svc，避免依赖动态的服务副本数量频繁重启 Ingress</p>
-<h4 id="https代理">https代理：</h4>
+<h4 id="https代理">https代理</h4>
 <p>创建 https 证书，以及创建 secret 对象进行存储</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">

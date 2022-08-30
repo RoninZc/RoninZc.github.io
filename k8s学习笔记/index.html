@@ -11,7 +11,7 @@
 <meta name="description" content="这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频 2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili 本文章为本人学习" /><meta name="keywords" content='k8s' /><meta itemprop="name" content="K8S学习笔记">
 <meta itemprop="description" content="这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频 2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili 本文章为本人学习"><meta itemprop="datePublished" content="2022-06-07T10:45:00+08:00" />
 <meta itemprop="dateModified" content="2022-06-07T10:45:00+08:00" />
-<meta itemprop="wordCount" content="12012"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
+<meta itemprop="wordCount" content="12010"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
 <meta itemprop="keywords" content="k8s," /><meta property="og:title" content="K8S学习笔记" />
 <meta property="og:description" content="这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频 2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili 本文章为本人学习" />
 <meta property="og:type" content="article" />
@@ -36,7 +36,7 @@
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https:\/\/ronin-zc.com\/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0\/"
-    },"genre": "posts","keywords": "k8s","wordcount":  12012 ,
+    },"genre": "posts","keywords": "k8s","wordcount":  12010 ,
     "url": "https:\/\/ronin-zc.com\/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0\/","datePublished": "2022-06-07T10:45:00+08:00","dateModified": "2022-06-07T10:45:00+08:00","publisher": {
       "@type": "Organization",
       "name": ""},"author": {
@@ -221,7 +221,7 @@
     title="RoninZc" />&nbsp;RoninZc</a></span></div>
       <div class="post-meta-line"><span title=2022-06-07&#32;10:45:00>
             <i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2022-06-07" >2022-06-07</time>
-          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 12012 字&nbsp;
+          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 12010 字&nbsp;
         <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 24 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="K8S学习笔记">
               <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
             </span>&nbsp;</div>
@@ -352,8 +352,8 @@
         <li><a href="#实现原理">实现原理</a></li>
         <li><a href="#示例-1">示例</a>
           <ul>
-            <li><a href="#http代理">http代理：</a></li>
-            <li><a href="#https代理">https代理：</a></li>
+            <li><a href="#http代理">http代理</a></li>
+            <li><a href="#https代理">https代理</a></li>
             <li><a href="#basicauth">BasicAuth</a></li>
             <li><a href="#nginx-进行重写">Nginx 进行重写</a></li>
           </ul>
@@ -2450,7 +2450,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
     alt="https://lsky.ronin-zc.com/i/2022/08/23/630478781b03f.png"
     title="image-20220823144927462" /></p>
 <h3 id="示例-1">示例</h3>
-<h4 id="http代理">http代理：</h4>
+<h4 id="http代理">http代理</h4>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -2544,7 +2544,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p>可以发现 Ingress 依赖与 svc，避免依赖动态的服务副本数量频繁重启 Ingress</p>
-<h4 id="https代理">https代理：</h4>
+<h4 id="https代理">https代理</h4>
 <p>创建 https 证书，以及创建 secret 对象进行存储</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
