@@ -1371,21 +1371,240 @@ spec:
               servicePort: 80 
 ```
 
+#### Nginx 进行重写
 
+| 名称                                           | 描述                                                         | 值     |
+| ---------------------------------------------- | ------------------------------------------------------------ | ------ |
+| nginx.ingress.kubernetes.io/rewrite-target     | 必须重定向流量的目标 URL                                     | 字符串 |
+| nginx.ingress.kubernetes.io/ssl-redirect       | 指示位置部分是否仅可访问SSL（当 Ingress 包含证书时默认为 true） | 布尔   |
+| nginx.ingress.kubernetes.io/force-ssl-redirect | 即使 Ingress 未启用 TLS，也强制重定向到 HTTPS                | 布尔   |
+| nginx.ingress.kubernetes.io/app-root           | 定义 Controller 必须重定向到应用程序根，如果它在 '/' 上下文中 | 字符串 |
+| nginx.ingress.kubernetes.io/use-regex          | 指示 Ingress 上定义当路径是否使用正则表达式                  | 布尔   |
 
+## 9、存储
 
+> K8S 集群中存储常用的有以下 4 种
+>
+> 1. ConfigMap: 一般用于存储配置信息
+> 2. Secret: 存储一些安全类型的内容，例如存储密钥
+> 3. Volume: 卷，可以保障 Pod 级别的文件存储
+> 4. Persistent Volume: 持久卷
 
+### 一、configMap
 
+#### 1、描述
 
+ConfigMap 功能在 Kubernetes 1.2 版本中引入，许多应用程序会从配置文件、命令行参数或环境变量中读取配置信息。ConfigMap 可以被用来保存单个属性，也可以用来保存整个配置文件或者 JSON 二进制等对象
 
+#### 2、创建
 
+**使用目录创建**
 
+```shell
+ls /root/game
+# game.file
+# ui.file
 
+cat /root/game/game.file
+# version=1.17
+# name=dave
+# age=18
 
+cat /root/game/ui.file
+# level=2
+# color=yellow
 
+kubectl create configmap game-config --from-file=/root/game
+```
 
+`-from-file`指定在目录下当所有文件都会被用在 ConfigMap 里面创建一个键值对，键的名称就是文件名，值就是文件的内容
 
+**使用文件创建**
 
+只要指定为一个文件就可以从单文件中创建 ConfigMap
+
+```shell
+kubectl create configmap game-config-2 --from-file=/root/game/game.file
+```
+
+`--form-file`这个参数可以使用多次、可以使用两次分别指定三个实例中的那两个配置文件，效果和指定整个目录是一样的
+
+**使用字面值创建**
+
+使用文字创建，利用`-from-literal`参数传递配置信息，该参数可以使用多次，格式如下
+
+```shell
+kubectl create configmap literal-config --from-literal=name=dave --from-literal=password=pass
+
+kubectl get configmap literal-config -o yaml
+```
+
+#### 使用
+
+**使用 ConfigMap 来代替环境变量**
+
+创建两个 ConfigMap
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: literal-config
+  namespace: default
+data:
+  name: dave
+  password: pass
+```
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env-config
+  namespace: default
+data:
+  log_level: INFO
+```
+
+在 Pod 中使用 ConfigMap
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-env-test-pod
+spec:
+  containers:
+    - name: test-container
+      image: myapp:v1
+      command: ["/bin/sh", "-c", "env"]
+      env: # 单个指定
+        - name: USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: literal-config
+              key: name
+        - name: PASSWORD
+          valueForm:
+            configMapKeyRef:
+              name: literal-config
+              key: password
+      envFrom: # 批量注入
+        - configMapRef:
+          name: env-config
+  restartPolicy: Never
+```
+
+**使用 ConfigMap 设置命令行参数**
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-env-test-pod
+spec:
+  containers:
+    - name: test-container
+      image: myapp:v1
+      command: ["/bin/sh", "-c", "echo $(USERNAME) $(PASSWORD)"]
+      env: # 单个指定
+        - name: USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: literal-config
+              key: name
+        - name: PASSWORD
+          valueForm:
+            configMapKeyRef:
+              name: literal-config
+              key: password
+  restartPolicy: Never
+```
+
+**通过数据卷插件使用 ConfigMap**
+
+在数据卷里面使用这个 ConfigMap，有不同的选项、最基本的就是将文件填入数据卷，在这个文件中，键就是文件名称，值就是文件内容
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-volume-test-pod
+spec:
+  containers:
+    - name: test-container
+      image: myapp:v1
+      volumeMounts:
+      - name: config-volume
+        mountPath: /etc/config
+   volumes:
+     - name: config-volume
+       configMap:
+         name: literal-config
+  restartPolicy: Never
+```
+
+**热更新**
+
+在通过数据卷插件的形式使用 ConfigMap 时，可以达到**热更新**的目的，修改 ConfigMap 之后，在 Pod 中的对应文件内容也将修改成对应修改后的内容
+
+创建初始 ConfigMap & Pod
+
+```yaml
+# 初始内容
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: log-cofnig
+  namespace: default
+data:
+  log_level: INFO
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hot-update
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        run: my-nginx
+    spec:
+      containers:
+        - name: my-nginx
+          image: myapp:v1
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: config-volume
+              mountPath: /etc/config
+      volumes:
+        - name: config-volume
+          configMap:
+            name: log-config
+```
+
+查看内容
+
+```shell
+kubectl exec pod-xxx cat /etc/config/log_level
+# INFO
+```
+
+修改 ConfigMap
+
+```shell
+kubectl edit cm log-config
+# log_level=ERROR
+```
+
+再次查看内容，需要一定时间
+
+```shell
+kubectl exec pod-xxx cat /etc/config/log_level
+# ERROR
+```
 
 
 
