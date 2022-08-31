@@ -1390,7 +1390,7 @@ spec:
 > 3. Volume: 卷，可以保障 Pod 级别的文件存储
 > 4. Persistent Volume: 持久卷
 
-### configMap
+### ConfigMap
 
 #### 描述
 
@@ -1441,7 +1441,7 @@ kubectl get configmap literal-config -o yaml
 
 #### 使用
 
-**使用 ConfigMap 来代替环境变量**
+##### 使用 ConfigMap 来代替环境变量
 
 创建两个 ConfigMap
 
@@ -1495,7 +1495,7 @@ spec:
   restartPolicy: Never
 ```
 
-**使用 ConfigMap 设置命令行参数**
+##### 使用 ConfigMap 设置命令行参数
 
 ```yaml
 apiVersion: v1
@@ -1521,7 +1521,7 @@ spec:
   restartPolicy: Never
 ```
 
-**通过数据卷插件使用 ConfigMap**
+##### 通过数据卷插件使用 ConfigMap
 
 在数据卷里面使用这个 ConfigMap，有不同的选项、最基本的就是将文件填入数据卷，在这个文件中，键就是文件名称，值就是文件内容
 
@@ -1544,7 +1544,9 @@ spec:
   restartPolicy: Never
 ```
 
-**热更新**
+
+
+##### 热更新
 
 在通过数据卷插件的形式使用 ConfigMap 时，可以达到**热更新**的目的，修改 ConfigMap 之后，在 Pod 中的对应文件内容也将修改成对应修改后的内容
 
@@ -1605,6 +1607,399 @@ kubectl edit cm log-config
 kubectl exec pod-xxx cat /etc/config/log_level
 # ERROR
 ```
+
+**注意：**如果 configMap 以 ENV 的方式挂载，修改并不会实现热更新
+
+##### 滚动更新Pod
+
+在更新 ConfigMap 之后并不会触发 Pod 的滚动更新，可以通过修改 Pod annotations 的方式来强制出发滚动更新
+
+```shell
+kubectl patch deploy my-nginx --patch '{"spec": {"template": {"metadata": {"anntations": {"version/config": "20190411"}}}}}'
+```
+
+这个例子里我们在`.spec.template.metadata.annotations`中添加`version/config`，每次通过修改`version/config`来触发滚动更新
+
+### Secret
+
+解决了密码、token、密钥等敏感数据等配置问题，而不需要把这些敏感数据暴露到镜像或者 Pod Spec 中。Secret 可以以 Volume 或者环境变量方式使用
+
+Secret有三种类型：
+
+* **Service Account**：用来访问 Kubernetes API，由 Kubernetes 自动创建，并且会自动挂载到 Pod 的 `/run/secrets/kubernetes.io/serviceaccount`目录中
+* **Opaque**：base64 编码格式的 Secret，用来存储密码、密钥等
+* **kubernetes.io/dockerconfigjson**：用来存放私有 docker 仓库等认证信息
+
+#### Service Account
+
+用来访问 Kubernetes API，由 Kubernetes 自动创建，并且会自动挂载到 Pod 的 `/run/secrets/kubernetes.io/serviceaccount`目录中
+
+```shell
+kubectl exec pod-xxx -- ls /run/secrets/kubernetes.io/serviceaccount
+# ca.crt
+# namespace
+# token
+```
+
+#### Opaque Secret
+
+Opaque 类型的数据是一个 map 类型，要求 value 是 base64 编码格式
+
+##### 创建
+
+```shell
+$ echo -n "admin" | base64
+YWRtaW4=
+$ echo -n "123456" | base64
+MTIzNDU2
+```
+
+**secrets.yaml**
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mysecret
+type: Opaque
+data:
+  username: YWRtaW4=
+  password: MTIzNDU2
+```
+
+>  secret 在挂载后会自动解密
+
+##### 使用
+
+**1、将 Secret 挂载到 Volume 中**
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    name: secret-test
+  name: secret-test
+spec:
+  volumes:
+    - name: volumes12
+      secret:
+        secretName: mysecret
+  containers:
+    - image: myapp:v1
+      name: db
+      volumeMounts:
+        - name: volumes12
+          mountPath: "/data"
+```
+
+**2、将 Secret 导出到环境变量中**
+
+```yaml
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  labels:
+    name: pod-deployment
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: pod-deployment
+    spec:
+      containers:
+        - name: pod-1
+          image: myapp:v1
+          ports:
+            - containerPort: 80
+          env:
+            - name: TEST_USER
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: username
+            - name: TEST_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysecret
+                  key: password
+```
+
+#### kubernetes.io/dockerconfigjson
+
+使用 kubectl 创建 docker 仓库认证的 secret
+
+```shell
+$ kubectl create secret docker-registry myregistrykey \
+--docker-server=DOCKER_REGISTRY_SERVER \
+--docker-username=DOCKER_USER \
+--docker-password=DOCKER_PASSWOED \
+--docker-email=DOCKER_EMAIL
+
+secret "myregistrykey" created。
+```
+
+在创建 Pod 的时候，通过 `imagePullSecrets`来引用刚创建的`myregistrykey`
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: foo
+spec:
+  containers:
+    - name: foo
+      image: hub.xxx.com/xxx/xxxx
+  imagePullSecrets:
+    - name: myregistrykey
+```
+
+### Volume「卷」
+
+容器磁盘上的文件等生命周期是短暂的，这就使得在容器中运行重要应用时会出现一些问题。首先，当容器崩溃时，kubelet 会重启它，但是容器中的文件将丢失，容器将以干净的状态（镜像最初的状态）重新启动。其次，在`Pod`中同时运行多个容器时，这些容器之间通常需要共享文件。Kubernetes 中的 `Volume` 抽象就很好的解决了这些问题。
+
+Kubernetes 中的卷有明确的寿命（与封装它的 Pod 相同）。所以，卷的生命比 Pod 中的所有容器都长，当这个容器重启时数据仍然得以保存。当然，当 Pod 不再存在时，卷也将不复存在。也许更重要的是，Kubernetes 支持多种类型的卷，Pod 可以同时使用任意数量的卷
+
+**类型**
+
+kubernetes 支持以下类型的卷：
+
+* `csi` 通用存储接口
+* `hostPath` 主机路径（不能限制使用量）
+* `emptyDir` 空目录
+* `awsElasticBlockStore` `azureDisk` `azureFile` `cephfs`  `downwardAPI` 
+* `fc` `flocker` `gcePersistentDisk` `gitRepo` `glusterfs` `hostPath` `iscsi` `local` `nfs`
+* `persistentVolumeClaim` `projected` `portworxVolume` `quobyte` `rbd` `scaleIO` `secret`
+* `storageos` `vsphereVolume`
+
+##### emptyDir
+
+当 Pod 被分配给节点时，首先创建 `emptyDir` 卷，并且只要该 Pod 在该节点上运行，该卷就会存在。正如卷名字所述，它最初时空的。Pod 中的容器可以读取喝写入 `emptyDir` 卷中的相同文件，尽管该卷可以挂载到每个容器中的相同或不同路径上。当出于任何原因从节点中删除 Pod 时，`empryDir` 中的数据将被永久删除
+
+⚠️**注意：** 容器崩溃不会从节点中移除 Pod，因此 `emptyDir` 卷中的数据在容器崩溃时是安全的
+
+用法：
+
+* 暂存空间，例如用于基于磁盘的合并排序、用作长时间计算崩溃恢复时的检查点
+* Web 服务器容器提供数据时，保存内容管理器提取的文件
+
+```yaml
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jobs-empty
+spec:
+  template:
+    spce:
+      restartPolicy: Never
+      initContainers:
+        - name: job-1
+          image: busybox:1.34.1
+          command:
+            - "sh"
+            - "-c"
+            - >
+              for i in 1 2 3;
+              do
+                echo "job-1 `date`";
+                sleep 1s;
+              done;
+              echo job-1 GG > /src/input/code
+          volumeMounts: # 挂载一个卷
+            - name: input
+              mountPath: /src/input/
+        - name: job-2
+          image: busybox:1.34.1
+          command:
+            - "sh"
+            - "-c"
+            - >
+              for i in 1 2 3;
+              do
+                echo "job-2 `date`";
+                sleep 1s;
+              done;
+              cat /src/input/code &&
+              echo job-2 GG > /sec/input/output/file
+          volumeMounts: # 挂载两个卷
+            - name: input
+              mountPath: /src/input/
+            - name: output
+              mountPath: /src/input/output/
+      containers:
+        - name: job-3
+          image: busybox:1.34.1
+          command:
+            - "sh"
+            - "-c"
+            - >
+              echo "job-1 and job-2 completed";
+              sleep 3s;
+              cat /src/output/file
+          volumeMounts:
+            - name: output
+              mountPath: /src/output/
+      volumes:
+        - name: input
+          emptyDir: {}
+        - name: output
+          emptyDir: {}
+```
+
+##### hostPath
+
+`hostPath` 卷将主机节点的文件系统中的文件或目录挂载到集群中
+
+用途如下：
+
+* 运行需要访问 Docker 内部的容器；使用 `/var/lib/docker` 的 `hostPath`
+* 在容器中运行 cAdvisor; 使用 `/dev/cgroups` 的 `hostPath`
+* 允许 Pod 指定给定的 hostPath 是否应该在 Pod 运行之前存在，是否应该创建，以及它应该以什么形式存在
+
+除了所需的 `path` 属性之外，用户还可以为 hostPath 卷指定 type
+
+| 值                  | 行为                                                         |
+| ------------------- | ------------------------------------------------------------ |
+|                     | 空字符串（默认）用于向后兼容，这意味着在挂载 hostPath 卷之前不会执行任何检查 |
+| `DirectoryOrCreate` | 如果在给定的路径没有任何东西存在，那么将根据需要在那里创建一个空目录，权限设置为 0755，与 kubelet 具有相同的组喝所有权 |
+| `Directory`         | 给定的路径下必须存在目录                                     |
+| `FileOrCreate`      | 如果在给定的路径没有任何东西存在，那么将根据需要在那里创建一个空文件，权限设置为 0655，与 kubelet 具有相同的组喝所有权 |
+| `File`              | 给定的路径下必须存在文件                                     |
+| `Socket`            | 给定的路径下必须存在 UNIX 套接字                             |
+| `CharDevice`        | 给定的路径下必须存在字符设备                                 |
+| `BlockDevice`       | 给定的路径下必须存在块设备                                   |
+
+使用这种卷类型时请注意，因为：
+
+* 由于每个节点上的文件都不同，具有相同配置（例如从 PodTemplate 创建的）的 Pod 在不同节点上的行为会有所不同
+* 当 Kubernetes 按照计划添加资源感知调度时，将无法考虑 `hostPath` 使用的资源
+* 在底层主机上创建的文件或目录只能由 root 写入，您需要在特权容器中以 root 身份运行进程，或修改主机上的文件权限以便写入 hostPath 卷
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pd
+spec:
+  containers:
+    - image: myapp:v1
+      name: test-container
+      volumeMounts:
+        - name: test-volume
+          mountPath: /test-pd
+  volumes:
+    - name: test-volume
+      hostPath:
+        path: /data
+        type: Dirctory
+```
+
+###  Persistent Volume「持久卷」
+
+#### 概念
+
+**PersistentVolume（PV）**
+
+是由管理员设置的存储，它是集群的一部分，就像节点是集群中的资源一样，PV 也是集群中的资源。PV 是 Volume 之类的卷插件，但具有独立于使用 PV 的 Pod 的生命周期。此 API 对象包含存储实现的细节，即 NFS、ISCSI 或特定于云供应商的存储系统
+
+**PersistentVolumeClaim（PVC）**
+
+是用户存储的请求，它与 Pod 相似。Pod 消耗节点资源，PVC 消耗 PV 资源。Pod 可以请求特定级别的资源（CPU 和 内存）。声明可以请求特定的大小和访问模式（例如：可以以读/写一次或只读多次模式挂载）
+
+**静态PV**
+
+集群管理员创建一些 PV。它们带有可供集群用户使用的实际存储的细节。它们存在于 Kuberneters API 中，可用于消费。
+
+**动态PV**
+
+当管理员创建的静态 PV 都不匹配用户的 `PVC` 时，集群可能会尝试动态的为 PVC 创建卷。此配置基于 `StorageClasses`： PVC 必须请求 「存储类」，并且管理员必须创建并配置该类才能进行动态创建。声明该类为 `""` 可以有效的禁用其动态配置
+
+要启用基于存储级别的动态存储配置，集群管理员需要启用 API server 上的 `DefaultStorageClass`「准入控制器」。例如，通过确保 `DefaultStorageClass` 位于 API server 组件的 `--admission-control` 标志，使用逗号分隔的有序值列表中，可以完成此操作
+
+#### 绑定
+
+master 中的控制环路监听新的 PVC，寻找匹配的 PV（如果可能），并将它们绑定在一起。如果为新的 PVC 动态掉配 PV，则该环路将始终将 PV 绑定到 PVC，否则用户总会得到他们所请求的存储，但是容量可能超出要求的数量。一旦 PV 和 PVC 绑定后，`PersistentVolumeClaim` 绑定是排他性的，不管它们是如何绑定的。PVC 跟 PV 绑定是一对一的映射
+
+#### 保护
+
+PVC 保护的目的是确保由 Pod 正在使用的 PVC 不会从系统中移除，因为如果被移除的话可能会导致数据丢失
+
+⚠️**注意：**当 Pod 状态为 `Pending` 并且 Pod 已经分配给节点或 Pod 为 `Running` 状态时，PVC处于活跃状态
+
+当启用 PVC 保护 alpha 功能时，如果用户删除了一个 Pod 正在使用的 PVC，则该 PVC 不会被立即删除。PVC 的删除将被推迟，直到 PVC 不再被任何 Pod 使用
+
+#### 分类
+
+`PersistentVolume` 类型以插件形式出现。Kubernetes 目前支持以下插件类型：
+
+* `HostPath`
+* `GCEPersistentDisk` `AWSElasticBlockStore` `AzureFile` `AzureDisk` `FC(Fibre Channel)`
+* `FlexVolume` `Flocker` `NFS` `iSCSI` `RBD` `CephFS` `Cinder(OpenStack block storage)`
+* `Glusterfs` `VsphereVolume` `Quobyte Volumes` `Vmware Photon` `Portworx Voumes`
+* `ScaleIO Volumes` `StorageOS`
+
+**持久卷示例代码**
+
+```yaml
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv0001
+spec:
+  capacity: # 容量
+    storage: 5Gi
+  volumeMode: Filesystem # 卷模式
+  accessModes: # 访问策略
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Recycle # 回收策略
+  storageClassName: slow # 存储类名称 默认为 StorageClass
+  mountOptions:
+    - hard
+    - nfsvers=4.1
+  nfs:
+    path: /tmp
+    server: 172.17.0.2
+```
+
+#### 访问模式
+
+PV 可以以资源提供者支持的任何形式挂载到主机上。如下表所示，供应商具有不同的功能，每个 PV 的访问模式都将被设置为该卷支持的特定模式。例如，NFS 可以支持多个读/写客户端，但特定的 NFS PV 可能以只读方式导出到服务器上。每个 PV 都有一套自己的用来描述特定功能的访问模式
+
+* **ReadWriteOnce** 该卷可以被单个节点以读/写模式挂载
+* **ReadOnlyMany** 该卷可以被多个节点以只读模式挂载
+* **ReadWriteMany** 该卷可以被多个节点以读/写模式挂载
+
+**在命令行中，访问模式缩写为：**
+
+* **RWO** - ReadWriteOnce
+* **ROX** - ReadOnlyMany
+* **ReadWriteMany** - RWX
+
+⚠️**注意：**一个卷一次只能使用一种访问模式挂载，即使它支持很多访问模式。例如，GCRPersistentDisk 可以由单个节点作为 ReadWriteOnce 模式挂载，或由多个节点以 ReadOnlyMany 模式挂载，但不能同时挂载
+
+#### 回收策略
+
+* Retain（保留）：手动回收
+* Recycle（回收）：基本擦除（`rm -rf /thevolume/*`）
+* Delete（删除）：关联的存储资产（例如 AWS EBS...）将被删除
+
+当前，只有 HostPath 支持回收策略，AWS EBS、GCE PD、Azure Disk 和 Cinder 卷支持删除策略
+
+#### 状态
+
+卷可以处于一下的某种状态：
+
+* Available（可用）：一块空闲资源还没有被任何声明绑定
+* Bound（已绑定）：卷已经被声明绑定
+* Released（已释放）：声明被删除，但是资源还未被集群重新声明
+* Failed（失败）：该卷的自动回收失败
+
+命令行会显示绑定到 PV 的 PVC 的名称
+
+
+
+
 
 
 
