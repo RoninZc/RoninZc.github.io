@@ -53,7 +53,7 @@ JSON模型，比较MySQL5.7以前使用text类型来存文本JSON的方式，JSO
 
 下面给出列模型、行模型、EAV模型和JSON模型的优缺点及表结构对比：
 
-![youque](http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631206917512.png)
+![youque](https://lsky.ronin-zc.com/i/2022/09/09/631ae2bc2a7dd.png)
 
 **由于列模型、行模型和NoSQL都是比较容易理解和常见，所以下文重点只对EAV模型和JSON模型进行分析和对比**
 
@@ -61,17 +61,17 @@ JSON模型，比较MySQL5.7以前使用text类型来存文本JSON的方式，JSO
 
 下面是两种模型参与性能测试的SQL，包括查询，更新和插入数据，可以对比观察一下不同模型SQL的复杂度：
 
-![sql](http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631216179938.png)
+![sql](https://lsky.ronin-zc.com/i/2022/09/09/631ae2ca99d43.png)
 
 下面为SQL在不同量级的数据量时，从查询、更新、插入、建立字段和索引等操作维度，对比了EAV模型、MySQL5.7的JSON模型 和 MySQL8.0的JSON模型 的性能，另外对比了磁盘空间占用和数据导入性能
 
-![table](http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237540600.png)
+![table](https://lsky.ronin-zc.com/i/2022/09/09/631ae2d63f2a6.png)
 
 图表展示，方便查看趋势
 
-![对比1](http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631214527159.png)
+![对比1](https://lsky.ronin-zc.com/i/2022/09/09/631ae2e671e64.png)
 
-![索引](http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631237502264.png)
+![索引](https://lsky.ronin-zc.com/i/2022/09/09/631ae2f2c722b.png)
 
 结论：
 
@@ -96,7 +96,7 @@ JSON模型，比较MySQL5.7以前使用text类型来存文本JSON的方式，JSO
 
 ### 1. EAV模型（Entity-Attribute-Value Model）
 
-![eav](http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208435800.png)
+![eav](https://lsky.ronin-zc.com/i/2022/09/09/631ae2fee3172.png)
 
 #### 表结构
 
@@ -211,7 +211,7 @@ VALUES (1, 1, 'name', '姓名', 'varchar'),
 
 #### 表结构
 
-![doc](http://jintang.zone/img/assets/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94-1631208484836.png)
+![doc](https://lsky.ronin-zc.com/i/2022/09/09/631ae30bc29d7.png)
 
 用户表
 

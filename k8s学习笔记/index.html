@@ -11,7 +11,7 @@
 <meta name="description" content="这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频 2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili 本文章为本人学习" /><meta name="keywords" content='k8s' /><meta itemprop="name" content="K8S学习笔记">
 <meta itemprop="description" content="这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频 2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili 本文章为本人学习"><meta itemprop="datePublished" content="2022-06-07T10:45:00+08:00" />
 <meta itemprop="dateModified" content="2022-06-07T10:45:00+08:00" />
-<meta itemprop="wordCount" content="15712"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
+<meta itemprop="wordCount" content="15896"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
 <meta itemprop="keywords" content="k8s," /><meta property="og:title" content="K8S学习笔记" />
 <meta property="og:description" content="这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频 2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili 本文章为本人学习" />
 <meta property="og:type" content="article" />
@@ -36,7 +36,7 @@
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https:\/\/ronin-zc.com\/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0\/"
-    },"genre": "posts","keywords": "k8s","wordcount":  15712 ,
+    },"genre": "posts","keywords": "k8s","wordcount":  15896 ,
     "url": "https:\/\/ronin-zc.com\/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0\/","datePublished": "2022-06-07T10:45:00+08:00","dateModified": "2022-06-07T10:45:00+08:00","publisher": {
       "@type": "Organization",
       "name": ""},"author": {
@@ -221,7 +221,7 @@
     title="RoninZc" />&nbsp;RoninZc</a></span></div>
       <div class="post-meta-line"><span title=2022-06-07&#32;10:45:00>
             <i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2022-06-07" >2022-06-07</time>
-          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 15712 字&nbsp;
+          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 15896 字&nbsp;
         <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 32 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="K8S学习笔记">
               <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
             </span>&nbsp;</div>
@@ -2368,6 +2368,9 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </span></span></span></code></pre></td></tr></table>
 </div>
 </div><p><strong>Headless Service</strong></p>
+<p>有时不需要或不想要负载均衡，以及单独的 Service IP。 遇到这种情况，可以通过指定 Cluster IP（<code>spec.clusterIP</code>）的值为 <code>&quot;None&quot;</code> 来创建 <code>Headless</code> Service。</p>
+<p>你可以使用一个无头 Service 与其他服务发现机制进行接口，而不必与 Kubernetes 的实现捆绑在一起。</p>
+<p>对于无头 <code>Services</code> 并不会分配 Cluster IP，kube-proxy 不会处理它们， 而且平台也不会为它们进行负载均衡和路由。 DNS 如何实现自动配置，依赖于 Service 是否定义了选择算符。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt"> 1
@@ -3725,7 +3728,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 <div id="comments"><div id="gitalk" class="comment"></div><noscript>
         Please enable JavaScript to view the comments powered by <a href="https://github.com/gitalk/gitalk" rel="external nofollow noopener noreferrer">Gitalk</a>.
       </noscript></div></article></main><footer class="footer">
-    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.102.1">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external nofollow noopener noreferrer" title="FixIt v0.2.15"><img class="fixit-icon" src="/images/fixit.svg" alt="FixIt logo" />&nbsp;FixIt</a>
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.102.3">Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external nofollow noopener noreferrer" title="FixIt v0.2.15"><img class="fixit-icon" src="/images/fixit.svg" alt="FixIt logo" />&nbsp;FixIt</a>
         </div><div class="footer-line copyright"><i class="fa-regular fa-copyright fa-fw"></i>
             <span itemprop="copyrightYear">2019 - 2022</span><span class="author" itemprop="copyrightHolder">
               <a
