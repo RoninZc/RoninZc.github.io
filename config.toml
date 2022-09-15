@@ -512,7 +512,7 @@ theme = "FixIt"
     # siteTime = '' # 例：'2019-02-03T19:30:34+08:00'
   # 网站验证代码，用于 Google/Bing/Yandex/Pinterest/Baidu/360/Sogou
   [params.verification]
-    google = ""
+    google = "U44GoJ1yb1R3AlVERQzjDak9xT7C3Ni898l0MmTSLLs"
     bing = ""
     yandex = ""
     pinterest = ""
