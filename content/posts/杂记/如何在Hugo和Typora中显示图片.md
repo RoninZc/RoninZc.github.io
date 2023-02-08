@@ -3,6 +3,8 @@ title: "如何在Hugo和Typora中显示图片"
 date: 2022-05-11T14:02:19+08:00
 draft: false
 images:
+categories:
+  - 折腾
 tags: 
   - Typora
   - image

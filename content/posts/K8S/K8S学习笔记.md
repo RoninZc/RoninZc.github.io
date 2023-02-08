@@ -2,6 +2,8 @@
 title: "K8S学习笔记"
 date: 2022-06-07T10:45:00+08:00
 images:
+categories:
+  - 学习
 tags: 
   - k8s
 ---

@@ -1,6 +1,8 @@
 ---
 title: "Ubuntu ARM Docker 安装"
 date: 2022-05-13T14:13:00+08:00
+categories:
+  - 折腾
 tags: 
   - Ubuntu
   - ARM
