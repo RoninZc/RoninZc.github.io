@@ -35,7 +35,7 @@
 <li>使用<code>const XXX</code>声明一个常量，常量不可被重新赋值</li>
 </ul>
 <h4 id="隐藏">隐藏</h4>
-<p>​	重复使用<code>let</code>定义一个与之前变量同名的变量，我们称第一个变量被第二个变量隐藏了，此时使用该名称的变量会使用第二个变量，我们可以重复使用<code>let</code>来多次隐藏。</p>
+<p>​ 重复使用<code>let</code>定义一个与之前变量同名的变量，我们称第一个变量被第二个变量隐藏了，此时使用该名称的变量会使用第二个变量，我们可以重复使用<code>let</code>来多次隐藏。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -71,7 +71,7 @@
 </span></span><span class="line"><span class="cl">block outer x:6
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>​	这个程序首先将 <code>x</code> 绑定到值 <code>5</code> 上。接着通过 <code>let x =</code> 隐藏 <code>x</code>，获取初始值并加 <code>1</code>，这样 <code>x</code> 的值就变成 <code>6</code> 了。然后，在内部作用域内，第三个 <code>let</code> 语句也隐藏了 <code>x</code>，将之前的值乘以 <code>2</code>，<code>x</code> 得到的值是 <code>12</code>。当该作用域结束时，内部 shadowing 的作用域也结束了，<code>x</code> 又返回到 <code>6</code>。</p>
+</div><p>​ 这个程序首先将 <code>x</code> 绑定到值 <code>5</code> 上。接着通过 <code>let x =</code> 隐藏 <code>x</code>，获取初始值并加 <code>1</code>，这样 <code>x</code> 的值就变成 <code>6</code> 了。然后，在内部作用域内，第三个 <code>let</code> 语句也隐藏了 <code>x</code>，将之前的值乘以 <code>2</code>，<code>x</code> 得到的值是 <code>12</code>。当该作用域结束时，内部 shadowing 的作用域也结束了，<code>x</code> 又返回到 <code>6</code>。</p>
 <h3 id="数据类型">数据类型</h3>
 <h4 id="标量类型">标量类型</h4>
 <h5 id="整型">整型</h5>
@@ -117,11 +117,11 @@
 </tbody>
 </table>
 <h5 id="浮点型">浮点型</h5>
-<p>​	Rust 的浮点数类型是 <code>f32</code> 和 <code>f64</code>，分别占 32 位和 64 位。默认类型是 <code>f64</code></p>
+<p>​ Rust 的浮点数类型是 <code>f32</code> 和 <code>f64</code>，分别占 32 位和 64 位。默认类型是 <code>f64</code></p>
 <h5 id="布尔型">布尔型</h5>
-<p>​	Rust 中的布尔类型有两个可能的值：<code>true</code> 和 <code>false</code>。Rust 中的布尔类型使用 <code>bool</code> 表示。</p>
+<p>​ Rust 中的布尔类型有两个可能的值：<code>true</code> 和 <code>false</code>。Rust 中的布尔类型使用 <code>bool</code> 表示。</p>
 <h5 id="字符型">字符型</h5>
-<p>​	Rust 的 <code>char</code> 类型的大小为四个字节(four bytes)，并代表了一个 Unicode 标量值（意味着你可以使用emoji）。</p>
+<p>​ Rust 的 <code>char</code> 类型的大小为四个字节(four bytes)，并代表了一个 Unicode 标量值（意味着你可以使用emoji）。</p>
 <h4 id="复合类型">复合类型</h4>
 <h5 id="元组类型">元组类型</h5>
 <p>相当于把一个或者多个类型的值组合成一个类型。元组的长度是固定的：一旦声明。其长度不会改变。</p>
@@ -346,9 +346,9 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">remaining</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">loop</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">			</span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;remaining = {}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">remaining</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;remaining = {}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">remaining</span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="n">remaining</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">9</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">				</span><span class="k">break</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">break</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">break</span><span class="w"> </span><span class="nl">&#39;counting_up</span><span class="p">;</span><span class="w">
@@ -455,7 +455,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">for</span> <span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
@@ -910,7 +910,7 @@
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="kd">let</span><span class="w"> </span><span class="n">rect1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Rectangle</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">width</span>: <span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">height</span>: <span class="mi">50</span><span class="w"> </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">rect1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Rectangle</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">width</span>: <span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">height</span>: <span class="mi">50</span><span class="w"> </span><span class="p">};</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;{:#?}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">rect1</span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;{:#?}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">rect1</span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="fm">dbg!</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rect1</span><span class="p">);</span><span class="w">
@@ -1208,7 +1208,7 @@
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">call</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">IpAddr</span>::<span class="n">V4</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">IpAddr</span>::<span class="n">V4</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;{}:{}:{}:{}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">

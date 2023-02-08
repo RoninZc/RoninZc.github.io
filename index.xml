@@ -4,9 +4,90 @@
     <link>https://ronin-zc.com/</link>
     <description>RoninZc 的个人博客</description>
     <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Wed, 20 Jul 2022 15:17:19 &#43;0800</lastBuildDate>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Wed, 08 Feb 2023 13:45:00 &#43;0800</lastBuildDate>
       <atom:link href="https://ronin-zc.com/index.xml" rel="self" type="application/rss+xml" />
     <item>
+  <title>MacOS使用DoH</title>
+  <link>https://ronin-zc.com/macos%E4%BD%BF%E7%94%A8doh/</link>
+  <pubDate>Wed, 08 Feb 2023 13:45:00 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/macos%E4%BD%BF%E7%94%A8doh/</guid>
+  <description><![CDATA[<h3 id="安装-homebrew已有则忽略">安装 HomeBrew（已有则忽略）</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/bin/bash -c <span class="s2">&#34;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh<span class="k">)</span><span class="s2">&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="安装-cloudflared">安装 cloudflared</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">brew install cloudflare/cloudflare/cloudflared
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="创建配置文件">创建配置文件</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mkdir -p /usr/local/etc/cloudflared
+</span></span><span class="line"><span class="cl">vim /usr/local/etc/cloudflared/config.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">proxy-dns</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">proxy-dns-upstream</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">https://doh.pub/dns-query</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">https://1.1.1.1/dns-query</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">https://1.0.0.1/dns-query</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>这里使用的是默认 DNSPod 的 DoH 服务
+下列两个是 Cloudflare 提供的 DoH 服务用于冗余</p>
+</blockquote>
+<h3 id="启动服务">启动服务</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo cloudflared service install
+</span></span><span class="line"><span class="cl">// 之后不想使用的话可以执行 sudo cloudflared service uninstall
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="修改本机设定">修改本机设定</h3>
+<p>「系统设置」-&gt;「Wi-Fi」-&gt;「详细信息」-&gt;「DNS」</p>
+<p></p>
+<p></p>
+<h3 id="测试">测试</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dig ronin-zc.com
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看相应请求的 DNS 服务器 ip</p>
+]]></description>
+</item><item>
   <title>Docker 部署 Nginx 出现「host not found in upstream」问题解决</title>
   <link>https://ronin-zc.com/docker%E9%83%A8%E7%BD%B2nginx%E5%87%BA%E7%8E%B0host-not-found-in-upstream%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</link>
   <pubDate>Wed, 20 Jul 2022 15:17:19 &#43;0800</pubDate>
@@ -4224,7 +4305,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 <li>使用<code>const XXX</code>声明一个常量，常量不可被重新赋值</li>
 </ul>
 <h4 id="隐藏">隐藏</h4>
-<p>​	重复使用<code>let</code>定义一个与之前变量同名的变量，我们称第一个变量被第二个变量隐藏了，此时使用该名称的变量会使用第二个变量，我们可以重复使用<code>let</code>来多次隐藏。</p>
+<p>​ 重复使用<code>let</code>定义一个与之前变量同名的变量，我们称第一个变量被第二个变量隐藏了，此时使用该名称的变量会使用第二个变量，我们可以重复使用<code>let</code>来多次隐藏。</p>
 <div class="highlight"><div class="chroma">
 <table class="lntable"><tr><td class="lntd">
 <pre tabindex="0" class="chroma"><code><span class="lnt">1
@@ -4260,7 +4341,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </span></span><span class="line"><span class="cl">block outer x:6
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>​	这个程序首先将 <code>x</code> 绑定到值 <code>5</code> 上。接着通过 <code>let x =</code> 隐藏 <code>x</code>，获取初始值并加 <code>1</code>，这样 <code>x</code> 的值就变成 <code>6</code> 了。然后，在内部作用域内，第三个 <code>let</code> 语句也隐藏了 <code>x</code>，将之前的值乘以 <code>2</code>，<code>x</code> 得到的值是 <code>12</code>。当该作用域结束时，内部 shadowing 的作用域也结束了，<code>x</code> 又返回到 <code>6</code>。</p>
+</div><p>​ 这个程序首先将 <code>x</code> 绑定到值 <code>5</code> 上。接着通过 <code>let x =</code> 隐藏 <code>x</code>，获取初始值并加 <code>1</code>，这样 <code>x</code> 的值就变成 <code>6</code> 了。然后，在内部作用域内，第三个 <code>let</code> 语句也隐藏了 <code>x</code>，将之前的值乘以 <code>2</code>，<code>x</code> 得到的值是 <code>12</code>。当该作用域结束时，内部 shadowing 的作用域也结束了，<code>x</code> 又返回到 <code>6</code>。</p>
 <h3 id="数据类型">数据类型</h3>
 <h4 id="标量类型">标量类型</h4>
 <h5 id="整型">整型</h5>
@@ -4306,11 +4387,11 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </tbody>
 </table>
 <h5 id="浮点型">浮点型</h5>
-<p>​	Rust 的浮点数类型是 <code>f32</code> 和 <code>f64</code>，分别占 32 位和 64 位。默认类型是 <code>f64</code></p>
+<p>​ Rust 的浮点数类型是 <code>f32</code> 和 <code>f64</code>，分别占 32 位和 64 位。默认类型是 <code>f64</code></p>
 <h5 id="布尔型">布尔型</h5>
-<p>​	Rust 中的布尔类型有两个可能的值：<code>true</code> 和 <code>false</code>。Rust 中的布尔类型使用 <code>bool</code> 表示。</p>
+<p>​ Rust 中的布尔类型有两个可能的值：<code>true</code> 和 <code>false</code>。Rust 中的布尔类型使用 <code>bool</code> 表示。</p>
 <h5 id="字符型">字符型</h5>
-<p>​	Rust 的 <code>char</code> 类型的大小为四个字节(four bytes)，并代表了一个 Unicode 标量值（意味着你可以使用emoji）。</p>
+<p>​ Rust 的 <code>char</code> 类型的大小为四个字节(four bytes)，并代表了一个 Unicode 标量值（意味着你可以使用emoji）。</p>
 <h4 id="复合类型">复合类型</h4>
 <h5 id="元组类型">元组类型</h5>
 <p>相当于把一个或者多个类型的值组合成一个类型。元组的长度是固定的：一旦声明。其长度不会改变。</p>
@@ -4535,9 +4616,9 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">remaining</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">10</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">loop</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">			</span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;remaining = {}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">remaining</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">   </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;remaining = {}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">remaining</span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="n">remaining</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">9</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">				</span><span class="k">break</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">break</span><span class="p">;</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="n">count</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">break</span><span class="w"> </span><span class="nl">&#39;counting_up</span><span class="p">;</span><span class="w">
@@ -4644,7 +4725,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-c" data-lang="c"><span class="line"><span class="cl"><span class="k">for</span> <span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">10</span><span class="p">;</span> <span class="n">x</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="n">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">  <span class="nf">printf</span><span class="p">(</span><span class="s">&#34;%d</span><span class="se">\n</span><span class="s">&#34;</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
 </span></span><span class="line"><span class="cl"><span class="p">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
@@ -5099,7 +5180,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="kd">let</span><span class="w"> </span><span class="n">rect1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Rectangle</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">width</span>: <span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">height</span>: <span class="mi">50</span><span class="w"> </span><span class="p">};</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">rect1</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Rectangle</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">width</span>: <span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="n">height</span>: <span class="mi">50</span><span class="w"> </span><span class="p">};</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;{:#?}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">rect1</span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;{:#?}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">rect1</span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="fm">dbg!</span><span class="p">(</span><span class="o">&amp;</span><span class="n">rect1</span><span class="p">);</span><span class="w">
@@ -5397,7 +5478,7 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-rust" data-lang="rust"><span class="line"><span class="cl"><span class="k">fn</span> <span class="nf">call</span><span class="p">(</span><span class="o">&amp;</span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
-</span></span></span><span class="line"><span class="cl"><span class="w">	</span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">IpAddr</span>::<span class="n">V4</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">IpAddr</span>::<span class="n">V4</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="w"> </span><span class="p">{</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&#34;{}:{}:{}:{}&#34;</span><span class="p">,</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">b</span><span class="p">,</span><span class="w"> </span><span class="n">c</span><span class="p">,</span><span class="w"> </span><span class="n">d</span><span class="p">);</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">  </span><span class="p">}</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="p">}</span><span class="w">
@@ -6505,301 +6586,5 @@ Systemd &gt; kubelet &gt; 容器组件 &gt; Kubernetes</p>
 </div>
 </div><p>配置都完成后，直接使用 docker-compose up -d 启动容器。在github上设置webhooks的部分就不再此赘述。</p>
 ]]></description>
-</item><item>
-  <title>LeetCode 232:用栈实现队列</title>
-  <link>https://ronin-zc.com/leetcode-232%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</link>
-  <pubDate>Fri, 05 Mar 2021 14:58:29 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/leetcode-232%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</guid>
-  <description><![CDATA[<h3 id="题目">题目</h3>
-<p>请你仅使用两个栈实现先入先出队列。队列应当支持一般队列的支持的所有操作（push、pop、peek、empty）：</p>
-<p>实现 MyQueue 类：</p>
-<ul>
-<li>void push(int x) 将元素 x 推到队列的末尾</li>
-<li>int pop() 从队列的开头移除并返回元素</li>
-<li>int peek() 返回队列开头的元素</li>
-<li>boolean empty() 如果队列为空，返回 true ；否则，返回 false</li>
-</ul>
-<p>说明：</p>
-<ul>
-<li>你只能使用标准的栈操作 —— 也就是只有 push to top, peek/pop from top, size, 和 is empty 操作是合法的。</li>
-<li>你所使用的语言也许不支持栈。你可以使用 list 或者 deque（双端队列）来模拟一个栈，只要是标准的栈操作即可。</li>
-</ul>
-<p>进阶：</p>
-<ul>
-<li>你能否实现每个操作均摊时间复杂度为 O(1) 的队列？换句话说，执行 n 个操作的总时间复杂度为 O(n) ，即使其中一个操作可能花费较长时间。</li>
-</ul>
-<p>示例：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">输入：
-</span></span><span class="line"><span class="cl">[&#34;MyQueue&#34;, &#34;push&#34;, &#34;push&#34;, &#34;peek&#34;, &#34;pop&#34;, &#34;empty&#34;]
-</span></span><span class="line"><span class="cl">[[], [1], [2], [], [], []]
-</span></span><span class="line"><span class="cl">输出：
-</span></span><span class="line"><span class="cl">[null, null, null, 1, 1, false]
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>解释：</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span><span class="lnt">2
-</span><span class="lnt">3
-</span><span class="lnt">4
-</span><span class="lnt">5
-</span><span class="lnt">6
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">MyQueue myQueue = new MyQueue();
-</span></span><span class="line"><span class="cl">myQueue.push(1); // queue is: [1]
-</span></span><span class="line"><span class="cl">myQueue.push(2); // queue is: [1, 2] (leftmost is front of the queue)
-</span></span><span class="line"><span class="cl">myQueue.peek(); // return 1
-</span></span><span class="line"><span class="cl">myQueue.pop(); // return 1, queue is [2]
-</span></span><span class="line"><span class="cl">myQueue.empty(); // return false
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>提示：</p>
-<p>1 &lt;= x &lt;= 9
-最多调用 100 次 push、pop、peek 和 empty
-假设所有操作都是有效的 （例如，一个空的队列不会调用 pop 或者 peek 操作）</p>
-<blockquote>
-<p>来源：力扣（LeetCode）
-链接：https://leetcode-cn.com/problems/implement-queue-using-stacks
-著作权归领扣网络所有。商业转载请联系官方授权，非商业转载请注明出处。</p>
-</blockquote>
-<h3 id="思路">思路</h3>
-<p>这题比较简单，主要是实现队列的基本功能，即先进先出。而我们知道栈是先进后出的，这就需要我们额外的操作了。</p>
-<p>题目提示的比较明显，使用两个栈来实现。我们可以做出如下模型：</p>
-<ul>
-<li>两个栈分别为输入栈和输出栈</li>
-<li>输入栈负责接收 push 的内容</li>
-<li>输出栈负责 pop 和 peek 的内容</li>
-<li>当执行 pop 或者 peek 时，当输出栈为空时，将输入栈的内容输出到输入栈中</li>
-</ul>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">in : []
-</span></span><span class="line"><span class="cl">out: []
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">--push(1) 
-</span></span><span class="line"><span class="cl">in : [1]
-</span></span><span class="line"><span class="cl">out: []
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">--push(2)
-</span></span><span class="line"><span class="cl">in : [2,1]
-</span></span><span class="line"><span class="cl">out: []
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">--peek
-</span></span><span class="line"><span class="cl">in : []
-</span></span><span class="line"><span class="cl">out: [1,2]
-</span></span><span class="line"><span class="cl">peek = 1
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">--pop
-</span></span><span class="line"><span class="cl">in : []
-</span></span><span class="line"><span class="cl">out: [2]
-</span></span><span class="line"><span class="cl">pop = 1
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">--isEmpty
-</span></span><span class="line"><span class="cl">isEmpty(in) &amp;&amp; isEmpty(out)
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="代码">代码</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span><span class="lnt">16
-</span><span class="lnt">17
-</span><span class="lnt">18
-</span><span class="lnt">19
-</span><span class="lnt">20
-</span><span class="lnt">21
-</span><span class="lnt">22
-</span><span class="lnt">23
-</span><span class="lnt">24
-</span><span class="lnt">25
-</span><span class="lnt">26
-</span><span class="lnt">27
-</span><span class="lnt">28
-</span><span class="lnt">29
-</span><span class="lnt">30
-</span><span class="lnt">31
-</span><span class="lnt">32
-</span><span class="lnt">33
-</span><span class="lnt">34
-</span><span class="lnt">35
-</span><span class="lnt">36
-</span><span class="lnt">37
-</span><span class="lnt">38
-</span><span class="lnt">39
-</span><span class="lnt">40
-</span><span class="lnt">41
-</span><span class="lnt">42
-</span><span class="lnt">43
-</span><span class="lnt">44
-</span><span class="lnt">45
-</span><span class="lnt">46
-</span><span class="lnt">47
-</span><span class="lnt">48
-</span><span class="lnt">49
-</span><span class="lnt">50
-</span><span class="lnt">51
-</span><span class="lnt">52
-</span><span class="lnt">53
-</span><span class="lnt">54
-</span><span class="lnt">55
-</span><span class="lnt">56
-</span><span class="lnt">57
-</span><span class="lnt">58
-</span><span class="lnt">59
-</span><span class="lnt">60
-</span><span class="lnt">61
-</span><span class="lnt">62
-</span><span class="lnt">63
-</span><span class="lnt">64
-</span><span class="lnt">65
-</span><span class="lnt">66
-</span><span class="lnt">67
-</span><span class="lnt">68
-</span><span class="lnt">69
-</span><span class="lnt">70
-</span><span class="lnt">71
-</span><span class="lnt">72
-</span><span class="lnt">73
-</span><span class="lnt">74
-</span><span class="lnt">75
-</span><span class="lnt">76
-</span><span class="lnt">77
-</span><span class="lnt">78
-</span><span class="lnt">79
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// MyQueue 队列
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">MyQueue</span> <span class="kd">struct</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">in</span>  <span class="nx">Stack</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">out</span> <span class="nx">Stack</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Constructor MyQueue构造方法
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="nf">Constructor</span><span class="p">()</span> <span class="nx">MyQueue</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">in</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">Stack</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">out</span> <span class="o">:=</span> <span class="nb">new</span><span class="p">(</span><span class="nx">Stack</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">MyQueue</span><span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">in</span><span class="p">:</span>  <span class="o">*</span><span class="nx">in</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">out</span><span class="p">:</span> <span class="o">*</span><span class="nx">out</span><span class="p">,</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">in2out</span><span class="p">()</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="k">for</span> <span class="nb">len</span><span class="p">(</span><span class="nx">mq</span><span class="p">.</span><span class="nx">in</span><span class="p">)</span> <span class="p">&gt;</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">mq</span><span class="p">.</span><span class="nx">in</span><span class="p">.</span><span class="nf">Pop</span><span class="p">())</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Push Push
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">Push</span><span class="p">(</span><span class="nx">x</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">mq</span><span class="p">.</span><span class="nx">in</span><span class="p">.</span><span class="nf">Push</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Pop Pop
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">Pop</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">mq</span><span class="p">.</span><span class="nf">in2out</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Pop</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Peek Peek
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">Peek</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="k">if</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">		<span class="nx">mq</span><span class="p">.</span><span class="nf">in2out</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl">	<span class="p">}</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">Top</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Empty Empty
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">mq</span> <span class="o">*</span><span class="nx">MyQueue</span><span class="p">)</span> <span class="nf">Empty</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">in</span><span class="p">.</span><span class="nf">IsEmpty</span><span class="p">()</span> <span class="o">&amp;&amp;</span> <span class="nx">mq</span><span class="p">.</span><span class="nx">out</span><span class="p">.</span><span class="nf">IsEmpty</span><span class="p">()</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// -------------------------------------------------------
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>
-</span></span><span class="line"><span class="cl"><span class="c1">// Stack 栈
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">type</span> <span class="nx">Stack</span> <span class="p">[]</span><span class="kt">int</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Len 获取栈的长度
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">Len</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Push push
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">Push</span><span class="p">(</span><span class="nx">value</span> <span class="kt">int</span><span class="p">)</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="nx">stack</span> <span class="p">=</span> <span class="nb">append</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Top 获取栈的第一个
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">Top</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)[</span><span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// Pop 弹出最后一个
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">Pop</span><span class="p">()</span> <span class="kt">int</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="nx">value</span> <span class="o">:=</span> <span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)[</span><span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">	<span class="o">*</span><span class="nx">stack</span> <span class="p">=</span> <span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)[:</span><span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nx">value</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1">// IsEmpty 判断是否为空
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="kd">func</span> <span class="p">(</span><span class="nx">stack</span> <span class="o">*</span><span class="nx">Stack</span><span class="p">)</span> <span class="nf">IsEmpty</span><span class="p">()</span> <span class="kt">bool</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">	<span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="o">*</span><span class="nx">stack</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span>
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div>]]></description>
 </item></channel>
 </rss>

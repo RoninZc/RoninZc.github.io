@@ -1,0 +1,89 @@
+<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+  <channel>
+    <title>MacOS - 标签 - RoninZc 的个人博客</title>
+    <link>https://ronin-zc.com/tags/macos/</link>
+    <description>MacOS - 标签 - RoninZc 的个人博客</description>
+    <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Wed, 08 Feb 2023 13:45:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/macos/" rel="self" type="application/rss+xml" /><item>
+  <title>MacOS使用DoH</title>
+  <link>https://ronin-zc.com/macos%E4%BD%BF%E7%94%A8doh/</link>
+  <pubDate>Wed, 08 Feb 2023 13:45:00 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/macos%E4%BD%BF%E7%94%A8doh/</guid>
+  <description><![CDATA[<h3 id="安装-homebrew已有则忽略">安装 HomeBrew（已有则忽略）</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">/bin/bash -c <span class="s2">&#34;</span><span class="k">$(</span>curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh<span class="k">)</span><span class="s2">&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="安装-cloudflared">安装 cloudflared</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">brew install cloudflare/cloudflare/cloudflared
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="创建配置文件">创建配置文件</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">mkdir -p /usr/local/etc/cloudflared
+</span></span><span class="line"><span class="cl">vim /usr/local/etc/cloudflared/config.yaml
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">proxy-dns</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"></span><span class="nt">proxy-dns-upstream</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">https://doh.pub/dns-query</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">https://1.1.1.1/dns-query</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">  </span>- <span class="l">https://1.0.0.1/dns-query</span><span class="w">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>这里使用的是默认 DNSPod 的 DoH 服务
+下列两个是 Cloudflare 提供的 DoH 服务用于冗余</p>
+</blockquote>
+<h3 id="启动服务">启动服务</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo cloudflared service install
+</span></span><span class="line"><span class="cl">// 之后不想使用的话可以执行 sudo cloudflared service uninstall
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="修改本机设定">修改本机设定</h3>
+<p>「系统设置」-&gt;「Wi-Fi」-&gt;「详细信息」-&gt;「DNS」</p>
+<p></p>
+<p></p>
+<h3 id="测试">测试</h3>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">dig ronin-zc.com
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查看相应请求的 DNS 服务器 ip</p>
+]]></description>
+</item></channel>
+</rss>

@@ -25,7 +25,7 @@
 
 #### 隐藏
 
-​	重复使用`let`定义一个与之前变量同名的变量，我们称第一个变量被第二个变量隐藏了，此时使用该名称的变量会使用第二个变量，我们可以重复使用`let`来多次隐藏。
+​ 重复使用`let`定义一个与之前变量同名的变量，我们称第一个变量被第二个变量隐藏了，此时使用该名称的变量会使用第二个变量，我们可以重复使用`let`来多次隐藏。
 
 ```rust
 fn main() {
@@ -46,9 +46,7 @@ block inner x:12
 block outer x:6
 ```
 
-​	这个程序首先将 `x` 绑定到值 `5` 上。接着通过 `let x =` 隐藏 `x`，获取初始值并加 `1`，这样 `x` 的值就变成 `6` 了。然后，在内部作用域内，第三个 `let` 语句也隐藏了 `x`，将之前的值乘以 `2`，`x` 得到的值是 `12`。当该作用域结束时，内部 shadowing 的作用域也结束了，`x` 又返回到 `6`。
-
-
+​ 这个程序首先将 `x` 绑定到值 `5` 上。接着通过 `let x =` 隐藏 `x`，获取初始值并加 `1`，这样 `x` 的值就变成 `6` 了。然后，在内部作用域内，第三个 `let` 语句也隐藏了 `x`，将之前的值乘以 `2`，`x` 得到的值是 `12`。当该作用域结束时，内部 shadowing 的作用域也结束了，`x` 又返回到 `6`。
 
 ### 数据类型
 
@@ -67,15 +65,15 @@ block outer x:6
 
 ##### 浮点型
 
-​	Rust 的浮点数类型是 `f32` 和 `f64`，分别占 32 位和 64 位。默认类型是 `f64`
+​ Rust 的浮点数类型是 `f32` 和 `f64`，分别占 32 位和 64 位。默认类型是 `f64`
 
 ##### 布尔型
 
-​	Rust 中的布尔类型有两个可能的值：`true` 和 `false`。Rust 中的布尔类型使用 `bool` 表示。
+​ Rust 中的布尔类型有两个可能的值：`true` 和 `false`。Rust 中的布尔类型使用 `bool` 表示。
 
 ##### 字符型
 
-​	Rust 的 `char` 类型的大小为四个字节(four bytes)，并代表了一个 Unicode 标量值（意味着你可以使用emoji）。
+​ Rust 的 `char` 类型的大小为四个字节(four bytes)，并代表了一个 Unicode 标量值（意味着你可以使用emoji）。
 
 #### 复合类型
 
@@ -118,8 +116,6 @@ fn main() {
 }
 ```
 
-
-
 ### 函数
 
 Rust 中的函数定义以 `fn` 开始并在函数名后跟一对圆括号。大括号告诉编译器哪里是函数体的开始和结尾。
@@ -144,8 +140,6 @@ fn main() {
     println!("The value of x is: {}", x);
 }
 ```
-
-
 
 #### 语句和表达式
 
@@ -178,8 +172,6 @@ fn main() {
 ```
 
 是一个代码块，它的值是 `4`。这个值作为 `let` 语句的一部分被绑定到 `y` 上。注意结尾没有分号的那一行 `x+1`，与你见过的大部分代码行不同。表达式的结尾没有分号。如果在表达式的结尾加上分号，它就变成了语句，而语句不会返回值。在接下来探索具有返回值的函数和表达式时要谨记这一点。
-
-
 
 ### 控制流
 
@@ -214,8 +206,6 @@ fn main() {
 }
 ```
 
-
-
 ### 循环
 
 Rust 中有三种循环：`loop`、`while`和`for`。
@@ -233,9 +223,9 @@ fn main() {
     let mut remaining = 10;
     
     loop {
-			println!("remaining = {}", remaining);
+   println!("remaining = {}", remaining);
       if remaining == 9 {
-				break;
+    break;
       }
       if count == 2 {
         break 'counting_up;
@@ -336,8 +326,6 @@ for (i,j) in (5..10).enumerate() {
 > i = 4 and j = 9
 > ```
 
-
-
 ### 所有权
 
 首先，让我们看一下所有权的规则。当我们通过举例说明时，请谨记这些规则：
@@ -426,8 +414,6 @@ fn test_two(some_integer: i32) {// some_integer 进入作用域
 
 函数的返回值也可以转移所有权。
 
-
-
 ### 引用与借用
 
 规则
@@ -494,7 +480,7 @@ fn change(some_string: &mut String) {
 
 这里使用`&mut`获取到的是 `s`的可变引用，这就清除的表明，我需要修改这个引用的值。不过可变引用有一个很大的限制。
 
->  **在同一时间只能有一个对某一特定数据的可变引用**
+> **在同一时间只能有一个对某一特定数据的可变引用**
 
 这个限制的好处是 Rust 可以在编译时就避免数据竞争。
 
@@ -517,8 +503,6 @@ println!("{}", r3);
 ```
 
 不可变引用 `r1` 和 `r2` 的作用域在 `println!` 最后一次使用之后结束，这也是创建可变引用 `r3` 的地方。它们的作用域没有重叠，所以代码是可以编译的。编译器在作用域结束之前判断不再使用的引用的能力被称为非词法作用域生命周期（Non-Lexical Lifetimes，简称NLL）。你可以在 [The Edition Guide](https://doc.rust-lang.org/edition-guide/rust-2018/ownership-and-lifetimes/non-lexical-lifetimes.html) 中阅读更多关于它的信息。
-
-
 
 ### 结构体
 
@@ -589,7 +573,7 @@ struct Rectangle {
 }
 
 fn main() {
-	let rect1 = Rectangle { width: 30, height: 50 };
+ let rect1 = Rectangle { width: 30, height: 50 };
   println!("{:#?}", rect1);
   println!("{:#?}", rect1);
   dbg!(&rect1);
@@ -612,8 +596,6 @@ Rectangle {
     height: 30,
 }
 ```
-
-
 
 #### 给`struct`绑定方法
 
@@ -672,8 +654,6 @@ fn main() {
   let sq = Rectangle::square(3);
 }
 ```
-
-
 
 ### 枚举
 
@@ -740,10 +720,6 @@ impl IpAddr {
 
 ##### todo option
 
-
-
-
-
 ### 相关控制流运算符
 
 #### `match`运算符
@@ -792,15 +768,13 @@ fn call(&self) {
 
 ```rust
 fn call(&self) {
-	if let IpAddr::V4(a, b, c, d) = self {
+ if let IpAddr::V4(a, b, c, d) = self {
     println!("{}:{}:{}:{}", a, b, c, d);
   }
 }
 ```
 
 这样我们就不用再用那么冗长的方式来编写了。
-
-
 
 ### package / crate / module
 
@@ -1089,8 +1063,6 @@ workspace 用于管理多个相关的 package，不同的 package 有各自的 C
 
 不过据我观察 workspace 功能没有什么特别强大之处，不使用该功能也可以同时管理几个 Cargo 项目，因此这里就不再深入介绍了。
 
-
-
 ### 常见集合
 
 一般来说在 Rust 常用的集合
@@ -1232,8 +1204,6 @@ let s = format!("{}{}{}", s1, s2, s3);
 
 上述代码会将`s`设置为`hello world`。`format!`与`println!`的工作原理相同，并且它使用索引不会获取任何参数的所有权。
 
-
-
 #### 索引字符串
 
 在很多语言中，通过索引来一用字符串中的单独字符是很常见的操作，比如说 `golang`。然而在 Rust 中，不允许使用索引语法访问`String`的一部分，会出现错误。
@@ -1272,8 +1242,6 @@ fn main() {
 
 上述代码可以安全的使用索引来获取单个字符。
 
-
-
 ### Hash Map
 
 #### 新建
@@ -1310,7 +1278,7 @@ for (key, value) in &map {
 
 直接使用相同的键重新调用`insert`方法，这样会直接替换成新值。
 
-当我们需要检查对应键是否存在值时，可以使用`entry`方法 
+当我们需要检查对应键是否存在值时，可以使用`entry`方法
 
 ```rust
 map.insert(String::from("Ronin"));
@@ -1323,19 +1291,6 @@ let s = map.entry(String::from("hello")).or_insert("世界");
 #### 所有权
 
 对于类似`i32`这样实现了`Copy` trait 的类型，值可以直接拷贝进`HashMap`。对于拥有所有权的值，其值将被移动而`HashMap`会成为这些值的所有者。或者将值的引用传入`HashMap`，但是需要保证生命周期，后续会了解。
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 ---
