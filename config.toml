@@ -62,7 +62,7 @@ theme = "FixIt"
   # 网站默认主题样式 ("light", "dark", "auto")
   defaultTheme = "auto"
   # 公共 git 仓库路径，仅在 enableGitInfo 设为 true 时有效
-  gitRepo = "https://github.com/RoninZc/blog.git"
+  gitRepo = "https://github.com/RoninZc/RoninZc.github.io.git"
   #  哪种哈希函数用来 SRI, 为空时表示不使用 SRI
   # ("sha256", "sha384", "sha512", "md5")
   fingerprint = ""
@@ -97,7 +97,7 @@ theme = "FixIt"
 
   #  搜索配置
   [params.search]
-    enable = true
+    enable = false
     # 搜索引擎的类型 ("lunr", "algolia")
     type = "lunr"
     # 文章内容最长索引长度
@@ -138,7 +138,7 @@ theme = "FixIt"
     #  页面头部导航栏副标题配置
     [params.header.subtitle]
       # 副标题名称
-      name = "摸鱼"
+      name = "Just do it"
       # 是否为副标题显示打字机动画
       typeit = true
 
@@ -212,7 +212,7 @@ theme = "FixIt"
       typeit = true
       # 是否显示社交账号
       social = true
-      #  免责声明（支持 HTML 格式）
+      # 免责声明（支持 HTML 格式）
       disclaimer = ""
     # 主页文章列表
     [params.home.posts]
@@ -337,9 +337,9 @@ theme = "FixIt"
       auto = true
       #  目录位置 ("left", "right")
       position = "right"
-    #  在文章开头显示提示信息，提醒读者文章内容可能过时
+    # 在文章开头显示提示信息，提醒读者文章内容可能过时
     [params.page.expirationReminder]
-      enable = false
+      enable = true
       # 如果文章最后更新于这天数之前，显示提醒
       reminder = 90
       # 如果文章最后更新于这天数之前，显示警告
