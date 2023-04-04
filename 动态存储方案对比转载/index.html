@@ -8,12 +8,12 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
     <title>MySQL动态存储方案对比「转」 - RoninZc 的个人博客</title><meta name="author" content="RoninZc">
 <meta name="author-link" content="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg">
-<meta name="description" content="此文章为转载，原文章链接动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone 一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简" /><meta name="keywords" content='MySQL, JSON' /><meta itemprop="name" content="MySQL动态存储方案对比「转」">
-<meta itemprop="description" content="此文章为转载，原文章链接动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone 一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简"><meta itemprop="datePublished" content="2022-05-17T11:00:00+08:00" />
+<meta name="description" content="一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，" /><meta name="keywords" content='MySQL, 动态字段, 动态表单' /><meta itemprop="name" content="MySQL动态存储方案对比「转」">
+<meta itemprop="description" content="一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，"><meta itemprop="datePublished" content="2022-05-17T11:00:00+08:00" />
 <meta itemprop="dateModified" content="2022-05-17T11:00:00+08:00" />
-<meta itemprop="wordCount" content="6404"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
-<meta itemprop="keywords" content="MySQL,JSON," /><meta property="og:title" content="MySQL动态存储方案对比「转」" />
-<meta property="og:description" content="此文章为转载，原文章链接动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone 一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简" />
+<meta itemprop="wordCount" content="6364"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
+<meta itemprop="keywords" content="MySQL,动态字段,动态表单," /><meta property="og:title" content="MySQL动态存储方案对比「转」" />
+<meta property="og:description" content="一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，" />
 <meta property="og:type" content="article" />
 <meta property="og:url" content="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" /><meta property="og:image" content="https://ronin-zc.com/logo.png"/><meta property="article:section" content="posts" />
 <meta property="article:published_time" content="2022-05-17T11:00:00+08:00" />
@@ -22,7 +22,7 @@
 <meta name="twitter:image" content="https://ronin-zc.com/logo.png"/>
 
 <meta name="twitter:title" content="MySQL动态存储方案对比「转」"/>
-<meta name="twitter:description" content="此文章为转载，原文章链接动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone 一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简"/>
+<meta name="twitter:description" content="一、前言 最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，"/>
 <meta name="application-name" content="FixIt">
 <meta name="apple-mobile-web-app-title" content="FixIt"><meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff"><meta name="theme-color" media="(prefers-color-scheme: dark)" content="#252627"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
@@ -35,7 +35,7 @@
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https:\/\/ronin-zc.com\/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD\/"
-    },"genre": "posts","keywords": "MySQL, JSON","wordcount":  6404 ,
+    },"genre": "posts","keywords": "MySQL, 动态字段, 动态表单","wordcount":  6364 ,
     "url": "https:\/\/ronin-zc.com\/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD\/","datePublished": "2022-05-17T11:00:00+08:00","dateModified": "2022-05-17T11:00:00+08:00","publisher": {
       "@type": "Organization",
       "name": ""},"author": {
@@ -164,7 +164,25 @@
 
   <article class="page single">
     <div class="header"><h1 class="single-title animate__animated animate__flipInX">
-        <span>MySQL动态存储方案对比「转」</span>
+        <a
+  href="http://jintang.zone/2021/08/31/%e5%8a%a8%e6%80%81%e5%ad%97%e6%ae%b5%e5%ad%98%e5%82%a8%e6%96%b9%e6%a1%88%e5%af%b9%e6%af%94.html"
+  
+    title="转载 -&gt; http://jintang.zone/2021/08/31/动态字段存储方案对比.html"
+  
+  
+    
+    
+    target="_blank"
+  
+  
+    rel="external nofollow noopener noreferrer"
+  
+  
+    class="icon-repost"
+  
+  
+><i class="fa-solid fa-share fa-fw"></i>
+    </a><span>MySQL动态存储方案对比「转」</span>
       </h1></div><div class="post-meta">
       <div class="post-meta-line"><span class="post-author"><a
   href="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg"
@@ -194,7 +212,7 @@
           <span class="post-category">收录于 <a href="/categories/%E5%AD%A6%E4%B9%A0/"><i class="fa-regular fa-folder fa-fw"></i>&nbsp;学习</a></span></div>
       <div class="post-meta-line"><span title=2022-05-17&#32;11:00:00>
             <i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2022-05-17" >2022-05-17</time>
-          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 6404 字&nbsp;
+          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 6364 字&nbsp;
         <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 13 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="MySQL动态存储方案对比「转」">
               <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
             </span>&nbsp;</div>
@@ -270,23 +288,7 @@
       <div class="details-content">
         <div class="admonition-content">本文最后更新于 2022-05-17，文中内容可能已过时。</div>
       </div>
-    </div><blockquote>
-<p>此文章为转载，原文章链接<a
-  href="http://jintang.zone/2021/08/31/%e5%8a%a8%e6%80%81%e5%ad%97%e6%ae%b5%e5%ad%98%e5%82%a8%e6%96%b9%e6%a1%88%e5%af%b9%e6%af%94.html"
-  
-  
-    
-    
-    target="_blank"
-  
-  
-    rel="external nofollow noopener noreferrer"
-  
-  
-  
->动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang&rsquo;s Zone</a></p>
-</blockquote>
-<h2 id="一前言">一、前言</h2>
+    </div><h2 id="一前言">一、前言</h2>
 <p>最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，后端接口能够在不增加新的表字段且基本不需要修改代码的方式存储起来。</p>
 <p>我们都知道，关系型数据库MySQL的数据表在修改表字段时，代价比较大，甚至出现锁表导致服务奔溃。有什么好的办法呢？下面我仍然基于MySQL，对比了两种可行的方法，希望对你有帮助。</p>
 <h2 id="二动态结构">二、动态结构</h2>
@@ -977,7 +979,7 @@
   
 >阅读原始文档</a></span></div>
       <div class="post-info-share">
-        <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」" data-hashtags="MySQL,JSON"><i class="fa-brands fa-twitter fa-fw"></i></a>
+        <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」" data-hashtags="MySQL,动态字段,动态表单"><i class="fa-brands fa-twitter fa-fw"></i></a>
   <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-hashtag="MySQL"><i class="fa-brands fa-facebook-square fa-fw"></i></a>
   <a href="javascript:void(0);" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」" data-web><i class="fa-brands fa-whatsapp fa-fw"></i></a>
   <a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/" data-title="MySQL动态存储方案对比「转」"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a>
@@ -991,7 +993,7 @@
   </div>
 
   <div class="post-info-more">
-    <section class="post-tags"><i class="fa-solid fa-tags fa-fw"></i>&nbsp;<a href="/tags/mysql/">MySQL</a>,&nbsp;<a href="/tags/json/">JSON</a></section>
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw"></i>&nbsp;<a href="/tags/mysql/">MySQL</a>,&nbsp;<a href="/tags/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5/">动态字段</a>,&nbsp;<a href="/tags/%E5%8A%A8%E6%80%81%E8%A1%A8%E5%8D%95/">动态表单</a></section>
     <section>
       <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
     </section>

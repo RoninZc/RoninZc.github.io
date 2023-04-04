@@ -4,7 +4,24 @@
     <link>https://ronin-zc.com/tags/arm/</link>
     <description>ARM - 标签 - RoninZc 的个人博客</description>
     <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Fri, 13 May 2022 14:13:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/arm/" rel="self" type="application/rss+xml" /><item>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Tue, 04 Apr 2023 23:02:13 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/arm/" rel="self" type="application/rss+xml" /><item>
+  <title>Mac ARM 包损坏修复</title>
+  <link>https://ronin-zc.com/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/</link>
+  <pubDate>Tue, 04 Apr 2023 23:02:13 &#43;0800</pubDate>
+  <author>RoninZc</author>
+  <guid>https://ronin-zc.com/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/</guid>
+  <description><![CDATA[<p>之前下载的 CFW 和 PicGo 的 ARM 版本一直提示损坏😫</p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-bash" data-lang="bash"><span class="line"><span class="cl">sudo xattr -d com.apple.quarantine <span class="s2">&#34;/Applications/Clash for Windows.app&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>执行完成重新打开即可</p>
+]]></description>
+</item><item>
   <title>Ubuntu ARM Docker 安装</title>
   <link>https://ronin-zc.com/ubuntu-arm-docker-%E5%AE%89%E8%A3%85/</link>
   <pubDate>Fri, 13 May 2022 14:13:00 &#43;0800</pubDate>

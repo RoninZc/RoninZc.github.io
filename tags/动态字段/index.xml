@@ -1,10 +1,10 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
   <channel>
-    <title>MySQL - 标签 - RoninZc 的个人博客</title>
-    <link>https://ronin-zc.com/tags/mysql/</link>
-    <description>MySQL - 标签 - RoninZc 的个人博客</description>
+    <title>动态字段 - 标签 - RoninZc 的个人博客</title>
+    <link>https://ronin-zc.com/tags/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5/</link>
+    <description>动态字段 - 标签 - RoninZc 的个人博客</description>
     <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Tue, 17 May 2022 11:00:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/mysql/" rel="self" type="application/rss+xml" /><item>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Tue, 17 May 2022 11:00:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5/" rel="self" type="application/rss+xml" /><item>
   <title>MySQL动态存储方案对比「转」</title>
   <link>https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/</link>
   <pubDate>Tue, 17 May 2022 11:00:00 &#43;0800</pubDate>

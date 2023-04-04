@@ -1,3 +1,5 @@
+https://ronin-zc.com/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/
+https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/
 https://ronin-zc.com/macos%E4%BD%BF%E7%94%A8doh/
 https://ronin-zc.com/docker%E9%83%A8%E7%BD%B2nginx%E5%87%BA%E7%8E%B0host-not-found-in-upstream%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/
 https://ronin-zc.com/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/

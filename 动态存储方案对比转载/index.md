@@ -1,8 +1,6 @@
 # MySQL动态存储方案对比「转」
 
 
-> 此文章为转载，原文章链接[动态字段存储方案对比 - 修行编程，沉淀技术，记录生活 - JinTang's Zone](http://jintang.zone/2021/08/31/动态字段存储方案对比.html)
-
 ## 一、前言
 
 最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，后端接口能够在不增加新的表字段且基本不需要修改代码的方式存储起来。
@@ -459,4 +457,4 @@ update user_extra_field set properties = json_set(properties, '$.phone', '150167
 
 > 作者: RoninZc  
 > URL: https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/  
-
+> 转载 URL: http://jintang.zone/2021/08/31/动态字段存储方案对比.html

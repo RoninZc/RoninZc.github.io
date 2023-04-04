@@ -2,13 +2,19 @@
   xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml"
   ><url>
-      <loc>https://ronin-zc.com/categories/</loc><lastmod>2023-02-08T13:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+      <loc>https://ronin-zc.com/tags/arm/</loc><lastmod>2023-04-04T23:02:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/categories/</loc><lastmod>2023-04-04T23:02:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/tags/mac/</loc><lastmod>2023-04-04T23:02:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/</loc><lastmod>2023-04-04T23:02:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/posts/</loc><lastmod>2023-04-04T23:02:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/</loc><lastmod>2023-04-04T23:02:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/tags/</loc><lastmod>2023-04-04T23:02:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/categories/%E6%9D%82%E8%AE%B0/</loc><lastmod>2023-04-04T23:02:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/tags/cfw/</loc><lastmod>2023-04-04T22:18:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
+      <loc>https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/</loc><lastmod>2023-04-04T22:18:13&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>1</priority></url><url>
       <loc>https://ronin-zc.com/tags/dns/</loc><lastmod>2023-02-08T13:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/tags/macos/</loc><lastmod>2023-02-08T13:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/macos%E4%BD%BF%E7%94%A8doh/</loc><lastmod>2023-02-08T13:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-      <loc>https://ronin-zc.com/posts/</loc><lastmod>2023-02-08T13:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-      <loc>https://ronin-zc.com/</loc><lastmod>2023-02-08T13:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-      <loc>https://ronin-zc.com/tags/</loc><lastmod>2023-02-08T13:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/categories/%E6%8A%98%E8%85%BE/</loc><lastmod>2023-02-08T13:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/tags/docker/</loc><lastmod>2022-07-20T15:17:19&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/docker%E9%83%A8%E7%BD%B2nginx%E5%87%BA%E7%8E%B0host-not-found-in-upstream%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</loc><lastmod>2022-07-20T15:17:19&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
@@ -16,12 +22,12 @@
       <loc>https://ronin-zc.com/tags/k8s/</loc><lastmod>2022-06-07T10:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc><lastmod>2022-06-07T10:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/</loc><lastmod>2022-06-07T10:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-      <loc>https://ronin-zc.com/tags/json/</loc><lastmod>2022-05-17T11:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/tags/mysql/</loc><lastmod>2022-05-17T11:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/</loc><lastmod>2022-05-17T11:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+      <loc>https://ronin-zc.com/tags/%E5%8A%A8%E6%80%81%E8%A1%A8%E5%8D%95/</loc><lastmod>2022-05-17T11:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
+      <loc>https://ronin-zc.com/tags/%E5%8A%A8%E6%80%81%E5%AD%97%E6%AE%B5/</loc><lastmod>2022-05-17T11:00:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/tags/containerd/</loc><lastmod>2022-05-14T16:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</loc><lastmod>2022-05-14T16:45:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
-      <loc>https://ronin-zc.com/tags/arm/</loc><lastmod>2022-05-13T14:13:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/tags/ubuntu/</loc><lastmod>2022-05-13T14:13:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/ubuntu-arm-docker-%E5%AE%89%E8%A3%85/</loc><lastmod>2022-05-13T14:13:00&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
       <loc>https://ronin-zc.com/tags/hugo/</loc><lastmod>2022-05-11T17:26:29&#43;08:00</lastmod><changefreq>weekly</changefreq><priority>0.5</priority></url><url>
