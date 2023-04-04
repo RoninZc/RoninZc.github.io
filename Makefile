@@ -1,5 +1,5 @@
 run:
-	@hugo server --buildDrafts --watch=false
+	@hugo server --buildDrafts
 
 build:
 	@hugo --baseUrl="/"
