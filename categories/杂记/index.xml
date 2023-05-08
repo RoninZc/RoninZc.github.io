@@ -160,6 +160,8 @@
 </span><span class="lnt"> 98
 </span><span class="lnt"> 99
 </span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">mixin</span><span class="p">:</span><span class="w"> </span><span class="c"># Mixin 配置文件</span><span class="w">
@@ -214,6 +216,8 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">tls://dot.360.cn</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">fallback</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># cloudflare DoH DNS 地址</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">https://1.0.0.1/dns-query</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># Google DoH DNS Server地址</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">https://dns.google/dns-query</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># Google DoT DNS Server地址</span><span class="w">

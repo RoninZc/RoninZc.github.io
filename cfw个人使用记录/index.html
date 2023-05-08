@@ -11,7 +11,7 @@
 <meta name="description" content="前言 最近一直在折腾关于 Clash 相关的内容，一直没仔细了解具体的功能 正好有点时间上网冲浪🏄（不是摸鱼） 也因为 mac 使用 doh 用 cloudflared 一直不稳定，无法正常解析导致" /><meta name="keywords" content='CFW' /><meta itemprop="name" content="CFW 个人使用记录">
 <meta itemprop="description" content="前言 最近一直在折腾关于 Clash 相关的内容，一直没仔细了解具体的功能 正好有点时间上网冲浪🏄（不是摸鱼） 也因为 mac 使用 doh 用 cloudflared 一直不稳定，无法正常解析导致"><meta itemprop="datePublished" content="2023-04-04T22:18:13+08:00" />
 <meta itemprop="dateModified" content="2023-04-04T22:18:13+08:00" />
-<meta itemprop="wordCount" content="826"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
+<meta itemprop="wordCount" content="836"><meta itemprop="image" content="https://ronin-zc.com/logo.png"/>
 <meta itemprop="keywords" content="CFW," /><meta property="og:title" content="CFW 个人使用记录" />
 <meta property="og:description" content="前言 最近一直在折腾关于 Clash 相关的内容，一直没仔细了解具体的功能 正好有点时间上网冲浪🏄（不是摸鱼） 也因为 mac 使用 doh 用 cloudflared 一直不稳定，无法正常解析导致" />
 <meta property="og:type" content="article" />
@@ -35,7 +35,7 @@
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": "https:\/\/ronin-zc.com\/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95\/"
-    },"genre": "posts","keywords": "CFW","wordcount":  826 ,
+    },"genre": "posts","keywords": "CFW","wordcount":  836 ,
     "url": "https:\/\/ronin-zc.com\/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95\/","datePublished": "2023-04-04T22:18:13+08:00","dateModified": "2023-04-04T22:18:13+08:00","publisher": {
       "@type": "Organization",
       "name": ""},"author": {
@@ -194,7 +194,7 @@
           <span class="post-category">收录于 <a href="/categories/%E6%9D%82%E8%AE%B0/"><i class="fa-regular fa-folder fa-fw"></i>&nbsp;杂记</a></span></div>
       <div class="post-meta-line"><span title=2023-04-04&#32;22:18:13>
             <i class="fa-regular fa-calendar-alt fa-fw"></i>&nbsp;<time datetime="2023-04-04" >2023-04-04</time>
-          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 826 字&nbsp;
+          </span>&nbsp;<i class="fa-solid fa-pencil-alt fa-fw"></i>&nbsp;约 836 字&nbsp;
         <i class="fa-regular fa-clock fa-fw"></i>&nbsp;预计阅读 2 分钟&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="CFW 个人使用记录">
               <i class="fa-regular fa-eye fa-fw"></i>&nbsp;<span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
             </span>&nbsp;</div>
@@ -360,6 +360,8 @@
 </span><span class="lnt"> 98
 </span><span class="lnt"> 99
 </span><span class="lnt">100
+</span><span class="lnt">101
+</span><span class="lnt">102
 </span></code></pre></td>
 <td class="lntd">
 <pre tabindex="0" class="chroma"><code class="language-yaml" data-lang="yaml"><span class="line"><span class="cl"><span class="nt">mixin</span><span class="p">:</span><span class="w"> </span><span class="c"># Mixin 配置文件</span><span class="w">
@@ -414,6 +416,8 @@
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">tls://dot.360.cn</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="nt">fallback</span><span class="p">:</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># cloudflare DoH DNS 地址</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">https://1.0.0.1/dns-query</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># Google DoH DNS Server地址</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span>- <span class="l">https://dns.google/dns-query</span><span class="w">
 </span></span></span><span class="line"><span class="cl"><span class="w">      </span><span class="c"># Google DoT DNS Server地址</span><span class="w">
@@ -506,15 +510,7 @@
   
 >阅读原始文档</a></span></div>
       <div class="post-info-share">
-        <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" data-title="CFW 个人使用记录" data-hashtags="CFW"><i class="fa-brands fa-twitter fa-fw"></i></a>
-  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" data-hashtag="CFW"><i class="fa-brands fa-facebook-square fa-fw"></i></a>
-  <a href="javascript:void(0);" title="分享到 WhatsApp" data-sharer="whatsapp" data-url="https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" data-title="CFW 个人使用记录" data-web><i class="fa-brands fa-whatsapp fa-fw"></i></a>
-  <a href="javascript:void(0);" title="分享到 Line" data-sharer="line" data-url="https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" data-title="CFW 个人使用记录"><i data-svg-src="/lib/simple-icons/icons/line.min.svg"></i></a>
-  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" data-title="CFW 个人使用记录"><i class="fa-brands fa-weibo fa-fw"></i></a>
-  <a href="javascript:void(0);" title="分享到 Myspace" data-sharer="myspace" data-url="https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" data-title="CFW 个人使用记录" data-description=""><i data-svg-src="/lib/simple-icons/icons/myspace.min.svg"></i></a>
-  <a href="javascript:void(0);" title="分享到 Blogger" data-sharer="blogger" data-url="https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" data-title="CFW 个人使用记录" data-description=""><i class="fa-brands fa-blogger fa-fw"></i></a>
-  <a href="javascript:void(0);" title="分享到 Evernote" data-sharer="evernote" data-url="https://ronin-zc.com/cfw%E4%B8%AA%E4%BA%BA%E4%BD%BF%E7%94%A8%E8%AE%B0%E5%BD%95/" data-title="CFW 个人使用记录"><i class="fa-brands fa-evernote fa-fw"></i></a>
-  </span>
+        <span></span>
       </div>
     </div>
   </div>
@@ -579,5 +575,5 @@
   
   
   
-  <link rel="stylesheet" href="/lib/gitalk/gitalk.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/gitalk/gitalk.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js" async defer></script><script type="text/javascript" src="/lib/sharer/sharer.min.js" async defer></script><script type="text/javascript" src="/lib/typeit/typeit.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/lib/pangu/pangu.min.js" defer></script><script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async defer></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"gitalk":{"admin":["RoninZc"],"clientID":"9c7b40a3888f1e78b982","clientSecret":"735c7f29eddf00774f46187ff25824109753fb3a","id":"2023-04-04T22:18:13+08:00","owner":"RoninZc","repo":"RoninZc.github.io","title":"CFW 个人使用记录"}},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"data":{"typeit-header-desktop":" RoninZc","typeit-header-subtitle-desktop":"Just do it","typeit-header-subtitle-mobile":"Just do it","typeit-header-title-mobile":" RoninZc"},"enablePWA":true,"enablePangu":true,"siteTime":"2021-11-01T00:00:00+08:00","typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"typeit-header-desktop":["typeit-header-desktop"],"typeit-header-subtitle-desktop":["typeit-header-subtitle-desktop"],"typeit-header-subtitle-mobile":["typeit-header-subtitle-mobile"],"typeit-header-title-mobile":["typeit-header-title-mobile"]},"duration":-1,"speed":100}};</script><script type="text/javascript" src="/js/theme.min.js" defer></script><script type="text/javascript" src="/js/_custom.min.js" defer></script></body>
+  <link rel="stylesheet" href="/lib/gitalk/gitalk.min.css"><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script type="text/javascript" src="/lib/gitalk/gitalk.min.js"></script><script type="text/javascript" src="/lib/lazysizes/lazysizes.min.js" async defer></script><script type="text/javascript" src="/lib/typeit/typeit.min.js" defer></script><script type="text/javascript" src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script type="text/javascript" src="/lib/pangu/pangu.min.js" defer></script><script type="text/javascript" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js" async defer></script><script type="text/javascript">window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"gitalk":{"admin":["RoninZc"],"clientID":"9c7b40a3888f1e78b982","clientSecret":"735c7f29eddf00774f46187ff25824109753fb3a","id":"2023-04-04T22:18:13+08:00","owner":"RoninZc","repo":"RoninZc.github.io","title":"CFW 个人使用记录"}},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"data":{"typeit-header-desktop":" RoninZc","typeit-header-subtitle-desktop":"Just do it","typeit-header-subtitle-mobile":"Just do it","typeit-header-title-mobile":" RoninZc"},"enablePWA":true,"enablePangu":true,"siteTime":"2021-11-01T00:00:00+08:00","typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"typeit-header-desktop":["typeit-header-desktop"],"typeit-header-subtitle-desktop":["typeit-header-subtitle-desktop"],"typeit-header-subtitle-mobile":["typeit-header-subtitle-mobile"],"typeit-header-title-mobile":["typeit-header-title-mobile"]},"duration":-1,"speed":100}};</script><script type="text/javascript" src="/js/theme.min.js" defer></script><script type="text/javascript" src="/js/_custom.min.js" defer></script></body>
 </html>
