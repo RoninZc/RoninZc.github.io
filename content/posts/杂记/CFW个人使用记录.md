@@ -105,6 +105,8 @@ mixin: # Mixin 配置文件
       - tls://dot.360.cn
 
     fallback:
+      # cloudflare DoH DNS 地址
+      - https://1.0.0.1/dns-query
       # Google DoH DNS Server地址
       - https://dns.google/dns-query
       # Google DoT DNS Server地址
