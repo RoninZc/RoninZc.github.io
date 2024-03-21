@@ -997,9 +997,9 @@ enableEmoji = true
 
   # FixIt 0.2.12 | NEW Busuanzi count
   [params.ibruce]
-    enable = false
+    enable = true
     # Enable in post meta
-    enablePost = false
+    enablePost = true
 
   # Site verification code config for Google/Bing/Yandex/Pinterest/Baidu/360/Sogou
   [params.verification]
