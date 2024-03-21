@@ -430,7 +430,7 @@ enableEmoji = true
     # Site creation year
     since = "2021"
     # FixIt 0.2.12 | NEW Public network security only in China (HTML format is supported)
-    gov = '<meta name="referrer" content="no-referrer-when-downgrade">'
+    gov = ""
     # ICP info only in China (HTML format is supported)
     icp = "<a href=\"https://beian.miit.gov.cn/\">赣ICP备18014838号</a>"
     # license info (HTML format is supported)
