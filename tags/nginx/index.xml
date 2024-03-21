@@ -2,70 +2,15 @@
   <channel>
     <title>Nginx - 标签 - RoninZc 的个人博客</title>
     <link>https://ronin-zc.com/tags/nginx/</link>
-    <description>Nginx - 标签 - RoninZc 的个人博客</description>
+    <description>Nginx - 标签 | RoninZc 的个人博客</description>
     <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Wed, 20 Jul 2022 15:17:19 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/nginx/" rel="self" type="application/rss+xml" /><item>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><copyright>1</copyright><lastBuildDate>Wed, 20 Jul 2022 15:17:19 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/nginx/" rel="self" type="application/rss+xml" /><item>
   <title>Docker 部署 Nginx 出现「host not found in upstream」问题解决</title>
-  <link>https://ronin-zc.com/docker%E9%83%A8%E7%BD%B2nginx%E5%87%BA%E7%8E%B0host-not-found-in-upstream%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</link>
+  <link>https://ronin-zc.com/posts/docker%E9%83%A8%E7%BD%B2nginx%E5%87%BA%E7%8E%B0host-not-found-in-upstream%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</link>
   <pubDate>Wed, 20 Jul 2022 15:17:19 &#43;0800</pubDate>
   <author>RoninZc</author>
-  <guid>https://ronin-zc.com/docker%E9%83%A8%E7%BD%B2nginx%E5%87%BA%E7%8E%B0host-not-found-in-upstream%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</guid>
-  <description><![CDATA[<h2 id="问题">问题</h2>
-<p>这个问题是本人在折腾自己的<del>良心云</del>（凉心云）的时候发现的，当时是想使用一个前置 Nginx 转发所有的请求，同时进行日志的记录等等。</p>
-<p>当我写完配置文件，测试时没有任何问题。但是当我关闭了自己搭建的 es 服务，我发现我访问所有的服务都 500 了，这时我查看 nginx error 日志，记录如下</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">[emerg] 1#1: host not found in upstream &#34;es&#34; in /etc/nginx/conf.d/es.conf:13
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h2 id="解决">解决</h2>
-<p>在 nginx 的配置文件中添加以下内容</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-nginx" data-lang="nginx"><span class="line"><span class="cl"><span class="k">server</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">  <span class="kn">listen</span> <span class="mi">80</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="kn">server_name</span> <span class="s">test.com</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="c1"># 添加额外的 dns 解析地址，此地址为 docker 内部 dns 地址
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="c1"># 当 proxy_pass 为变量时 必须添加
-</span></span></span><span class="line"><span class="cl"><span class="c1"></span>  <span class="kn">resolver</span> <span class="mi">127</span><span class="s">.0.0.11</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl">  <span class="kn">location</span> <span class="s">/</span> <span class="p">{</span>
-</span></span><span class="line"><span class="cl">    <span class="kn">set</span> <span class="nv">$tmp</span> <span class="s">es</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">    <span class="kn">proxy_pass</span> <span class="s">http://</span><span class="nv">$tmp</span><span class="p">;</span>
-</span></span><span class="line"><span class="cl">  <span class="p">}</span>  
-</span></span><span class="line"><span class="cl"><span class="p">}</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="原理">原理</h3>
-<p>nginx 启动时，会对其配置的 upstream 进行 DNS 解析测试，如果无法解析成功则会报错无法启动。</p>
-<p>但是，当我们将 upstream 修改为<strong>变量</strong>时，nginx 不会进行测试，以此绕过这个问题。</p>
-<p>resolver 则为 Nginx 设置 DNS 服务器，Nginx会动态利用 resolver 设置的DNS服务器（本机设置的 DNS 服务器或 /etc/hosts 无效），将域名解析成 IP，proxy 模块会将请求转发到解析后的IP上。</p>
-<p>如果不添加的话，访问将会<code>502 Bad Gateway</code>，同时日志会显示</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-fallback" data-lang="fallback"><span class="line"><span class="cl">no resolver defined to resolve es
-</span></span></code></pre></td></tr></table>
-</div>
-</div>]]></description>
-</item></channel>
+  <guid>https://ronin-zc.com/posts/docker%E9%83%A8%E7%BD%B2nginx%E5%87%BA%E7%8E%B0host-not-found-in-upstream%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</guid>
+  <description><![CDATA[问题这个问题是本人在折腾自己的良心云（凉心云）的时候发现的，当时是想使用一个前置 Nginx 转发所有的请求，同时进行日志的记录等等。 当我写完配置文件，]]></description>
+</item>
+</channel>
 </rss>

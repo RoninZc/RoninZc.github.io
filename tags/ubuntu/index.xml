@@ -2,144 +2,15 @@
   <channel>
     <title>Ubuntu - 标签 - RoninZc 的个人博客</title>
     <link>https://ronin-zc.com/tags/ubuntu/</link>
-    <description>Ubuntu - 标签 - RoninZc 的个人博客</description>
+    <description>Ubuntu - 标签 | RoninZc 的个人博客</description>
     <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Fri, 13 May 2022 14:13:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/ubuntu/" rel="self" type="application/rss+xml" /><item>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><copyright>1</copyright><lastBuildDate>Fri, 13 May 2022 14:13:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/ubuntu/" rel="self" type="application/rss+xml" /><item>
   <title>Ubuntu ARM Docker 安装</title>
-  <link>https://ronin-zc.com/ubuntu-arm-docker-%E5%AE%89%E8%A3%85/</link>
+  <link>https://ronin-zc.com/posts/ubuntu-arm-docker-%E5%AE%89%E8%A3%85/</link>
   <pubDate>Fri, 13 May 2022 14:13:00 &#43;0800</pubDate>
   <author>RoninZc</author>
-  <guid>https://ronin-zc.com/ubuntu-arm-docker-%E5%AE%89%E8%A3%85/</guid>
-  <description><![CDATA[<h3 id="1卸载可能存在的旧版本">1、卸载可能存在的旧版本</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt remove docker docker-engine docker-ce docker.io
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="2安装依赖使-apt-可通过-https-下载包">2、安装依赖使 apt 可通过 HTTPS 下载包</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> apt install -y apt-transport-https ca-certificates curl software-properties-common
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="3添加-docker-密钥">3、添加 docker 密钥</h3>
-<h4 id="31阿里云-docker-源">3.1、阿里云 docker 源</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg <span class="p">|</span> sudo apt-key add -
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h4 id="32官方-docker-源">3.2、官方 docker 源</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">curl -fsSL https://download.docker.com/linux/ubuntu/gpg <span class="p">|</span> sudo apt-key add -
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="4添加对应的-docker-源需要和第三部一致">4、添加对应的 docker 源「需要和第三部一致」</h3>
-<h4 id="41阿里云-官方文档httpsdeveloperaliyuncommirrordocker-ce">4.1、阿里云 <a
-  href="https://developer.aliyun.com/mirror/docker-ce"
-  
-  
-    
-    
-    target="_blank"
-  
-  
-    rel="external nofollow noopener noreferrer"
-  
-  
-  
->「官方文档」</a></h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo add-apt-repository <span class="s2">&#34;deb [arch=arm64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu </span><span class="k">$(</span>lsb_release -cs<span class="k">)</span><span class="s2"> stable&#34;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h4 id="42官方源">4.2、官方源</h4>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo add-apt-repository <span class="s2">&#34;deb [arch=arm64] https://download.docker.com/linux/ubuntu </span><span class="k">$(</span>lsb_release -cs<span class="k">)</span><span class="s2"> stable&#34;</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><blockquote>
-<p><code>$(lsb_release -cs)</code>是获取当前 Ubuntu 代号</p>
-<p>如果没有科学上网手段，推荐使用阿里云源</p>
-</blockquote>
-<h3 id="5安装-docker">5、安装 docker</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">sudo apt update <span class="o">&amp;&amp;</span> apt install -y docker-ce
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="6配置镜像仓库">6、配置镜像仓库</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
-</span><span class="lnt"> 2
-</span><span class="lnt"> 3
-</span><span class="lnt"> 4
-</span><span class="lnt"> 5
-</span><span class="lnt"> 6
-</span><span class="lnt"> 7
-</span><span class="lnt"> 8
-</span><span class="lnt"> 9
-</span><span class="lnt">10
-</span><span class="lnt">11
-</span><span class="lnt">12
-</span><span class="lnt">13
-</span><span class="lnt">14
-</span><span class="lnt">15
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">mkdir /etc/docker
-</span></span><span class="line"><span class="cl">cat &gt; /etc/docker/daemon.json <span class="s">&lt;&lt; EOF
-</span></span></span><span class="line"><span class="cl"><span class="s">{
-</span></span></span><span class="line"><span class="cl"><span class="s">	&#34;exec-opts&#34;: [&#34;native.cgroupdriver=systemd&#34;],
-</span></span></span><span class="line"><span class="cl"><span class="s">	&#34;log-driver&#34;: &#34;json-file&#34;,
-</span></span></span><span class="line"><span class="cl"><span class="s">	&#34;log-opts&#34;: {
-</span></span></span><span class="line"><span class="cl"><span class="s">		&#34;max-size&#34;: &#34;100m&#34;
-</span></span></span><span class="line"><span class="cl"><span class="s">	},
-</span></span></span><span class="line"><span class="cl"><span class="s">	&#34;registry-mirrors&#34;: [&#34;https://xxx.mirror.aliyuncs.com&#34;]
-</span></span></span><span class="line"><span class="cl"><span class="s">}
-</span></span></span><span class="line"><span class="cl"><span class="s">EOF</span>
-</span></span><span class="line"><span class="cl">
-</span></span><span class="line"><span class="cl"><span class="c1"># 设置完成后重启</span>
-</span></span><span class="line"><span class="cl">sudo systemctl daemon-reload
-</span></span><span class="line"><span class="cl">sudo systemctl restart docker
-</span></span></code></pre></td></tr></table>
-</div>
-</div><h3 id="7验证安装">7、验证安装</h3>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl">systemstl status docker
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>正常运行则会显示</p>
-<p></p>
-]]></description>
-</item></channel>
+  <guid>https://ronin-zc.com/posts/ubuntu-arm-docker-%E5%AE%89%E8%A3%85/</guid>
+  <description><![CDATA[1、卸载可能存在的旧版本 1 sudo apt remove docker docker-engine docker-ce docker.io 2、安装依赖使 apt 可通过 HTTPS 下载包 1 sudo apt update &amp;&amp; apt install -y apt-transport-https ca-certificates curl software-properties-common 3、添加 docker 密钥 3.1、阿里云 docker 源 1 curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key]]></description>
+</item>
+</channel>
 </rss>

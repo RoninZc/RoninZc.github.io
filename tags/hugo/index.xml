@@ -2,24 +2,15 @@
   <channel>
     <title>Hugo - 标签 - RoninZc 的个人博客</title>
     <link>https://ronin-zc.com/tags/hugo/</link>
-    <description>Hugo - 标签 - RoninZc 的个人博客</description>
+    <description>Hugo - 标签 | RoninZc 的个人博客</description>
     <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><lastBuildDate>Wed, 11 May 2022 17:26:29 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/hugo/" rel="self" type="application/rss+xml" /><item>
+      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><copyright>1</copyright><lastBuildDate>Wed, 11 May 2022 17:26:29 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/hugo/" rel="self" type="application/rss+xml" /><item>
   <title>解决Hugo字数统计不正确</title>
-  <link>https://ronin-zc.com/%E8%A7%A3%E5%86%B3hugo%E5%AD%97%E6%95%B0%E7%BB%9F%E8%AE%A1%E4%B8%8D%E6%AD%A3%E7%A1%AE/</link>
+  <link>https://ronin-zc.com/posts/%E8%A7%A3%E5%86%B3hugo%E5%AD%97%E6%95%B0%E7%BB%9F%E8%AE%A1%E4%B8%8D%E6%AD%A3%E7%A1%AE/</link>
   <pubDate>Wed, 11 May 2022 17:26:29 &#43;0800</pubDate>
   <author>RoninZc</author>
-  <guid>https://ronin-zc.com/%E8%A7%A3%E5%86%B3hugo%E5%AD%97%E6%95%B0%E7%BB%9F%E8%AE%A1%E4%B8%8D%E6%AD%A3%E7%A1%AE/</guid>
-  <description><![CDATA[<p>在 Hugo 的配置文件中添加一行</p>
-<div class="highlight"><div class="chroma">
-<table class="lntable"><tr><td class="lntd">
-<pre tabindex="0" class="chroma"><code><span class="lnt">1
-</span></code></pre></td>
-<td class="lntd">
-<pre tabindex="0" class="chroma"><code class="language-shell" data-lang="shell"><span class="line"><span class="cl"><span class="nv">hasCJKLanguage</span> <span class="o">=</span> <span class="nb">true</span> <span class="c1"># 字数统计添加中文支持</span>
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>重新编译即可</p>
-]]></description>
-</item></channel>
+  <guid>https://ronin-zc.com/posts/%E8%A7%A3%E5%86%B3hugo%E5%AD%97%E6%95%B0%E7%BB%9F%E8%AE%A1%E4%B8%8D%E6%AD%A3%E7%A1%AE/</guid>
+  <description><![CDATA[在 Hugo 的配置文件中添加一行 1 hasCJKLanguage = true # 字数统计添加中文支持 重新编译即可]]></description>
+</item>
+</channel>
 </rss>

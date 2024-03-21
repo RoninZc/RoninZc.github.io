@@ -1,0 +1,89 @@
+# Ubuntu ARM Docker 安装
+
+
+### 1、卸载可能存在的旧版本
+
+```shell
+sudo apt remove docker docker-engine docker-ce docker.io
+```
+
+### 2、安装依赖使 apt 可通过 HTTPS 下载包
+
+```shell
+sudo apt update &amp;&amp; apt install -y apt-transport-https ca-certificates curl software-properties-common
+```
+
+### 3、添加 docker 密钥
+
+#### 3.1、阿里云 docker 源
+
+```shell
+curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
+```
+
+#### 3.2、官方 docker 源
+
+```shell
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+```
+
+### 4、添加对应的 docker 源「需要和第三部一致」
+
+#### 4.1、阿里云 [「官方文档」](https://developer.aliyun.com/mirror/docker-ce)
+
+```shell
+sudo add-apt-repository &#34;deb [arch=arm64] https://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable&#34;
+```
+
+#### 4.2、官方源
+
+```shell
+sudo add-apt-repository &#34;deb [arch=arm64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable&#34;
+```
+
+&gt; `$(lsb_release -cs)`是获取当前 Ubuntu 代号
+&gt;
+&gt; 如果没有科学上网手段，推荐使用阿里云源
+
+### 5、安装 docker
+
+```shell
+sudo apt update &amp;&amp; apt install -y docker-ce
+```
+
+### 6、配置镜像仓库
+
+```shell
+mkdir /etc/docker
+cat &gt; /etc/docker/daemon.json &lt;&lt; EOF
+{
+	&#34;exec-opts&#34;: [&#34;native.cgroupdriver=systemd&#34;],
+	&#34;log-driver&#34;: &#34;json-file&#34;,
+	&#34;log-opts&#34;: {
+		&#34;max-size&#34;: &#34;100m&#34;
+	},
+	&#34;registry-mirrors&#34;: [&#34;https://xxx.mirror.aliyuncs.com&#34;]
+}
+EOF
+
+# 设置完成后重启
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+### 7、验证安装
+
+```shell
+systemstl status docker
+```
+
+正常运行则会显示
+
+![image-20220513142604338.png](https://lsky.ronin-zc.com/i/2022/08/17/62fc9697284d7.png)
+
+
+---
+
+> 作者: RoninZc  
+> URL: https://ronin-zc.com/posts/ubuntu-arm-docker-%E5%AE%89%E8%A3%85/  
+

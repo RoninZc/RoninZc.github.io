@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>Golang标准库限流器timerate实现剖析 - RoninZc 的个人博客</title><meta name="author" content="RoninZc">
+<meta name="author-link" content="">
+<meta name="description" content="限流器是微服务中必不缺少的一环，可以起到保护下游服务，防止服务过载等作用。上一篇文章 《Golang 限流器 time/rate 使用介绍》 简单介绍了 time/rate 的使用方法，" /><meta name="keywords" content='Go标准库' /><meta itemprop="name" content="Golang标准库限流器timerate实现剖析">
+<meta itemprop="description" content="限流器是微服务中必不缺少的一环，可以起到保护下游服务，防止服务过载等作用。上一篇文章 《Golang 限流器 time/rate 使用介绍》 简单介绍了 time/rate 的使用方法，"><meta itemprop="datePublished" content="2021-03-03T16:14:05+08:00" />
+<meta itemprop="dateModified" content="2021-03-03T16:14:05+08:00" />
+<meta itemprop="wordCount" content="3236"><meta itemprop="image" content="https://ronin-zc.com/logo.png" />
+<meta itemprop="keywords" content="Go标准库," /><meta property="og:title" content="Golang标准库限流器timerate实现剖析" />
+<meta property="og:description" content="限流器是微服务中必不缺少的一环，可以起到保护下游服务，防止服务过载等作用。上一篇文章 《Golang 限流器 time/rate 使用介绍》 简单介绍了 time/rate 的使用方法，" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/" /><meta property="og:image" content="https://ronin-zc.com/logo.png" /><meta property="article:section" content="posts" />
+<meta property="article:published_time" content="2021-03-03T16:14:05+08:00" />
+<meta property="article:modified_time" content="2021-03-03T16:14:05+08:00" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:image" content="https://ronin-zc.com/logo.png" /><meta name="twitter:title" content="Golang标准库限流器timerate实现剖析"/>
+<meta name="twitter:description" content="限流器是微服务中必不缺少的一环，可以起到保护下游服务，防止服务过载等作用。上一篇文章 《Golang 限流器 time/rate 使用介绍》 简单介绍了 time/rate 的使用方法，"/>
+<meta name="application-name" content="RoninZc的个人博客">
+<meta name="apple-mobile-web-app-title" content="RoninZc的个人博客"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" href="https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/" /><link rel="prev" href="https://ronin-zc.com/about/" /><link rel="next" href="https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D/" /><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "Golang标准库限流器timerate实现剖析",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https:\/\/ronin-zc.com\/posts\/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90\/"
+    },"genre": "posts","keywords": "Go标准库","wordcount":  3236 ,
+    "url": "https:\/\/ronin-zc.com\/posts\/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90\/","datePublished": "2021-03-03T16:14:05+08:00","dateModified": "2021-03-03T16:14:05+08:00","license": "1","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "RoninZc"
+      },"description": ""
+  }
+  </script></head>
+  <body data-header-desktop="sticky" data-header-mobile="auto"><script>(window.localStorage?.getItem('theme') ? localStorage.getItem('theme') === 'dark' : ('auto' === 'auto' ? window.matchMedia('(prefers-color-scheme: dark)').matches : 'auto' === 'dark')) && document.body.setAttribute('data-theme', 'dark');</script><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper" data-github-corner="right">
+    <div class="header-title">
+      <a href="/" title="RoninZc 的个人博客"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" alt="RoninZc 的个人博客" data-title="RoninZc 的个人博客" class="logo" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/><span class="header-title-text">RoninZc</span></a><span id="typeit-header-subtitle-desktop" class="typeit header-subtitle"></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a
+                class="menu-link"
+                href="/posts/"
+                
+                
+              ><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 文章</a></li><li class="menu-item">
+              <a
+                class="menu-link"
+                href="/categories/"
+                
+                
+              ><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a
+                class="menu-link"
+                href="/tags/"
+                
+                
+              ><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="RoninZc 的个人博客"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" alt="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" data-title="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" class="logo" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/><span class="header-title-text">RoninZc</span></a><span id="typeit-header-subtitle-mobile" class="typeit header-subtitle"></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li
+              class="menu-item"
+            ><a
+                  class="menu-link"
+                  href="/posts/"
+                  
+                  
+                ><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 文章</a></li><li
+              class="menu-item"
+            ><a
+                  class="menu-link"
+                  href="/categories/"
+                  
+                  
+                ><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li
+              class="menu-item"
+            ><a
+                  class="menu-link"
+                  href="/tags/"
+                  
+                  
+                ><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><nav aria-label="breadcrumb" class="breadcrumb-container sticky">
+    <ol class="breadcrumb"><li class="breadcrumb-item"><a href="/" title="RoninZc 的个人博客">主页</a></li><li class="breadcrumb-item"><a href="/posts/" title="Posts">文章</a></li><li class="breadcrumb-item active" aria-current="page">Golang标准库限流器timerate实现剖析</li>
+    </ol>
+  </nav><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span>Golang标准库限流器timerate实现剖析</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" alt="RoninZc" data-title="RoninZc" class="avatar" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/>&nbsp;RoninZc</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category" title="分类 - 学习"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> 学习</a></span></div><div class="post-meta-line"><span title="发布于 2021-03-03 16:14:05"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="2021-03-03">2021-03-03</time></span>&nbsp;<span title="3236 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 3300 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 7 分钟</span>&nbsp;</div>
+    </div><div class="content" id="content"><p>限流器是微服务中必不缺少的一环，可以起到保护下游服务，防止服务过载等作用。上一篇文章 <a href="https://www.cyhone.com/articles/usage-of-golang-rate/"target="_blank" rel="external nofollow noopener noreferrer">《Golang 限流器 time/rate 使用介绍》<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a> 简单介绍了 time/rate 的使用方法，本文则着重分析下其实现原理。建议在正式阅读本文之前，先阅读下上一篇文章。</p>
+<p>上一篇文章讲到，time/rate 是基于 Token Bucket(令牌桶) 算法实现的限流。本文将会基于源码，深入剖析下 Golang 是如何实现 Token Bucket 的。其代码也非常简洁，去除注释后，也就 200 行左右的代码量。</p>
+<p>同时，我也提供了 <a href="https://github.com/chenyahui/AnnotatedCode/tree/master/go/x/time"target="_blank" rel="external nofollow noopener noreferrer">time/rate 注释版<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a>，辅助大家理解该组件的实现。</p>
+<h1 id="背景" class="heading-element">
+  <a href="#%e8%83%8c%e6%99%af" class="heading-mark"></a>背景</h1><p>简单来说，令牌桶就是想象有一个固定大小的桶，系统会以恒定速率向桶中放 Token，桶满则暂时不放。
+而用户则从桶中取 Token，如果有剩余 Token 就可以一直取。如果没有剩余 Token，则需要等到系统中被放置了 Token 才行。</p>
+<p>一般介绍 Token Bucket 的时候，都会有一张这样的原理图：
+<img loading="lazy" src="https://www.cyhone.com/img/token-bucket/token-bucket.jpg" alt="Token Bucket 原理图" srcset="https://www.cyhone.com/img/token-bucket/token-bucket.jpg?size=small, https://www.cyhone.com/img/token-bucket/token-bucket.jpg?size=medium 1.5x, https://www.cyhone.com/img/token-bucket/token-bucket.jpg?size=large 2x" data-title="Token Bucket 原理图" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></p>
+<p>从这个图中看起来，似乎令牌桶实现应该是这样的：</p>
+<blockquote>
+<p>有一个 Timer 和一个 BlockingQueue。Timer 固定的往 BlockingQueue 中放 token。用户则从 BlockingQueue 中取数据。</p>
+</blockquote>
+<p>这固然是 Token Bucket 的一种实现方式，这么做也非常直观，但是效率太低了：我们需要不仅多维护一个 Timer 和 BlockingQueue，而且还耗费了一些不必要的内存。</p>
+<p>在 Golang 的 <code>timer/rate</code> 中的实现, 并没有单独维护一个 Timer，而是采用了 lazyload 的方式，直到每次消费之前才根据时间差更新 Token 数目，而且也不是用 BlockingQueue 来存放 Token，而是仅仅通过计数的方式。</p>
+<h1 id="token-的生成和消费" class="heading-element">
+  <a href="#token-%e7%9a%84%e7%94%9f%e6%88%90%e5%92%8c%e6%b6%88%e8%b4%b9" class="heading-mark"></a>Token 的生成和消费</h1><p>我们在 <a href="https://www.cyhone.com/articles/usage-of-golang-rate/"target="_blank" rel="external nofollow noopener noreferrer">上一篇文章<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a> 中讲到，Token 的消费方式有三种。但其实在内部实现，最终三种消费方式都调用了 reserveN 函数来生成和消费 Token。</p>
+<p>我们看下 reserveN 函数的具体实现，整个过程非常简单。在正式讲之前，我们先了解一个简单的概念：</p>
+<p>在 <code>time/rate</code> 中，<code>NewLimiter</code> 的第一个参数是速率 limit，代表了一秒钟可以产生多少 Token。
+那么简单换算一下，我们就可以知道一个 Token 的生成间隔是多少。</p>
+<p>有了这个生成间隔，我们就可以轻易地得到两个数据：
+<strong>1. 生成 N 个新的 Token 一共需要多久。</strong><code>time/rate</code> 中对应的实现函数为 <code>durationFromTokens</code>。
+<strong>2. 给定一段时长，这段时间一共可以生成多少个 Token。</strong><code>time/rate</code> 中对应的实现函数为 <code>tokensFromDuration</code>。</p>
+<p>那么，有了这些转换函数，整个过程就很清晰了，如下：</p>
+<ol>
+<li>计算从上次取 Token 的时间到当前时刻，期间一共新产生了多少 Token：
+我们只在取 Token 之前生成新的 Token，也就意味着每次取 Token 的间隔，实际上也是生成 Token 的间隔。我们可以利用 <code>tokensFromDuration</code>, 轻易的算出这段时间一共产生 Token 的数目。
+那么，当前 Token 数目 = 新产生的 Token 数目 + 之前剩余的 Token 数目 - 要消费的 Token 数目。</li>
+<li>如果消费后剩余 Token 数目大于零，说明此时 Token 桶内仍不为空，此时 Token 充足，无需调用侧等待。
+如果 Token 数目小于零，则需等待一段时间。
+那么这个时候，我们可以利用 <code>durationFromTokens</code> 将当前负值的 Token 数转化为需要等待的时间。</li>
+<li>将需要等待的时间等相关结果返回给调用方。</li>
+</ol>
+<p>从上面可以看出，其实整个过程就是利用了 <strong>Token 数可以和时间相互转化</strong> 的原理。而如果 Token 数为负，则需要等待相应时间即可。</p>
+<p><strong>注意</strong> 如果当消费时，Token 桶中的 Token 数目已经为负值了，依然可以按照上述流程进行消费。随着负值越来越小，等待的时间将会越来越长。
+从结果来看，这个行为跟用 Timer+BlockQueue 实现是一样的。</p>
+<p>此外，整个过程为了保证线程安全，更新令牌桶相关数据时都用了 mutex 加锁。</p>
+<p>我们模拟下请求与 Token 数变化的关系：</p>
+<ol>
+<li>当某一时间，桶内 Token 数为 3, 此时 A 线程请求 5 个 Token。那么此时桶内 Token 不足，因此 A 线程需要等待 2 个 Token 的时间。
+且此时桶内 Token 数变为 - 2。</li>
+<li>同时，B 线程请求 4 个 Token，此时桶内 Token 数为 - 2，因此 B 线程需要等待 2+4=6 个 Token 的时间，且此时桶内 Token 数变为 - 6。</li>
+</ol>
+<p>对于 Allow 函数实现时，只要判断需要等待的时间是否为 0 即可，如果大于 0 说明需要等待，则返回 False，反之返回 True。</p>
+<p>对于 Wait 函数，直接 <code>t := time.NewTimer(delay)</code>，等待对应的时间即可。</p>
+<h1 id="float-精度问题" class="heading-element">
+  <a href="#float-%e7%b2%be%e5%ba%a6%e9%97%ae%e9%a2%98" class="heading-mark"></a>float 精度问题</h1><p>从上面原理讲述可以看出，在 Token 和时间的相互转化函数 <code>durationFromTokens</code> 和 <code>tokensFromDuration</code> 中，涉及到 float64 的乘除运算。
+一谈到 float 的乘除，我们就需要小心精度问题了。</p>
+<p>而 Golang 在这里也踩了坑，以下是 <code>tokensFromDuration</code> 最初的实现版本</p>
+<div class="highlight" id="id-1"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">limit</span> <span class="nx">Limit</span><span class="p">)</span> <span class="nf">tokensFromDuration</span><span class="p">(</span><span class="nx">d</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nf">Seconds</span><span class="p">()</span> <span class="o">*</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">limit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>这个操作看起来一点问题都没：每秒生成的 Token 数乘于秒数。
+然而，这里的问题在于，<code>d.Seconds()</code> 已经是小数了。两个小数相乘，会带来精度的损失。</p>
+<p>所以就有了这个 issue:<a href="https://github.com/golang/go/issues/34861"target="_blank" rel="external nofollow noopener noreferrer">golang.org/issues/34861<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a>。</p>
+<p>修改后新的版本如下：</p>
+<div class="highlight" id="id-2"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="kd">func</span> <span class="p">(</span><span class="nx">limit</span> <span class="nx">Limit</span><span class="p">)</span> <span class="nf">tokensFromDuration</span><span class="p">(</span><span class="nx">d</span> <span class="nx">time</span><span class="p">.</span><span class="nx">Duration</span><span class="p">)</span> <span class="kt">float64</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">sec</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">d</span><span class="o">/</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">limit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">nsec</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">d</span><span class="o">%</span><span class="nx">time</span><span class="p">.</span><span class="nx">Second</span><span class="p">)</span> <span class="o">*</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">limit</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span> <span class="nx">sec</span> <span class="o">+</span> <span class="nx">nsec</span><span class="o">/</span><span class="mf">1e9</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>time.Duration</code> 是 <code>int64</code> 的别名，代表纳秒。分别求出秒的整数部分和小数部分，进行相乘后再相加，这样可以得到最精确的精度。</p>
+<h1 id="数值溢出问题" class="heading-element">
+  <a href="#%e6%95%b0%e5%80%bc%e6%ba%a2%e5%87%ba%e9%97%ae%e9%a2%98" class="heading-mark"></a>数值溢出问题</h1><p>我们讲 reserveN 函数的具体实现时，第一步就是计算从当前时间到上次取 Token 的时刻，期间一共新产生了多少 Token，同时也可得出当前的 Token 是多少。</p>
+<p>我最开始的理解是，直接可以这么做：</p>
+<div class="highlight" id="id-3"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span><span class="lnt">6
+</span><span class="lnt">7
+</span><span class="lnt">8
+</span><span class="lnt">9
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="c1">// elapsed 表示过去的时间差
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">elapsed</span> <span class="o">:=</span> <span class="nx">now</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">lim</span><span class="p">.</span><span class="nx">last</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="c1">// delta 表示这段时间一共新产生了多少 Token
+</span></span></span><span class="line"><span class="cl"><span class="c1"></span><span class="nx">delta</span> <span class="p">=</span> <span class="nf">tokensFromDuration</span><span class="p">(</span><span class="nx">now</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">lim</span><span class="p">.</span><span class="nx">last</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">tokens</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">tokens</span> <span class="o">+</span> <span class="nx">delta</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span><span class="p">(</span><span class="nx">token</span><span class="p">&gt;</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span><span class="p">){</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">token</span> <span class="p">=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>其中，<code>lim.tokens</code> 是当前剩余的 Token，<code>lim.last</code> 是上次取 token 的时刻。<code>lim.burst</code> 是 Token 桶的大小。
+使用 tokensFromDuration 计算出新生成了多少 Token，累加起来后，不能超过桶的容量即可。</p>
+<p>这么做看起来也没什么问题，然而并不是这样。</p>
+<p>在 <code>time/rate</code> 里面是这么做的，如下代码所示：</p>
+<div class="highlight" id="id-4"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">maxElapsed</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">durationFromTokens</span><span class="p">(</span><span class="nb">float64</span><span class="p">(</span><span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span><span class="p">)</span> <span class="o">-</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">tokens</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="nx">elapsed</span> <span class="o">:=</span> <span class="nx">now</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">last</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">elapsed</span> <span class="p">&gt;</span> <span class="nx">maxElapsed</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">elapsed</span> <span class="p">=</span> <span class="nx">maxElapsed</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">delta</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">tokensFromDuration</span><span class="p">(</span><span class="nx">elapsed</span><span class="p">)</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl"><span class="nx">tokens</span> <span class="o">:=</span> <span class="nx">lim</span><span class="p">.</span><span class="nx">tokens</span> <span class="o">+</span> <span class="nx">delta</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">burst</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">lim</span><span class="p">.</span><span class="nx">burst</span><span class="p">);</span> <span class="nx">tokens</span> <span class="p">&gt;</span> <span class="nx">burst</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="nx">tokens</span> <span class="p">=</span> <span class="nx">burst</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>与我们最开始的代码不一样的是，它没有直接用 <code>now.Sub(lim.last)</code> 来转化为对应的 Token 数，而是
+先用 <code>lim.limit.durationFromTokens(float64(lim.burst) - lim.tokens)</code>，计算把桶填满的时间 maxElapsed。
+取 elapsed 和 maxElapsed 的最小值。</p>
+<p>这么做算出的结果肯定是正确的，但是这么做相比于我们的做法，好处在哪里？</p>
+<p>对于我们的代码，当 last 非常小的时候（或者当其为初始值 0 的时候），此时 <code>now.Sub(lim.last)</code> 的值就会非常大，如果 <code>lim.limit</code> 即每秒生成的 Token 数目也非常大时，直接将二者进行乘法运算，<strong>结果有可能会溢出。</strong></p>
+<p>因此，<code>time/rate</code> 先计算了把桶填满的时间，将其作为时间差值的上限，这样就规避了溢出的问题。</p>
+<h1 id="token-的归还" class="heading-element">
+  <a href="#token-%e7%9a%84%e5%bd%92%e8%bf%98" class="heading-mark"></a>Token 的归还</h1><p>而对于 Reserve 函数，返回的结果中，我们可以通过 <code>Reservation.Delay()</code> 函数，得到需要等待时间。
+同时调用方可以根据返回条件和现有情况，可以调用 <code>Reservation.Cancel()</code> 函数，取消此次消费。
+当调用 <code>Cancel()</code> 函数时，消费的 Token 数将会尽可能归还给 Token 桶。</p>
+<p>此外，我们在 <a href="https://www.cyhone.com/articles/usage-of-golang-rate/"target="_blank" rel="external nofollow noopener noreferrer">上一篇文章<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a> 中讲到，Wait 函数可以通过 Context 进行取消或者超时等，
+当通过 Context 进行取消或超时时，此时消费的 Token 数也会归还给 Token 桶。</p>
+<p>然而，归还 Token 的时候，并不是简单的将 Token 数直接累加到现有 Token 桶的数目上，这里还有一些注意点：</p>
+<div class="highlight" id="id-5"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-go" data-lang="go"><span class="line"><span class="cl"><span class="nx">restoreTokens</span> <span class="o">:=</span> <span class="nb">float64</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="nx">r</span><span class="p">.</span><span class="nx">limit</span><span class="p">.</span><span class="nf">tokensFromDuration</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">lim</span><span class="p">.</span><span class="nx">lastEvent</span><span class="p">.</span><span class="nf">Sub</span><span class="p">(</span><span class="nx">r</span><span class="p">.</span><span class="nx">timeToAct</span><span class="p">))</span>
+</span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="nx">restoreTokens</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="k">return</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>以上代码就是计算需要归还多少的 Token。其中：</p>
+<ol>
+<li><code>r.tokens</code> 指的是本次消费的 Token 数</li>
+<li><code>r.timeToAct</code> 指的是 Token 桶可以满足本次消费数目的时刻，也就是消费的时刻 + 等待的时长。</li>
+<li><code>r.lim.lastEvent</code> 指的是最近一次消费的 timeToAct 值</li>
+</ol>
+<p>其中：<code>r.limit.tokensFromDuration(r.lim.lastEvent.Sub(r.timeToAct))</code> 指的是，从该次消费到当前时间，一共又新消费了多少 Token 数目。</p>
+<p>根据代码来看，要归还的 Token 要是该次消费的 Token 减去新消费的 Token。
+不过这里我还没有想明白，为什么归还的时候，要减去新消费数目。</p>
+<p>按照我的理解，直接归还全部 Token 数目，这样对于下一次消费是无感知影响的。这块的具体原因还需要进一步探索。</p>
+<h1 id="总结" class="heading-element">
+  <a href="#%e6%80%bb%e7%bb%93" class="heading-mark"></a>总结</h1><p>Token Bucket 其实非常适合互联网突发式请求的场景，其请求 Token 时并不是严格的限制为固定的速率，而是中间有一个桶作为缓冲。
+只要桶中还有 Token，请求就还可以一直进行。当突发量激增到一定程度，则才会按照预定速率进行消费。</p>
+<p>此外在维基百科中，也提到了分层 Token Bucket(HTB) 作为传统 Token Bucket 的进一步优化，Linux 内核中也用它进行流量控制。</p>
+<h1 id="参考" class="heading-element">
+  <a href="#%e5%8f%82%e8%80%83" class="heading-mark"></a>参考</h1><ul>
+<li><a href="https://en.wikipedia.org/wiki/Token_bucket"target="_blank" rel="external nofollow noopener noreferrer">Wiki: Token bucket<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a></li>
+</ul>
+<h1 id="相关文章" class="heading-element">
+  <a href="#%e7%9b%b8%e5%85%b3%e6%96%87%e7%ab%a0" class="heading-mark"></a>相关文章</h1><ul>
+<li><a href="https://www.cyhone.com/articles/usage-of-golang-rate/"target="_blank" rel="external nofollow noopener noreferrer">Golang 限流器 time/rate 使用介绍<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a></li>
+<li><a href="https://www.cyhone.com/articles/analysis-of-uber-go-ratelimit/"target="_blank" rel="external nofollow noopener noreferrer">uber-go 漏桶限流器使用与原理分析<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a></li>
+</ul>
+<p><em>如果你在阅读过程中发现本文有错误或者存疑之处，请在下方评论区或者通过公众号进行留言，作者会尽快回复和解答。感谢您的支持与帮助。</em></p>
+<blockquote>
+<p><strong>本文作者：</strong> cyhone
+<strong>本文链接：</strong> <a href="https://www.cyhone.com/articles/analisys-of-golang-rate/"target="_blank" rel="external nofollow noopener noreferrer">https://www.cyhone.com/articles/analisys-of-golang-rate/<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a>
+<strong>版权声明：</strong> 本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/"target="_blank" rel="external nofollow noopener noreferrer">BY-NC-SA<i class="fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary" aria-hidden="true"></i></a> 许可协议。转载请注明出处！</p>
+</blockquote>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2021-03-03 16:14:05">更新于 2021-03-03&nbsp;</span>
+      </div><div class="post-info-license">
+            <span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a></span>
+          </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span><span><a href="https://github.com/RoninZc/RoninZc.github.io.git/blob/main/content/posts/Golang/%e6%a0%87%e5%87%86%e5%ba%93/Golang%e6%a0%87%e5%87%86%e5%ba%93%e9%99%90%e6%b5%81%e5%99%a8timerate%e5%ae%9e%e7%8e%b0%e5%89%96%e6%9e%90.md?plain=1" title="查看源码"target="_blank" rel="external nofollow noopener noreferrer" class="link-to-source">查看源码</a></span><span><a href="https://github.com/RoninZc/RoninZc.github.io.git/edit/main/content/posts/Golang/%e6%a0%87%e5%87%86%e5%ba%93/Golang%e6%a0%87%e5%87%86%e5%ba%93%e9%99%90%e6%b5%81%e5%99%a8timerate%e5%ae%9e%e7%8e%b0%e5%89%96%e6%9e%90.md" title="编辑此页"target="_blank" rel="external nofollow noopener noreferrer" class="link-to-edit">编辑此页</a></span><span><a href="https://github.com/RoninZc/RoninZc.github.io.git/issues/new?title=[BUG]%20Golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90&amp;body=%7cField%7cValue%7c%0A%7c-%7c-%7c%0A%7cTitle%7cGolang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90%7c%0A%7cURL%7chttps://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/%7c%0A%7cFilename%7chttps://github.com/RoninZc/RoninZc.github.io.git/blob/main/content/posts/Golang/%e6%a0%87%e5%87%86%e5%ba%93/Golang%e6%a0%87%e5%87%86%e5%ba%93%e9%99%90%e6%b5%81%e5%99%a8timerate%e5%ae%9e%e7%8e%b0%e5%89%96%e6%9e%90.md?plain=1%7c" title="报告问题"target="_blank" rel="external nofollow noopener noreferrer" class="link-to-report">报告问题</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 Twitter" data-sharer="twitter" data-url="https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/" data-title="Golang标准库限流器timerate实现剖析" data-hashtags="Go标准库"><i class="fa-brands fa-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/" data-hashtag="Go标准库"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/" data-title="Golang标准库限流器timerate实现剖析"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/go%E6%A0%87%E5%87%86%E5%BA%93/" class="post-tag" title="标签 - Go标准库">Go标准库</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div>
+
+  <div class="post-nav">
+      <a href="/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D/" class="post-nav-item" rel="next" title="Golang标准库限流器timerate使用介绍">Golang标准库限流器timerate使用介绍<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"><div id="gitalk" class="comment"></div><noscript>
+        Please enable JavaScript to view the comments powered by <a href="https://github.com/gitalk/gitalk" rel="external nofollow noopener noreferrer">Gitalk</a>.
+      </noscript></div></article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.124.1"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.2"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2021 - 2024</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">RoninZc</a></span><span class="license footer-divider"><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div><div class="footer-line statistics"><span class="site-time" title='网站运行中……'><i class="fa-solid fa-heartbeat fa-fw animate-icon" aria-hidden="true"></i><span class="run-times ms-1">网站运行中……</span></span></div><div class="footer-line beian"><span class="icp footer-divider"><a href="https://beian.miit.gov.cn/">赣ICP备18014838号</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div><div class="fixed-button view-comments d-none" role="button" aria-label="查看评论"><i class="fa-solid fa-comment fa-fw" aria-hidden="true"></i></div></div><a href="https://github.com/RoninZc/RoninZc.github.io" title="在 GitHub 上查看源代码"target="_blank" rel="external nofollow" class="github-corner right d-none-mobile"><svg viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a><div id="mask"></div><div class="reading-progress-bar" style="left: 0;top: 0;"></div><noscript>
+    <div class="noscript-warning">FixIt 主题在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="stylesheet" href="/lib/gitalk/gitalk.min.css"><link rel="preload" href="/lib/katex/katex.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/katex/katex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><link rel="stylesheet" href="/lib/pace/themes/blue/pace-theme-minimal.css"><script src="/lib/gitalk/gitalk.min.js"></script><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/typeit/index.umd.js" defer></script><script src="/lib/katex/katex.min.js" defer></script><script src="/lib/katex/auto-render.min.js" defer></script><script src="/lib/katex/copy-tex.min.js" defer></script><script src="/lib/katex/mhchem.min.js" defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="/lib/pace/pace.min.js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":true,"expired":false,"gitalk":{"admin":["RoninZc"],"clientID":"9c7b40a3888f1e78b982","clientSecret":"735c7f29eddf00774f46187ff25824109753fb3a","id":"2021-03-03T16:14:05+08:00","owner":"RoninZc","repo":"RoninZc.github.io","title":"Golang标准库限流器timerate实现剖析"}},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"data":{"typeit-header-subtitle-desktop":"Just do it","typeit-header-subtitle-mobile":"Just do it"},"enablePWA":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"siteTime":"2021-11-01T00:00:00+08:00","typeit":{"cursorChar":"|","cursorSpeed":1000,"data":{"typeit-header-subtitle-desktop":["typeit-header-subtitle-desktop"],"typeit-header-subtitle-mobile":["typeit-header-subtitle-mobile"]},"duration":-1,"loop":false,"speed":100}};</script><script src="/js/theme.min.js" defer></script></body>
+</html>
