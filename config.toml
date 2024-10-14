@@ -9,7 +9,7 @@
 # -------------------------------------------------------------------------------------
 
 # website title
-title = "RoninZc 的个人博客"
+title = "RoninZc 的个人记录"
 # Hostname (and path) to the root
 baseURL = "https://ronin-zc.com"
 # theme list
