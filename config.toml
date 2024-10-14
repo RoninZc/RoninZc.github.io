@@ -288,7 +288,7 @@ enableEmoji = true
   # FixIt 0.2.15 | CHANGED FixIt theme version
   version = "0.3.X" # e.g. "0.2.X", "0.2.15", "v0.2.15" etc.
   # site description
-  description = "RoninZc 的个人博客"
+  description = "RoninZc 的个人记录"
   # site keywords
   keywords = ["RoninZc", "blog", "技术", "记录", "解决问题"]
   # site default theme ["light", "dark", "auto"]
@@ -339,7 +339,7 @@ enableEmoji = true
   # App icon config
   [params.app]
     # optional site title override for the app when added to an iOS home screen or Android launcher
-    title = "RoninZc的个人博客"
+    title = "RoninZc的个人记录"
     # whether to omit favicon resource links
     noFavicon = false
     # modern SVG favicon to use in place of older style .png and .ico files
@@ -509,7 +509,7 @@ enableEmoji = true
       # FixIt 0.2.17 | NEW identifier of avatar menu link
       avatarMenu = ""
       # title shown in home page (HTML format is supported)
-      title = "RoninZc 的个人博客"
+      title = "RoninZc 的个人记录"
       # subtitle shown in home page
       subtitle = "随便写写～"
       # whether to use typeit animation for subtitle
