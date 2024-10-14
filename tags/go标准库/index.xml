@@ -1,8 +1,8 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
   <channel>
-    <title>Go标准库 - 标签 - RoninZc 的个人博客</title>
+    <title>Go标准库 - 标签 - RoninZc 的个人记录</title>
     <link>https://ronin-zc.com/tags/go%E6%A0%87%E5%87%86%E5%BA%93/</link>
-    <description>Go标准库 - 标签 | RoninZc 的个人博客</description>
+    <description>Go标准库 - 标签 | RoninZc 的个人记录</description>
     <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
       <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><copyright>1</copyright><lastBuildDate>Wed, 03 Mar 2021 16:21:52 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/go%E6%A0%87%E5%87%86%E5%BA%93/" rel="self" type="application/rss+xml" /><item>
   <title>Golang标准库限流器timerate使用介绍</title>

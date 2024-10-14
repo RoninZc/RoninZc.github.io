@@ -1,8 +1,8 @@
 <rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
   <channel>
-    <title>CFW - 标签 - RoninZc 的个人博客</title>
+    <title>CFW - 标签 - RoninZc 的个人记录</title>
     <link>https://ronin-zc.com/tags/cfw/</link>
-    <description>CFW - 标签 | RoninZc 的个人博客</description>
+    <description>CFW - 标签 | RoninZc 的个人记录</description>
     <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
       <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><copyright>1</copyright><lastBuildDate>Tue, 04 Apr 2023 22:18:13 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/cfw/" rel="self" type="application/rss+xml" /><item>
   <title>CFW 个人使用记录</title>
