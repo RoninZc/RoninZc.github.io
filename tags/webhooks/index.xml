@@ -1,16 +1,23 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Webhooks - 标签 - RoninZc 的个人记录</title>
     <link>https://ronin-zc.com/tags/webhooks/</link>
-    <description>Webhooks - 标签 | RoninZc 的个人记录</description>
-    <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><copyright>1</copyright><lastBuildDate>Mon, 08 Nov 2021 11:31:25 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/webhooks/" rel="self" type="application/rss+xml" /><item>
-  <title>Webhooks实现博客自动更新</title>
-  <link>https://ronin-zc.com/posts/webhooks%E5%AE%9E%E7%8E%B0%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0/</link>
-  <pubDate>Mon, 08 Nov 2021 11:31:25 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/webhooks%E5%AE%9E%E7%8E%B0%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0/</guid>
-  <description><![CDATA[今年嫖了一波良心云的服务器（2c4g8m），打算把 github page迁移到自己的服务器上。 又不想每次都 ssh 上服务器去拉取，也不想 ftp 去上传文件（公司安全]]></description>
-</item>
-</channel>
+    <description>RoninZc 的个人记录</description>
+    <generator>Hugo 0.140.2 &amp; FixIt v0.3.16</generator>
+    <language>zh-CN</language>
+    <managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
+    <webMaster>devroninzc@gmail.com (RoninZc)</webMaster>
+    <copyright>1</copyright>
+    <lastBuildDate>Mon, 08 Nov 2021 11:31:25 +0800</lastBuildDate>
+    <atom:link href="https://ronin-zc.com/tags/webhooks/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Webhooks实现博客自动更新</title>
+      <link>https://ronin-zc.com/posts/webhooks%E5%AE%9E%E7%8E%B0%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0/</link>
+      <pubDate>Mon, 08 Nov 2021 11:31:25 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/webhooks%E5%AE%9E%E7%8E%B0%E5%8D%9A%E5%AE%A2%E8%87%AA%E5%8A%A8%E6%9B%B4%E6%96%B0/</guid>
+      <category domain="https://ronin-zc.com/categories/%E6%8A%98%E8%85%BE/">折腾</category>
+      <description>&lt;p&gt;今年嫖了一波良心云的服务器（2c4g8m），打算把 github page迁移到自己的服务器上。&lt;/p&gt;&#xA;&lt;p&gt;又不想每次都 ssh 上服务器去拉取，也不想 ftp 去上传文件（公司安全要求）。所以想通过webhooks通知，让服务器自动的去更新博客。具体实现希望通过 docker 来解决，这样可以通用，下次迁移服务的时候可以直接拿个 docker-compose 文件就迁移完成了。&lt;del&gt;毕竟良心云续费可不良心&lt;/del&gt;。&lt;/p&gt;</description>
+    </item>
+  </channel>
 </rss>

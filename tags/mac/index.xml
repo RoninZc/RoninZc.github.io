@@ -1,16 +1,23 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Mac - 标签 - RoninZc 的个人记录</title>
     <link>https://ronin-zc.com/tags/mac/</link>
-    <description>Mac - 标签 | RoninZc 的个人记录</description>
-    <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><copyright>1</copyright><lastBuildDate>Tue, 04 Apr 2023 23:02:13 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/tags/mac/" rel="self" type="application/rss+xml" /><item>
-  <title>Mac ARM 包损坏修复</title>
-  <link>https://ronin-zc.com/posts/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/</link>
-  <pubDate>Tue, 04 Apr 2023 23:02:13 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/</guid>
-  <description><![CDATA[之前下载的 CFW 和 PicGo 的 ARM 版本一直提示损坏😫 1 sudo xattr -d com.apple.quarantine &#34;/Applications/Clash for Windows.app&#34; 执行完成重新打开即可]]></description>
-</item>
-</channel>
+    <description>RoninZc 的个人记录</description>
+    <generator>Hugo 0.140.2 &amp; FixIt v0.3.16</generator>
+    <language>zh-CN</language>
+    <managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
+    <webMaster>devroninzc@gmail.com (RoninZc)</webMaster>
+    <copyright>1</copyright>
+    <lastBuildDate>Tue, 04 Apr 2023 23:02:13 +0800</lastBuildDate>
+    <atom:link href="https://ronin-zc.com/tags/mac/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Mac ARM 包损坏修复</title>
+      <link>https://ronin-zc.com/posts/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/</link>
+      <pubDate>Tue, 04 Apr 2023 23:02:13 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/</guid>
+      <category domain="https://ronin-zc.com/categories/%E6%9D%82%E8%AE%B0/">杂记</category>
+      <description>&lt;p&gt;之前下载的 CFW 和 PicGo 的 ARM 版本一直提示损坏😫&lt;/p&gt;&#xA;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;&#xA;&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1&#xA;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&#xA;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo xattr -d com.apple.quarantine &lt;span class=&#34;s2&#34;&gt;&amp;#34;/Applications/Clash for Windows.app&amp;#34;&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&#xA;&lt;/div&gt;&#xA;&lt;/div&gt;&lt;p&gt;执行完成重新打开即可&lt;/p&gt;</description>
+    </item>
+  </channel>
 </rss>

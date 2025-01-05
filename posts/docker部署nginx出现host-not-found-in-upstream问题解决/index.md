@@ -1,4 +1,4 @@
-# Docker 部署 Nginx 出现「host not found in upstream」问题解决
+# Docker 部署 Nginx 出现「host Not Found in Upstream」问题解决
 
 
 ## 问题

@@ -1,80 +1,87 @@
-<rss xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>学习 - 分类 - RoninZc 的个人记录</title>
     <link>https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/</link>
-    <description>学习 - 分类 | RoninZc 的个人记录</description>
-    <generator>Hugo -- gohugo.io</generator><language>zh-CN</language><managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
-      <webMaster>devroninzc@gmail.com (RoninZc)</webMaster><copyright>1</copyright><lastBuildDate>Tue, 07 Jun 2022 10:45:00 &#43;0800</lastBuildDate><atom:link href="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/" rel="self" type="application/rss+xml" /><item>
-  <title>K8S学习笔记</title>
-  <link>https://ronin-zc.com/posts/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
-  <pubDate>Tue, 07 Jun 2022 10:45:00 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
-  <description><![CDATA[这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频 2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili 本文章为本人学习]]></description>
-</item>
-<item>
-  <title>MySQL动态存储方案对比「转」</title>
-  <link>https://ronin-zc.com/posts/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/</link>
-  <pubDate>Tue, 17 May 2022 11:00:00 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/</guid>
-  <description><![CDATA[一、前言最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，]]></description>
-</item>
-<item>
-  <title>K8Sv1.24.0 containerd 安装教程</title>
-  <link>https://ronin-zc.com/posts/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</link>
-  <pubDate>Sat, 14 May 2022 16:45:00 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</guid>
-  <description><![CDATA[1、卸载旧版本 1 sudo apt remove docker docker-engine docker.io containerd runc 2、安装相关依赖包 1 sudo apt update &amp;&amp; sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release 3、添加证书&amp;镜像 官方镜像 1 2 3 4 5 6 # 官方镜像 curl -fsSL https://download.docker.com/linux/ubuntu/gpg]]></description>
-</item>
-<item>
-  <title>Rust官方文档学习记录</title>
-  <link>https://ronin-zc.com/posts/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</link>
-  <pubDate>Mon, 22 Nov 2021 14:37:00 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</guid>
-  <description><![CDATA[常用命令 rustc rustc xxx.rs // 编译Rust程序 cargo cargo build // 编译Rust项目，如block在更新lock文件，可执行 rm -rf ~/.cargo/.package-cache cargo run // 立刻运行Rust项目 cargo doc &ndash;open // 生成]]></description>
-</item>
-<item>
-  <title>LeetCode 232:用栈实现队列</title>
-  <link>https://ronin-zc.com/posts/leetcode-232%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</link>
-  <pubDate>Fri, 05 Mar 2021 14:58:29 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/leetcode-232%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</guid>
-  <description><![CDATA[题目请你仅使用两个栈实现先入先出队列。队列应当支持一般队列的支持的所有操作（push、pop、peek、empty）： 实现 MyQueue 类： void push(int x) 将元素]]></description>
-</item>
-<item>
-  <title>LeetCode 354:俄罗斯信封套娃问题</title>
-  <link>https://ronin-zc.com/posts/leetcode-354%E4%BF%84%E7%BD%97%E6%96%AF%E5%A5%97%E5%A8%83%E4%BF%A1%E5%B0%81%E9%97%AE%E9%A2%98/</link>
-  <pubDate>Fri, 05 Mar 2021 09:26:34 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/leetcode-354%E4%BF%84%E7%BD%97%E6%96%AF%E5%A5%97%E5%A8%83%E4%BF%A1%E5%B0%81%E9%97%AE%E9%A2%98/</guid>
-  <description><![CDATA[题目给定一些标记了宽度和高度的信封，宽度和高度以整数对形式 (w, h) 出现。当另一个信封的宽度和高度都比这个信封大的时候，这个信封就可以放进另一个信]]></description>
-</item>
-<item>
-  <title>LeetCode 338:比特位计数</title>
-  <link>https://ronin-zc.com/posts/leetcode-338%E6%AF%94%E7%89%B9%E4%BD%8D%E8%AE%A1%E6%95%B0/</link>
-  <pubDate>Wed, 03 Mar 2021 16:36:09 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/leetcode-338%E6%AF%94%E7%89%B9%E4%BD%8D%E8%AE%A1%E6%95%B0/</guid>
-  <description><![CDATA[题目给定一个非负整数 num。对于 0 ≤ i ≤ num 范围中的每个数字 i ，计算其二进制数中的 1 的数目并将它们作为数组返回 示例1: 输入: 2 输出: [0, 1, 1] 示例]]></description>
-</item>
-<item>
-  <title>Golang标准库限流器timerate使用介绍</title>
-  <link>https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D/</link>
-  <pubDate>Wed, 03 Mar 2021 16:21:52 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D/</guid>
-  <description><![CDATA[本主题为系列文章，分上下两篇。本文主要介绍 time/rate 的具体使用方法，另外一篇文章 《Golang 限流器 time/rate 实现剖析》 则着重介绍其内部实现原理。 限流器是后]]></description>
-</item>
-<item>
-  <title>Golang标准库限流器timerate实现剖析</title>
-  <link>https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/</link>
-  <pubDate>Wed, 03 Mar 2021 16:14:05 &#43;0800</pubDate>
-  <author>RoninZc</author>
-  <guid>https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/</guid>
-  <description><![CDATA[限流器是微服务中必不缺少的一环，可以起到保护下游服务，防止服务过载等作用。上一篇文章 《Golang 限流器 time/rate 使用介绍》 简单介绍了 time/rate 的使用方法，]]></description>
-</item>
-</channel>
+    <description>RoninZc 的个人记录</description>
+    <generator>Hugo 0.140.2 &amp; FixIt v0.3.16</generator>
+    <language>zh-CN</language>
+    <managingEditor>devroninzc@gmail.com (RoninZc)</managingEditor>
+    <webMaster>devroninzc@gmail.com (RoninZc)</webMaster>
+    <copyright>1</copyright>
+    <lastBuildDate>Tue, 07 Jun 2022 10:45:00 +0800</lastBuildDate>
+    <atom:link href="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>K8S学习笔记</title>
+      <link>https://ronin-zc.com/posts/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</link>
+      <pubDate>Tue, 07 Jun 2022 10:45:00 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;blockquote&gt;&#xA;&lt;p&gt;这篇文章用作自己学习 k8s 的笔记，学习的资料为b站的视频&lt;/p&gt;&#xA;&lt;p&gt;&lt;a href=&#34;https://www.bilibili.com/video/BV1Hq4y1y7rL&#34;target=&#34;_blank&#34; rel=&#34;external nofollow noopener noreferrer&#34;&gt;2021 年末倾力打造 Kubernetes 入门至精通 - 2022 年幸福的开胃菜_哔哩哔哩_bilibili&lt;i class=&#34;fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary&#34; aria-hidden=&#34;true&#34;&gt;&lt;/i&gt;&lt;/a&gt;&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>MySQL动态存储方案对比「转」</title>
+      <link>https://ronin-zc.com/posts/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/</link>
+      <pubDate>Tue, 17 May 2022 11:00:00 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/%E5%8A%A8%E6%80%81%E5%AD%98%E5%82%A8%E6%96%B9%E6%A1%88%E5%AF%B9%E6%AF%94%E8%BD%AC%E8%BD%BD/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;h2 id=&#34;一前言&#34; class=&#34;heading-element&#34;&gt;&lt;span&gt;一、前言&lt;/span&gt;&#xA;  &lt;a href=&#34;#%e4%b8%80%e5%89%8d%e8%a8%80&#34; class=&#34;heading-mark&#34;&gt;&#xA;    &lt;svg class=&#34;octicon octicon-link&#34; viewBox=&#34;0 0 16 16&#34; version=&#34;1.1&#34; width=&#34;16&#34; height=&#34;16&#34; aria-hidden=&#34;true&#34;&gt;&lt;path d=&#34;m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z&#34;&gt;&lt;/path&gt;&lt;/svg&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h2&gt;&lt;p&gt;最近在考虑PAAS移动平台的”动态字段存储”问题，简单来说就是前段某页面中的表单动态增加一个编辑框，以某一个新字段的形式提交到后端，后端接口能够在不增加新的表字段且基本不需要修改代码的方式存储起来。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>K8Sv1.24.0 containerd 安装教程</title>
+      <link>https://ronin-zc.com/posts/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</link>
+      <pubDate>Sat, 14 May 2022 16:45:00 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;h3 id=&#34;1卸载旧版本&#34; class=&#34;heading-element&#34;&gt;&lt;span&gt;1、卸载旧版本&lt;/span&gt;&#xA;  &lt;a href=&#34;#1%e5%8d%b8%e8%bd%bd%e6%97%a7%e7%89%88%e6%9c%ac&#34; class=&#34;heading-mark&#34;&gt;&#xA;    &lt;svg class=&#34;octicon octicon-link&#34; viewBox=&#34;0 0 16 16&#34; version=&#34;1.1&#34; width=&#34;16&#34; height=&#34;16&#34; aria-hidden=&#34;true&#34;&gt;&lt;path d=&#34;m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z&#34;&gt;&lt;/path&gt;&lt;/svg&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;&#xA;&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1&#xA;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&#xA;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo apt remove docker docker-engine docker.io containerd runc&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&#xA;&lt;/div&gt;&#xA;&lt;/div&gt;&lt;h3 id=&#34;2安装相关依赖包&#34; class=&#34;heading-element&#34;&gt;&lt;span&gt;2、安装相关依赖包&lt;/span&gt;&#xA;  &lt;a href=&#34;#2%e5%ae%89%e8%a3%85%e7%9b%b8%e5%85%b3%e4%be%9d%e8%b5%96%e5%8c%85&#34; class=&#34;heading-mark&#34;&gt;&#xA;    &lt;svg class=&#34;octicon octicon-link&#34; viewBox=&#34;0 0 16 16&#34; version=&#34;1.1&#34; width=&#34;16&#34; height=&#34;16&#34; aria-hidden=&#34;true&#34;&gt;&lt;path d=&#34;m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z&#34;&gt;&lt;/path&gt;&lt;/svg&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h3&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div class=&#34;chroma&#34;&gt;&#xA;&lt;table class=&#34;lntable&#34;&gt;&lt;tr&gt;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code&gt;&lt;span class=&#34;lnt&#34;&gt;1&#xA;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&#xA;&lt;td class=&#34;lntd&#34;&gt;&#xA;&lt;pre tabindex=&#34;0&#34; class=&#34;chroma&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span class=&#34;line&#34;&gt;&lt;span class=&#34;cl&#34;&gt;sudo apt update &lt;span class=&#34;o&#34;&gt;&amp;amp;&amp;amp;&lt;/span&gt; sudo apt install -y apt-transport-https ca-certificates curl gnupg lsb-release&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&#xA;&lt;/div&gt;&#xA;&lt;/div&gt;&lt;h3 id=&#34;3添加证书镜像&#34; class=&#34;heading-element&#34;&gt;&lt;span&gt;3、添加证书&amp;amp;镜像&lt;/span&gt;&#xA;  &lt;a href=&#34;#3%e6%b7%bb%e5%8a%a0%e8%af%81%e4%b9%a6%e9%95%9c%e5%83%8f&#34; class=&#34;heading-mark&#34;&gt;&#xA;    &lt;svg class=&#34;octicon octicon-link&#34; viewBox=&#34;0 0 16 16&#34; version=&#34;1.1&#34; width=&#34;16&#34; height=&#34;16&#34; aria-hidden=&#34;true&#34;&gt;&lt;path d=&#34;m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z&#34;&gt;&lt;/path&gt;&lt;/svg&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h3&gt;&lt;ul&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;官方镜像&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Rust官方文档学习记录</title>
+      <link>https://ronin-zc.com/posts/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</link>
+      <pubDate>Mon, 22 Nov 2021 14:37:00 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;h2 id=&#34;常用命令&#34; class=&#34;heading-element&#34;&gt;&lt;span&gt;常用命令&lt;/span&gt;&#xA;  &lt;a href=&#34;#%e5%b8%b8%e7%94%a8%e5%91%bd%e4%bb%a4&#34; class=&#34;heading-mark&#34;&gt;&#xA;    &lt;svg class=&#34;octicon octicon-link&#34; viewBox=&#34;0 0 16 16&#34; version=&#34;1.1&#34; width=&#34;16&#34; height=&#34;16&#34; aria-hidden=&#34;true&#34;&gt;&lt;path d=&#34;m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z&#34;&gt;&lt;/path&gt;&lt;/svg&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h2&gt;&lt;ul&gt;&#xA;&lt;li&gt;&#xA;&lt;p&gt;rustc&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode 232:用栈实现队列</title>
+      <link>https://ronin-zc.com/posts/leetcode-232%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</link>
+      <pubDate>Fri, 05 Mar 2021 14:58:29 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/leetcode-232%E7%94%A8%E6%A0%88%E5%AE%9E%E7%8E%B0%E9%98%9F%E5%88%97/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;h3 id=&#34;题目&#34; class=&#34;heading-element&#34;&gt;&lt;span&gt;题目&lt;/span&gt;&#xA;  &lt;a href=&#34;#%e9%a2%98%e7%9b%ae&#34; class=&#34;heading-mark&#34;&gt;&#xA;    &lt;svg class=&#34;octicon octicon-link&#34; viewBox=&#34;0 0 16 16&#34; version=&#34;1.1&#34; width=&#34;16&#34; height=&#34;16&#34; aria-hidden=&#34;true&#34;&gt;&lt;path d=&#34;m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z&#34;&gt;&lt;/path&gt;&lt;/svg&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h3&gt;&lt;p&gt;请你仅使用两个栈实现先入先出队列。队列应当支持一般队列的支持的所有操作（push、pop、peek、empty）：&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode 354:俄罗斯信封套娃问题</title>
+      <link>https://ronin-zc.com/posts/leetcode-354%E4%BF%84%E7%BD%97%E6%96%AF%E5%A5%97%E5%A8%83%E4%BF%A1%E5%B0%81%E9%97%AE%E9%A2%98/</link>
+      <pubDate>Fri, 05 Mar 2021 09:26:34 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/leetcode-354%E4%BF%84%E7%BD%97%E6%96%AF%E5%A5%97%E5%A8%83%E4%BF%A1%E5%B0%81%E9%97%AE%E9%A2%98/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;h3 id=&#34;题目&#34; class=&#34;heading-element&#34;&gt;&lt;span&gt;题目&lt;/span&gt;&#xA;  &lt;a href=&#34;#%e9%a2%98%e7%9b%ae&#34; class=&#34;heading-mark&#34;&gt;&#xA;    &lt;svg class=&#34;octicon octicon-link&#34; viewBox=&#34;0 0 16 16&#34; version=&#34;1.1&#34; width=&#34;16&#34; height=&#34;16&#34; aria-hidden=&#34;true&#34;&gt;&lt;path d=&#34;m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z&#34;&gt;&lt;/path&gt;&lt;/svg&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h3&gt;&lt;p&gt;给定一些标记了宽度和高度的信封，宽度和高度以整数对形式 (w, h) 出现。当另一个信封的宽度和高度都比这个信封大的时候，这个信封就可以放进另一个信封里，如同俄罗斯套娃一样。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>LeetCode 338:比特位计数</title>
+      <link>https://ronin-zc.com/posts/leetcode-338%E6%AF%94%E7%89%B9%E4%BD%8D%E8%AE%A1%E6%95%B0/</link>
+      <pubDate>Wed, 03 Mar 2021 16:36:09 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/leetcode-338%E6%AF%94%E7%89%B9%E4%BD%8D%E8%AE%A1%E6%95%B0/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;h3 id=&#34;题目&#34; class=&#34;heading-element&#34;&gt;&lt;span&gt;题目&lt;/span&gt;&#xA;  &lt;a href=&#34;#%e9%a2%98%e7%9b%ae&#34; class=&#34;heading-mark&#34;&gt;&#xA;    &lt;svg class=&#34;octicon octicon-link&#34; viewBox=&#34;0 0 16 16&#34; version=&#34;1.1&#34; width=&#34;16&#34; height=&#34;16&#34; aria-hidden=&#34;true&#34;&gt;&lt;path d=&#34;m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z&#34;&gt;&lt;/path&gt;&lt;/svg&gt;&#xA;  &lt;/a&gt;&#xA;&lt;/h3&gt;&lt;p&gt;给定一个非负整数 &lt;strong&gt;num&lt;/strong&gt;。对于 &lt;strong&gt;0 ≤ i ≤ num&lt;/strong&gt; 范围中的每个数字 &lt;strong&gt;i&lt;/strong&gt; ，计算其二进制数中的 1 的数目并将它们作为数组返回&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Golang标准库限流器timerate使用介绍</title>
+      <link>https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D/</link>
+      <pubDate>Wed, 03 Mar 2021 16:21:52 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E4%BD%BF%E7%94%A8%E4%BB%8B%E7%BB%8D/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;blockquote&gt;&#xA;&lt;p&gt;本主题为系列文章，分上下两篇。本文主要介绍 &lt;code&gt;time/rate&lt;/code&gt; 的具体使用方法，另外一篇文章 &lt;a href=&#34;https://www.cyhone.com/articles/analisys-of-golang-rate/&#34;target=&#34;_blank&#34; rel=&#34;external nofollow noopener noreferrer&#34;&gt;《Golang 限流器 time/rate 实现剖析》&lt;i class=&#34;fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary&#34; aria-hidden=&#34;true&#34;&gt;&lt;/i&gt;&lt;/a&gt; 则着重介绍其内部实现原理。&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title>Golang标准库限流器timerate实现剖析</title>
+      <link>https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/</link>
+      <pubDate>Wed, 03 Mar 2021 16:14:05 +0800</pubDate><author>devroninzc@gmail.com (RoninZc)</author>
+      <guid>https://ronin-zc.com/posts/golang%E6%A0%87%E5%87%86%E5%BA%93%E9%99%90%E6%B5%81%E5%99%A8timerate%E5%AE%9E%E7%8E%B0%E5%89%96%E6%9E%90/</guid>
+      <category domain="https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/">学习</category>
+      <description>&lt;p&gt;限流器是微服务中必不缺少的一环，可以起到保护下游服务，防止服务过载等作用。上一篇文章 &lt;a href=&#34;https://www.cyhone.com/articles/usage-of-golang-rate/&#34;target=&#34;_blank&#34; rel=&#34;external nofollow noopener noreferrer&#34;&gt;《Golang 限流器 time/rate 使用介绍》&lt;i class=&#34;fa-solid fa-external-link-alt fa-fw fa-xs ms-1 text-secondary&#34; aria-hidden=&#34;true&#34;&gt;&lt;/i&gt;&lt;/a&gt; 简单介绍了 time/rate 的使用方法，本文则着重分析下其实现原理。建议在正式阅读本文之前，先阅读下上一篇文章。&lt;/p&gt;</description>
+    </item>
+  </channel>
 </rss>

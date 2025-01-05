@@ -1,4 +1,4 @@
-# K8Sv1.24.0 containerd 安装教程
+# K8Sv1.24.0 Containerd 安装教程
 
 
 ### 1、卸载旧版本
