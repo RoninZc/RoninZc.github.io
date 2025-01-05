@@ -752,7 +752,7 @@ enableEmoji = true
   # FixIt 0.3.10 | NEW Busuanzi count
   [params.busuanzi]
     # whether to enable busuanzi count
-    enable = false
+    enable = true
     # busuanzi count core script source. Default is https://vercount.one/js
     source = "https://vercount.one/js"
     # whether to show the site views
