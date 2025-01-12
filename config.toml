@@ -452,7 +452,7 @@ enableEmoji = true
     # FixIt 0.2.12 | NEW Header subtitle config
     [params.header.subtitle]
       # subtitle name
-      name = "Think bold, Just do it"
+      name = "Think bold and do it"
       # whether to use typeit animation for subtitle name
       typeit = true
 
@@ -570,7 +570,7 @@ enableEmoji = true
       # title shown in home page (HTML format is supported)
       title = "RoninZc 的个人记录"
       # subtitle shown in home page
-      subtitle = "Think bold, Just do it"
+      subtitle = "Think bold and do it"
       # whether to use typeit animation for subtitle
       typeit = true
       # whether to show social links
