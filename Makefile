@@ -1,5 +1,5 @@
 run:
-	@hugo server --buildDrafts
+	@hugo server --buildDrafts --disableFastRender
 
 build:
 	@hugo --baseURL="/"
