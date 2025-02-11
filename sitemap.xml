@@ -43,6 +43,42 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://ronin-zc.com/tags/%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2025-02-06T08:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://ronin-zc.com/categories/%E7%AC%94%E8%AE%B0/</loc>
+    <lastmod>2025-02-06T08:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://ronin-zc.com/posts/6mbgkbi9pestbg/</loc>
+    <lastmod>2025-02-06T08:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://ronin-zc.com/tags/%E6%9E%B6%E6%9E%84/</loc>
+    <lastmod>2025-02-06T08:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://ronin-zc.com/tags/%E8%BD%AF%E8%80%83/</loc>
+    <lastmod>2025-02-06T08:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/</loc>
+    <lastmod>2025-02-06T08:00:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://ronin-zc.com/posts/4pfpwqgczufqa/</loc>
     <lastmod>2025-02-02T08:00:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -158,12 +194,6 @@
   </url>
   <url>
     <loc>https://ronin-zc.com/posts/k8s%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0/</loc>
-    <lastmod>2022-06-07T10:45:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://ronin-zc.com/categories/%E5%AD%A6%E4%B9%A0/</loc>
     <lastmod>2022-06-07T10:45:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
