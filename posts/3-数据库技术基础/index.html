@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <head>
+    
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+    <meta name="robots" content="noodp" />
+    <title>数据库技术基础 - RoninZc 的个人记录</title><meta name="author" content="RoninZc">
+<meta name="description" content="数据库系统 概述 数据: 是数据库中存储的基本对象，是描述事物的符号记录 种类: 文本、图像、音频、视频等 数据库（DB）: 是长期存储在计算机内、有组织的、可共享的大量数据的集合 数据库的基本特征: 数据可按一定的数据模型组织、描述和存储 可为各种用户共享 冗余度较小 数据独立性较高 易扩展 数据库系统（DBS）: 是一个采用了数据库技术，有组织地、动态地存储大量相关数据，方便多用户访问的计算机系统，由下面四部分组成 数据库: 统一管理、长期存储在计算机内的，有组织的相关数据的集合 硬件: 构成计算机系统包括存储数据所需的外部设备 软件: 操作系统、数据库管理系统及应用程序 人员: 系统分析和数据库设计人员、应用程序员、最终用户、数据库管理员DBA 数据库管理系统（DBMS）的功能 实现对共享数据有效的组织、管理和存取 包括数据定义、数据库操作、数据库运行管理、数据的存储管理、数据库的建立和维护等 三级模式-两级映像 内模式: 管理如何存储物理的数据，对应具体物理存储文件
+"><meta name="keywords" content='软考, 架构, 笔记'>
+  <meta itemprop="name" content="数据库技术基础">
+  <meta itemprop="description" content="数据库系统 概述 数据: 是数据库中存储的基本对象，是描述事物的符号记录 种类: 文本、图像、音频、视频等 数据库（DB）: 是长期存储在计算机内、有组织的、可共享的大量数据的集合 数据库的基本特征: 数据可按一定的数据模型组织、描述和存储 可为各种用户共享 冗余度较小 数据独立性较高 易扩展 数据库系统（DBS）: 是一个采用了数据库技术，有组织地、动态地存储大量相关数据，方便多用户访问的计算机系统，由下面四部分组成 数据库: 统一管理、长期存储在计算机内的，有组织的相关数据的集合 硬件: 构成计算机系统包括存储数据所需的外部设备 软件: 操作系统、数据库管理系统及应用程序 人员: 系统分析和数据库设计人员、应用程序员、最终用户、数据库管理员DBA 数据库管理系统（DBMS）的功能 实现对共享数据有效的组织、管理和存取 包括数据定义、数据库操作、数据库运行管理、数据的存储管理、数据库的建立和维护等 三级模式-两级映像 内模式: 管理如何存储物理的数据，对应具体物理存储文件">
+  <meta itemprop="datePublished" content="2025-02-12T08:00:00+08:00">
+  <meta itemprop="dateModified" content="2025-02-12T08:00:00+08:00">
+  <meta itemprop="wordCount" content="4558">
+  <meta itemprop="image" content="https://ronin-zc.com/logo.png">
+  <meta itemprop="keywords" content="软考,架构,笔记"><meta property="og:url" content="https://ronin-zc.com/posts/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/">
+  <meta property="og:site_name" content="RoninZc 的个人记录">
+  <meta property="og:title" content="数据库技术基础">
+  <meta property="og:description" content="数据库系统 概述 数据: 是数据库中存储的基本对象，是描述事物的符号记录 种类: 文本、图像、音频、视频等 数据库（DB）: 是长期存储在计算机内、有组织的、可共享的大量数据的集合 数据库的基本特征: 数据可按一定的数据模型组织、描述和存储 可为各种用户共享 冗余度较小 数据独立性较高 易扩展 数据库系统（DBS）: 是一个采用了数据库技术，有组织地、动态地存储大量相关数据，方便多用户访问的计算机系统，由下面四部分组成 数据库: 统一管理、长期存储在计算机内的，有组织的相关数据的集合 硬件: 构成计算机系统包括存储数据所需的外部设备 软件: 操作系统、数据库管理系统及应用程序 人员: 系统分析和数据库设计人员、应用程序员、最终用户、数据库管理员DBA 数据库管理系统（DBMS）的功能 实现对共享数据有效的组织、管理和存取 包括数据定义、数据库操作、数据库运行管理、数据的存储管理、数据库的建立和维护等 三级模式-两级映像 内模式: 管理如何存储物理的数据，对应具体物理存储文件">
+  <meta property="og:locale" content="zh_CN">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="posts">
+    <meta property="article:published_time" content="2025-02-12T08:00:00+08:00">
+    <meta property="article:modified_time" content="2025-02-12T08:00:00+08:00">
+    <meta property="article:tag" content="软考">
+    <meta property="article:tag" content="架构">
+    <meta property="article:tag" content="笔记">
+    <meta property="og:image" content="https://ronin-zc.com/logo.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://ronin-zc.com/logo.png">
+  <meta name="twitter:title" content="数据库技术基础">
+  <meta name="twitter:description" content="数据库系统 概述 数据: 是数据库中存储的基本对象，是描述事物的符号记录 种类: 文本、图像、音频、视频等 数据库（DB）: 是长期存储在计算机内、有组织的、可共享的大量数据的集合 数据库的基本特征: 数据可按一定的数据模型组织、描述和存储 可为各种用户共享 冗余度较小 数据独立性较高 易扩展 数据库系统（DBS）: 是一个采用了数据库技术，有组织地、动态地存储大量相关数据，方便多用户访问的计算机系统，由下面四部分组成 数据库: 统一管理、长期存储在计算机内的，有组织的相关数据的集合 硬件: 构成计算机系统包括存储数据所需的外部设备 软件: 操作系统、数据库管理系统及应用程序 人员: 系统分析和数据库设计人员、应用程序员、最终用户、数据库管理员DBA 数据库管理系统（DBMS）的功能 实现对共享数据有效的组织、管理和存取 包括数据定义、数据库操作、数据库运行管理、数据的存储管理、数据库的建立和维护等 三级模式-两级映像 内模式: 管理如何存储物理的数据，对应具体物理存储文件">
+<meta name="application-name" content="RoninZc的个人记录">
+<meta name="apple-mobile-web-app-title" content="RoninZc的个人记录"><meta name="theme-color" data-light="#f8f8f8" data-dark="#252627" content="#f8f8f8"><meta name="msapplication-TileColor" content="#da532c"><link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png"><link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"><link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"><link rel="manifest" href="/site.webmanifest"><link rel="canonical" type="text/html" href="https://ronin-zc.com/posts/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/" title="数据库技术基础 - RoninZc 的个人记录" /><link rel="prev" type="text/html" href="https://ronin-zc.com/posts/20250209/" title="20250209" /><link rel="next" type="text/html" href="https://ronin-zc.com/posts/2-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" title="操作系统" /><link rel="alternate" type="text/markdown" href="https://ronin-zc.com/posts/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/index.md" title="数据库技术基础 - RoninZc 的个人记录"><link rel="stylesheet" href="/css/style.min.css"><link rel="preload" href="/lib/fontawesome-free/all.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/fontawesome-free/all.min.css"></noscript><link rel="preload" href="/lib/animate/animate.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/animate/animate.min.css"></noscript><script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "BlogPosting",
+    "headline": "数据库技术基础",
+    "inLanguage": "zh-CN",
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": "https:\/\/ronin-zc.com\/posts\/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80\/"
+    },"genre": "posts","keywords": "软考, 架构, 笔记","wordcount":  4558 ,
+    "url": "https:\/\/ronin-zc.com\/posts\/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80\/","datePublished": "2025-02-12T08:00:00+08:00","dateModified": "2025-02-12T08:00:00+08:00","license": "1","publisher": {
+      "@type": "Organization",
+      "name": ""},"author": {
+        "@type": "Person",
+        "name": "RoninZc"
+      },"description": ""
+  }
+  </script><script src="/js/head/color-scheme.min.js"></script></head>
+  <body data-header-desktop="sticky" data-header-mobile="auto"><div class="wrapper" data-page-style="normal"><header class="desktop animate__faster" id="header-desktop">
+  <div class="header-wrapper">
+    <div class="header-title">
+      <a href="/" title="RoninZc 的个人记录"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" alt="RoninZc 的个人记录" data-title="RoninZc 的个人记录" width="26" height="26" class="logo" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/><span class="header-title-text">RoninZc</span></a><span class="typeit header-subtitle"><template>Think bold and do it</template></span></div>
+    <nav>
+      <ul class="menu"><li class="menu-item">
+              <a class="menu-link" href="/posts/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 文章</a></li><li class="menu-item">
+              <a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item">
+              <a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item delimiter"></li><li class="menu-item theme-switch" title="切换主题">
+          <i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i>
+        </li></ul>
+    </nav>
+  </div>
+</header><header class="mobile animate__faster" id="header-mobile">
+  <div class="header-container">
+    <div class="header-wrapper">
+      <div class="header-title">
+        <a href="/" title="RoninZc 的个人记录"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" alt="RoninZc 的个人记录" data-title="RoninZc 的个人记录" width="26" height="26" class="logo" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/><span class="header-title-text">RoninZc</span></a><span class="typeit header-subtitle"><template>Think bold and do it</template></span></div>
+      <div class="menu-toggle" id="menu-toggle-mobile">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+    <nav>
+      <ul class="menu" id="menu-mobile"><li class="menu-item"><a class="menu-link" href="/posts/"><i class="fa-solid fa-archive fa-fw fa-sm" aria-hidden="true"></i> 文章</a></li><li class="menu-item"><a class="menu-link" href="/categories/"><i class="fa-solid fa-folder-tree fa-fw fa-sm" aria-hidden="true"></i> 分类</a></li><li class="menu-item"><a class="menu-link" href="/tags/"><i class="fa-solid fa-tags fa-fw fa-sm" aria-hidden="true"></i> 标签</a></li><li class="menu-item menu-system">
+          <span class="menu-system-item theme-switch" title="切换主题"><i class="fa-solid fa-adjust fa-fw" aria-hidden="true"></i></span></li>
+      </ul>
+    </nav>
+  </div>
+</header><main class="container"><aside class="aside-collection animate__animated animate__fadeIn animate__faster" aria-label="合集"></aside>
+
+  <article class="page single">
+    <div class="header"><h1 class="single-title animate__animated animate__flipInX"><span>数据库技术基础</span>
+      </h1></div><div class="post-meta">
+      <div class="post-meta-line"><span class="post-author"><span class="author"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2022/07/25/62de10979d4e1.jpg" alt="RoninZc" data-title="RoninZc" width="20" height="20" class="avatar" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/>&nbsp;RoninZc</span></span><span class="post-included-in">&nbsp;收录于 <a href="/categories/%E5%AD%A6%E4%B9%A0/" class="post-category" title="分类 - 学习"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> 学习</a>&ensp;<a href="/categories/%E7%AC%94%E8%AE%B0/" class="post-category" title="分类 - 笔记"><i class="fa-regular fa-folder fa-fw" aria-hidden="true"></i> 笔记</a></span></div><div class="post-meta-line"><span title="发布于 2025-02-12 08:00:00"><i class="fa-solid fa-calendar-days fa-fw me-1" aria-hidden="true"></i><time datetime="2025-02-12">2025-02-12</time></span>&nbsp;<span title="4558 字"><i class="fa-solid fa-pencil-alt fa-fw me-1" aria-hidden="true"></i>约 4600 字</span>&nbsp;<span><i class="fa-regular fa-clock fa-fw me-1" aria-hidden="true"></i>预计阅读 10 分钟</span>&nbsp;<span id="busuanzi_container_page_pv" class="busuanzi_visitors comment-visitors" data-flag-title="数据库技术基础"><i class="fa-regular fa-eye fa-fw me-1" aria-hidden="true"></i><span id="busuanzi_value_page_pv">-</span>&nbsp;次阅读
+          </span>&nbsp;</div>
+    </div><div class="details toc" id="toc-static" data-kept="false">
+        <div class="details-summary toc-title">
+          <span>目录</span>
+          <span><i class="details-icon fa-solid fa-angle-right" aria-hidden="true"></i></span>
+        </div>
+        <div class="details-content toc-content" id="toc-content-static"><nav id="TableOfContents">
+  <ul>
+    <li><a href="#数据库系统">数据库系统</a>
+      <ul>
+        <li><a href="#概述">概述</a></li>
+        <li><a href="#三级模式-两级映像">三级模式-两级映像</a></li>
+        <li><a href="#数据库设计">数据库设计</a></li>
+        <li><a href="#数据模型">数据模型</a>
+          <ul>
+            <li><a href="#分类">分类</a></li>
+            <li><a href="#模型数据三要素">模型数据三要素</a></li>
+            <li><a href="#er模型">ER模型</a></li>
+            <li><a href="#关系模型">关系模型</a></li>
+            <li><a href="#er模型转关系模型">ER模型转关系模型</a></li>
+          </ul>
+        </li>
+        <li><a href="#关系代数">关系代数</a></li>
+        <li><a href="#函数依赖">函数依赖</a>
+          <ul>
+            <li><a href="#公理系统">公理系统</a></li>
+          </ul>
+        </li>
+        <li><a href="#键码与约束">键(码)与约束</a></li>
+        <li><a href="#范式">范式</a>
+          <ul>
+            <li><a href="#第一范式1nf">第一范式（1NF）</a></li>
+            <li><a href="#第二范式2nf">第二范式（2NF）</a></li>
+            <li><a href="#第三范式3nf">第三范式（3NF）</a></li>
+            <li><a href="#bc范式bcnf">BC范式（BCNF）</a></li>
+            <li><a href="#解题方法">解题方法</a></li>
+          </ul>
+        </li>
+        <li><a href="#模式分解">模式分解</a></li>
+        <li><a href="#并发控制">并发控制</a>
+          <ul>
+            <li><a href="#事务">事务</a></li>
+            <li><a href="#封锁协议加锁">封锁协议（加锁）</a></li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>
+</nav></div>
+      </div><div class="content" id="content"><h2 id="数据库系统" class="heading-element"><span>数据库系统</span>
+  <a href="#%e6%95%b0%e6%8d%ae%e5%ba%93%e7%b3%bb%e7%bb%9f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h2><h3 id="概述" class="heading-element"><span>概述</span>
+  <a href="#%e6%a6%82%e8%bf%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><ul>
+<li>数据: 是数据库中存储的基本对象，是描述事物的符号记录
+<ul>
+<li>种类: 文本、图像、音频、视频等</li>
+</ul>
+</li>
+<li>数据库（DB）: 是长期存储在计算机内、有组织的、可共享的大量数据的集合</li>
+<li>数据库的基本特征:
+<ul>
+<li>数据可按一定的数据模型组织、描述和存储</li>
+<li>可为各种用户共享</li>
+<li>冗余度较小</li>
+<li>数据独立性较高</li>
+<li>易扩展</li>
+</ul>
+</li>
+<li>数据库系统（DBS）: 是一个采用了数据库技术，有组织地、动态地存储大量相关数据，方便多用户访问的计算机系统，由下面四部分组成
+<ul>
+<li>数据库: 统一管理、长期存储在计算机内的，有组织的相关数据的集合</li>
+<li>硬件: 构成计算机系统包括存储数据所需的外部设备</li>
+<li>软件: 操作系统、数据库管理系统及应用程序</li>
+<li>人员: 系统分析和数据库设计人员、应用程序员、最终用户、数据库管理员DBA</li>
+</ul>
+</li>
+<li>数据库管理系统（DBMS）的功能
+<ul>
+<li>实现对共享数据有效的组织、管理和存取</li>
+<li>包括数据定义、数据库操作、数据库运行管理、数据的存储管理、数据库的建立和维护等</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="三级模式-两级映像" class="heading-element"><span>三级模式-两级映像</span>
+  <a href="#%e4%b8%89%e7%ba%a7%e6%a8%a1%e5%bc%8f-%e4%b8%a4%e7%ba%a7%e6%98%a0%e5%83%8f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><a class="lightgallery" href="https://lsky.ronin-zc.com/i/2025/03/09/67cd3123ef61f.png?size=large" data-thumbnail="https://lsky.ronin-zc.com/i/2025/03/09/67cd3123ef61f.png?size=small" data-sub-html="<h2>三级模式-两级映像</h2>"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2025/03/09/67cd3123ef61f.png" alt="三级模式-两级映像" srcset="https://lsky.ronin-zc.com/i/2025/03/09/67cd3123ef61f.png?size=small, https://lsky.ronin-zc.com/i/2025/03/09/67cd3123ef61f.png?size=medium 1.5x, https://lsky.ronin-zc.com/i/2025/03/09/67cd3123ef61f.png?size=large 2x" data-title="三级模式-两级映像" width="50%" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></a>
+<ul>
+<li>
+<p>内模式: 管理如何存储物理的数据，对应具体物理存储文件</p>
+</li>
+<li>
+<p>模式: 又称为概念模式，就是我们通常使用的基本表，根据应用、需求将物理数据划分为一张张表</p>
+</li>
+<li>
+<p>外模式: 对应数据库中的视图这个级别，将表进行一定的处理后再提供给用户使用</p>
+</li>
+<li>
+<p>外模式-模式映像: 是表和视图时间的映射，存在于概念级和外部级之间，若表中数据发生了修改，只需要修改此映射，而无需修改应用程序</p>
+</li>
+<li>
+<p>模式-内模式映像: 是表和数据的物理存储之间的映射，存在于概念级和内部级之间，若修改了数据的存储方式，只需要修改此映射，而不需要去修改应用程序</p>
+</li>
+</ul>
+<hr>
+<h3 id="数据库设计" class="heading-element"><span>数据库设计</span>
+  <a href="#%e6%95%b0%e6%8d%ae%e5%ba%93%e8%ae%be%e8%ae%a1" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><a class="lightgallery" href="https://lsky.ronin-zc.com/i/2025/03/09/67cd3379064e2.png?size=large" data-thumbnail="https://lsky.ronin-zc.com/i/2025/03/09/67cd3379064e2.png?size=small" data-sub-html="<h2>数据库设计</h2>"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2025/03/09/67cd3379064e2.png" alt="数据库设计" srcset="https://lsky.ronin-zc.com/i/2025/03/09/67cd3379064e2.png?size=small, https://lsky.ronin-zc.com/i/2025/03/09/67cd3379064e2.png?size=medium 1.5x, https://lsky.ronin-zc.com/i/2025/03/09/67cd3379064e2.png?size=large 2x" data-title="数据库设计" width="50%" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></a>
+<ul>
+<li>需求分析: 即分析数据存储的要求，<strong>产出物又数据流图、数据字典、需求说明书</strong></li>
+<li>概念结构设计: 就是<strong>设计 E-R 图</strong>，也即实体-关系图，与物理实现无关，说明有哪些实体，实体有哪些属性，实体之间的关系</li>
+<li>逻辑结构设计: <strong>将 E-R 图，转换成关系模式</strong>，也即转换成实际的表和表中的列属性，这里要考虑很多规范化的东西</li>
+<li>物理设计: 根据生成的表等概念，<strong>生成物理数据库</strong></li>
+</ul>
+<hr>
+<h3 id="数据模型" class="heading-element"><span>数据模型</span>
+  <a href="#%e6%95%b0%e6%8d%ae%e6%a8%a1%e5%9e%8b" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><h4 id="分类" class="heading-element"><span>分类</span>
+  <a href="#%e5%88%86%e7%b1%bb" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><ul>
+<li><strong>关系模型是二维表的形式表示的实体-联系模型</strong>，是将实体-联系模型转换而来的，经过开发人员设计的</li>
+<li><strong>概念模型是从用户角度进行建模</strong>的，是现实世界信息到信息世界的第一抽象，是真正的实体联系模型</li>
+<li>网状模型表示实体类型及其实体之间的联系，一个事物和另外几个都有联系，形成一张网</li>
+<li>面向对象模型是采用面对对象的方法设计数据库，以对象为单位，每个对象包括属性和方法，具有类和基础等特点</li>
+</ul>
+<h4 id="模型数据三要素" class="heading-element"><span>模型数据三要素</span>
+  <a href="#%e6%a8%a1%e5%9e%8b%e6%95%b0%e6%8d%ae%e4%b8%89%e8%a6%81%e7%b4%a0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><ul>
+<li>数据结构: 所研究的对象类型的集合</li>
+<li>数据操作: 对数据库中各种对象的实例允许执行的操作的集合</li>
+<li>数据的约束条件: 一组完整性规则的集合</li>
+</ul>
+<h4 id="er模型" class="heading-element"><span>ER模型</span>
+  <a href="#er%e6%a8%a1%e5%9e%8b" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><a class="lightgallery" href="https://lsky.ronin-zc.com/i/2025/03/09/67cd3af9683aa.png?size=large" data-thumbnail="https://lsky.ronin-zc.com/i/2025/03/09/67cd3af9683aa.png?size=small" data-sub-html="<h2>ER模型</h2>"><img loading="lazy" src="https://lsky.ronin-zc.com/i/2025/03/09/67cd3af9683aa.png" alt="ER模型" srcset="https://lsky.ronin-zc.com/i/2025/03/09/67cd3af9683aa.png?size=small, https://lsky.ronin-zc.com/i/2025/03/09/67cd3af9683aa.png?size=medium 1.5x, https://lsky.ronin-zc.com/i/2025/03/09/67cd3af9683aa.png?size=large 2x" data-title="ER模型" width="50%" style="background: url(/images/loading.min.svg) no-repeat center;" onload="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}this.dataset.lazyloaded='';" onerror="this.title=this.dataset.title;for(const i of ['style', 'data-title','onerror','onload']){this.removeAttribute(i);}"/></a>
+<ul>
+<li>用 E-R 图来描述概念数据模型，世界是由一组称为实体的基本对象和这些对象之间的联系构成的
+<ul>
+<li>椭圆表示属性（一般没有）
+<ul>
+<li><strong>实体具有的特性</strong></li>
+<li>分类
+<ul>
+<li>简单属性和符合属性</li>
+<li>单值属性和多值属性</li>
+<li>NULL 属性</li>
+<li>派生属性</li>
+</ul>
+</li>
+<li>域: 属性的取值范围称为该属性的域</li>
+<li>码(key): 唯一标识实体的属性集</li>
+</ul>
+</li>
+<li>长方体表示实体（强实体: 正常长方体、弱实体: 两侧多一条竖线）
+<ul>
+<li><strong>客观存在并可相互区别的事物</strong>。可以是具体的人、事、物或抽象概念</li>
+<li>弱实体和强实体: 弱实体依赖于强实体的存在而存在</li>
+<li>实体集: 具有相同类型和共享相同属性的实体的集合，如学生、课程</li>
+</ul>
+</li>
+<li>菱形表示联系
+<ul>
+<li>现实世界中<strong>事物内部以及事物之间的联系</strong>，在 E-R 图中反映为<strong>实体内部的联系和实体之间的联系</strong></li>
+<li>联系的两端要写联系类型（一对多，一对一，多对多）</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="关系模型" class="heading-element"><span>关系模型</span>
+  <a href="#%e5%85%b3%e7%b3%bb%e6%a8%a1%e5%9e%8b" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><ul>
+<li>关系模型中数据结构是一张<strong>二维表</strong>，由行列组成。用表格结构表达实体集，用外键标识实体间的联系</li>
+<li>优点
+<ul>
+<li>建立在严格的数学概念基础上</li>
+<li>概念单一、结构简单、清晰，用户易懂</li>
+<li>存取路径对用户透明，从而数据独立性、安全性好，简化数据库开发工作</li>
+</ul>
+</li>
+<li>缺点
+<ul>
+<li>由于存取路径透明，查询效率往往不如非关系数据模型</li>
+</ul>
+</li>
+</ul>
+<h4 id="er模型转关系模型" class="heading-element"><span>ER模型转关系模型</span>
+  <a href="#er%e6%a8%a1%e5%9e%8b%e8%bd%ac%e5%85%b3%e7%b3%bb%e6%a8%a1%e5%9e%8b" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><ul>
+<li>每一个实体（强实体）都对应一个关系模型</li>
+<li>联系分为三种
+<ul>
+<li>1:1 联系中，联系可以放到<strong>任意的两端实体中，作为一个属性</strong>（要保证 1:1 的两端关联），也可以转换为一个单独的关系模式</li>
+<li>1:N 联系中，联系可以单独作为一个关系模式，也可以在<strong>N端中加入1端实体的主键</strong></li>
+<li>M:N 联系中，联系<strong>必须作为一个单独的关系模式，其主键是M和N端的联合主键</strong></li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="关系代数" class="heading-element"><span>关系代数</span>
+  <a href="#%e5%85%b3%e7%b3%bb%e4%bb%a3%e6%95%b0" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><ul>
+<li>并
+<ul>
+<li>结果是两张表中所有记录数合并，相同记录只显示一次</li>
+<li>符号: ∪</li>
+<li>示例: R ∪ S</li>
+</ul>
+</li>
+<li>交
+<ul>
+<li>结果是两张表中相同的记录</li>
+<li>符号: ∩</li>
+<li>示例: R ∩ S</li>
+</ul>
+</li>
+<li>差
+<ul>
+<li>结果是第一张表中有第二张表中没有的记录</li>
+<li>符号: −</li>
+<li>示例: R − S</li>
+</ul>
+</li>
+<li>笛卡尔积
+<ul>
+<li>结果是两张表中所有的属性列，并且两张表中每一条记录两两组合成一条记录</li>
+<li>符号: ×</li>
+<li>示例: R × S</li>
+</ul>
+</li>
+<li>投影
+<ul>
+<li>实际是按条件选择某关系模式中的某列，列也可以用数字表示</li>
+<li>符号: π</li>
+<li>示例: π_{A,B}(R)（表示从关系 R 中提取属性 A 和 B）</li>
+</ul>
+</li>
+<li>选择
+<ul>
+<li>实际是按条件选择某关系模式中的某条记录</li>
+<li>符号：σ</li>
+<li>示例：σ_{A=5}(R)（表示从关系 R 中选择满足条件 A=5 的元组）</li>
+</ul>
+</li>
+<li>自然连接
+<ul>
+<li>结果是<strong>显示全部的属性列，但是相同的属性列只显示一次，显示两个关系模式中属性相同且值相同的记录</strong></li>
+<li>符号：⋈</li>
+<li>示例：R ⋈ S（表示 R 和 S 在共同属性上的自然连接）</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="函数依赖" class="heading-element"><span>函数依赖</span>
+  <a href="#%e5%87%bd%e6%95%b0%e4%be%9d%e8%b5%96" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><ul>
+<li>给定一个 X，能唯一确定一个 Y，就称 X 确定 Y，或者说 Y 依赖于 X，例如 <code>Y = X * X</code> 函数</li>
+<li>函数依赖又可扩展以下两种规则
+<ul>
+<li>部分函数依赖: A 可确定 C，（A，B）也可以确定 C，<strong>（A，B）中的一部分（即A）可以确定 C，称为部分函数依赖</strong></li>
+<li>传递函数依赖: 当 A 和 B 不等价时，A 可确定 B，B 可确定 C，则 A 可确定 C，是传递函数依赖；若 A 和 B 等价，则不存在传递，直接就可确定 C</li>
+</ul>
+</li>
+</ul>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt"> 1
+</span><span class="lnt"> 2
+</span><span class="lnt"> 3
+</span><span class="lnt"> 4
+</span><span class="lnt"> 5
+</span><span class="lnt"> 6
+</span><span class="lnt"> 7
+</span><span class="lnt"> 8
+</span><span class="lnt"> 9
+</span><span class="lnt">10
+</span><span class="lnt">11
+</span><span class="lnt">12
+</span><span class="lnt">13
+</span><span class="lnt">14
+</span><span class="lnt">15
+</span><span class="lnt">16
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-text" data-lang="text"><span class="line"><span class="cl">(A) ---&gt; (C)
+</span></span><span class="line"><span class="cl"> |        ^
+</span></span><span class="line"><span class="cl"> |        |
+</span></span><span class="line"><span class="cl"> |--------+
+</span></span><span class="line"><span class="cl"> |
+</span></span><span class="line"><span class="cl">(B)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">《部分函数依赖》
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">  (not)
+</span></span><span class="line"><span class="cl"> +------+
+</span></span><span class="line"><span class="cl"> |      |
+</span></span><span class="line"><span class="cl"> v      |
+</span></span><span class="line"><span class="cl">(A)---&gt;(B)---&gt;(C)
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">《传递函数依赖》</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="公理系统" class="heading-element"><span>公理系统</span>
+  <a href="#%e5%85%ac%e7%90%86%e7%b3%bb%e7%bb%9f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><ul>
+<li>设关系模式 <code>R&lt;U, F&gt;</code>
+<ul>
+<li><code>U</code> 是关系模式 <code>R</code> 的属性全集</li>
+<li><code>F</code> 是关系模式 <code>R</code> 的一个函数依赖集</li>
+</ul>
+</li>
+<li>对于此关系模式，有以下定律
+<ul>
+<li>自反律: 若 <code>Y ⊆ X ⊆ U</code>，则 <code>X -&gt; Y</code> 被 <code>F</code> 所逻辑蕴含</li>
+<li>增广律: 若 <code>X -&gt; Y</code> 被       <code>F</code> 所逻辑蕴含，且 <code>Z ⊆ U</code>，则 <code>XZ -&gt; YZ</code> 为 <code>F</code> 所逻辑蕴含</li>
+<li>传递律: 若 <code>X -&gt; Y</code> 和 <code>Y -&gt; Z</code> 为 <code>F</code> 所逻辑蕴含，则 <code>X -&gt; Z</code> 为 <code>F</code> 所逻辑蕴含</li>
+<li>合并规则: 若 <code>X -&gt; Y</code>，<code>X -&gt; Z</code>，则 <code>X -&gt; YZ</code> 为 <code>F</code> 所蕴含</li>
+<li>伪传递律: 若 <code>X -&gt; Y</code>，<code>WY -&gt; Z</code>，则 <code>XW -&gt; Z</code> 为 <code>F</code> 所蕴含</li>
+<li>分解规则: 若 <code>X -&gt; Y</code>，<code>Z ⊆ Y</code>，则 <code>X -&gt; Z</code> 为 <code>F</code> 所蕴含</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="键码与约束" class="heading-element"><span>键(码)与约束</span>
+  <a href="#%e9%94%ae%e7%a0%81%e4%b8%8e%e7%ba%a6%e6%9d%9f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><blockquote>
+<p>键与码可以通用，即主键主码代表的含义一样</p>
+</blockquote>
+<ul>
+<li>超键: 能<strong>唯一标识</strong>此表的属性的组合</li>
+<li>候选键: 超键中<strong>去掉冗余的属性</strong>，剩余的属性就是候选键</li>
+<li>主键: 任选一个候选键，即可作为主键</li>
+<li>外键: 其他表中的主键</li>
+<li>主属性: <strong>候选键内的属性为主属性</strong>，其他属性为非主属性</li>
+</ul>
+<p>约束</p>
+<ul>
+<li>实体完整性约束: 即<strong>主键约束，主键值不能为空，也不能重复</strong></li>
+<li>参照完整性约束: 即外键约束，<strong>外键必须是其他表中已经存在的主键的值，或者为空</strong></li>
+<li>用户自定义完整性约束: <strong>自定义表达式</strong>约束，如设定年龄属性的值必须在 0 到 150 之间</li>
+</ul>
+<hr>
+<h3 id="范式" class="heading-element"><span>范式</span>
+  <a href="#%e8%8c%83%e5%bc%8f" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><h4 id="第一范式1nf" class="heading-element"><span>第一范式（1NF）</span>
+  <a href="#%e7%ac%ac%e4%b8%80%e8%8c%83%e5%bc%8f1nf" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>关系中每一个分量必须是一个不可分的数据项。通俗的说，第一范式就是表中不允许有小表的存在。</p>
+<p>例如如下的员工表，就不属于第一范式</p>
+<ul>
+<li>员工编号</li>
+<li>员工姓名</li>
+<li>出生日期</li>
+<li>薪资/月
+<ul>
+<li>基本工资/月</li>
+<li>补贴/月</li>
+</ul>
+</li>
+<li>所属部门</li>
+</ul>
+<h4 id="第二范式2nf" class="heading-element"><span>第二范式（2NF）</span>
+  <a href="#%e7%ac%ac%e4%ba%8c%e8%8c%83%e5%bc%8f2nf" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><blockquote>
+<p>消除部分函数依赖</p>
+</blockquote>
+<p>如果<strong>关系 <code>R</code> 属于 1NF</strong>，且<strong>每一个非主属性完全函数依赖于任何一个候选码</strong>，则 <code>R</code> 属于 2NF</p>
+<p>通俗的说， 2NF 就是在 1NF 的基础上，表中的<strong>每一个非主属性不会依赖复合主键中的某一个列</strong></p>
+<p>单主键的表都满足第二范式，对于复合主键的表，例子如下</p>
+<ul>
+<li>学生表
+<ul>
+<li>学号</li>
+<li>学生姓名</li>
+<li>所在系</li>
+<li>系主任姓名</li>
+<li>课程号</li>
+<li>成绩</li>
+</ul>
+</li>
+<li>其中
+<ul>
+<li>学号可以确定课程号，所以课程号依赖于学号</li>
+<li>学号和课程号可以确定成绩，所以成绩部分函数依赖学号和课程号</li>
+<li>所以不满足第二范式，需要进行拆分
+<ul>
+<li>学生表(学号，学生姓名，所在系，系主任姓名)</li>
+<li>选课表(学号，课程号，成绩)</li>
+<li>但是还是不满足第三范式</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="第三范式3nf" class="heading-element"><span>第三范式（3NF）</span>
+  <a href="#%e7%ac%ac%e4%b8%89%e8%8c%83%e5%bc%8f3nf" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><blockquote>
+<p>消除传递依赖</p>
+</blockquote>
+<p>在<strong>满足 2NF 的基础上，表中不存在非主属性对键的传递依赖</strong></p>
+<p>继续第二范式的例子，可以分解为</p>
+<ul>
+<li>学生表(学号，学生姓名，系编号)</li>
+<li>系表(系编号，系名，系主任)</li>
+<li>选课表（学号，课程号，成绩）</li>
+</ul>
+<h4 id="bc范式bcnf" class="heading-element"><span>BC范式（BCNF）</span>
+  <a href="#bc%e8%8c%83%e5%bc%8fbcnf" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>BCNF 是指在<strong>第三范式的基础上进一步消除主属性对键的部分函数依赖和传递依赖</strong></p>
+<p>通俗的来说，就是<strong>在每一种情况下，每一个依赖的左边决定因素都必然包含候选键</strong></p>
+<div class="highlight"><div class="chroma">
+<table class="lntable"><tr><td class="lntd">
+<pre tabindex="0" class="chroma"><code><span class="lnt">1
+</span><span class="lnt">2
+</span><span class="lnt">3
+</span><span class="lnt">4
+</span><span class="lnt">5
+</span></code></pre></td>
+<td class="lntd">
+<pre tabindex="0" class="chroma"><code class="language-txt" data-lang="txt"><span class="line"><span class="cl">S---+---&gt;T
+</span></span><span class="line"><span class="cl">    |    |
+</span></span><span class="line"><span class="cl">    |    |
+</span></span><span class="line"><span class="cl">    |    |
+</span></span><span class="line"><span class="cl">    J&lt;---+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>上图中，候选键有两种情况: 组合键 (S,T) 或者 (S,J)，依赖集为 { SJ-&gt;T, T-&gt;J }
+<ul>
+<li>可知 STJ 三个属性都是主属性，因此达到了 3NF</li>
+<li>然而第二种情况，即 (S,J) 为候选键的时候，对于依赖 T-&gt;J，T 在这种情况不是候选键，即 T-&gt;J 的决定因素不包含任意候选键，因此上图不是 BCNF</li>
+</ul>
+</li>
+<li>要转换为 BCNF 只需要将依赖 T-&gt;J 变为 TS-&gt;J 即可</li>
+</ul>
+<h4 id="解题方法" class="heading-element"><span>解题方法</span>
+  <a href="#%e8%a7%a3%e9%a2%98%e6%96%b9%e6%b3%95" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><ul>
+<li>没有在关系表达式右侧出现过的关键字，一定是候选关键字</li>
+</ul>
+<hr>
+<h3 id="模式分解" class="heading-element"><span>模式分解</span>
+  <a href="#%e6%a8%a1%e5%bc%8f%e5%88%86%e8%a7%a3" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><ul>
+<li>范式之间的转换一般都是通过拆分属性，即模式分解，将具有部分函数依赖和传递依赖的属性分离出来，来达到一步步优化，一般分为以下两种
+<ul>
+<li>保持函数依赖分解
+<ul>
+<li>对于关系模式 R，有依赖集 F，若对 R 进行分解，分解出来的多个关系模式，保持原来的依赖集不变，则为保持函数依赖的分解。另外要消除掉冗余依赖（如传递依赖）</li>
+<li>实例:
+<ul>
+<li>设原关系模式 R(A, B, C)，依赖集 F(A-&gt;B, B-&gt;C, A-&gt;C)</li>
+<li>将其分解为两个关系模式 R1(A, B) 和 R2(B, C)</li>
+<li>此时 R1 中保持依赖 A-&gt;B，R2 保持依赖 B-&gt;C</li>
+<li>说明分解后的 R1 和 R2 是保持函数依赖的分解，因为 A-&gt;C 是一个冗余依赖</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>无损|有损分解
+<ul>
+<li>分解后的关系模式能够还原出原关系模式，就是无损分解，不能还原就是有损分解
+<ul>
+<li>就是可以通过函数依赖，可以使用某一个分解后的关系模式推导出原有的关系模式</li>
+</ul>
+</li>
+<li>当分解为<strong>两个关系模式</strong>，可以通过以下定理判断是否无损分解
+<ul>
+<li>如果 R 的分解为 p={R1, R2}，F 为 R 所满足的函数依赖集合，分解 p 具有无损连接性的<strong>充分必要条件是 R1∩R2-&gt;(R1-R2) 或者 R1∩R2-&gt;(R2-R1)</strong></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h3 id="并发控制" class="heading-element"><span>并发控制</span>
+  <a href="#%e5%b9%b6%e5%8f%91%e6%8e%a7%e5%88%b6" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h3><h4 id="事务" class="heading-element"><span>事务</span>
+  <a href="#%e4%ba%8b%e5%8a%a1" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><p>由一系列操作组成，这些操作，要么全做，要么全不做，拥有以下四中特性</p>
+<ul>
+<li>(操作)<strong>原子性</strong>: 要么全做，要么全不做</li>
+<li>(数据)<strong>一致性</strong>: 事务发生后数据是一致的，例如银行坏账，不会存在 A 账户转出，但是 B 账户没收到的情况</li>
+<li>(执行)<strong>隔离性</strong>: 任一事务的更新操作直到其成功提交的整个过程对其他事物都是不可见的，不同事务之间是隔离的，互不干涉</li>
+<li>(改变)<strong>持续性</strong>: 事务操作的结果是持续性的</li>
+</ul>
+<p>事务是并发控制的前提条件，并发控制就是控制不同的事务并发执行，提高系统效率，但是并发控制中存在下面三个问题</p>
+<ul>
+<li><strong>丢失更新</strong>: 事务 1 对数据 A 进行了修改并写回，事务 2 也对 A 进行了修改并写回，此时事务 2 写回的数据会覆盖事务 1 写回的数据，就丢失了事务 1 对 A 的更新。即对数据 A 的更新会被覆盖</li>
+<li><strong>不可重复读</strong>: 事务 2 读 A，而后事务 1 对数据 A 进行了修改并写回，此时若事务 2 再读 A，发现数据不对。即一个事务重复读 A 两次，会发现数据 A 有误</li>
+<li><strong>读脏数据</strong>: 事务 1 对 数据 A 进行了修改后，事务 2 读数据 A，而后事务 1 回滚，数据 A 恢复了原来的值，那么事务 2 对数据 A 做的操作是无效的，读到了脏数据</li>
+</ul>
+<h4 id="封锁协议加锁" class="heading-element"><span>封锁协议（加锁）</span>
+  <a href="#%e5%b0%81%e9%94%81%e5%8d%8f%e8%ae%ae%e5%8a%a0%e9%94%81" class="heading-mark">
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"><path d="m7.775 3.275 1.25-1.25a3.5 3.5 0 1 1 4.95 4.95l-2.5 2.5a3.5 3.5 0 0 1-4.95 0 .751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018 1.998 1.998 0 0 0 2.83 0l2.5-2.5a2.002 2.002 0 0 0-2.83-2.83l-1.25 1.25a.751.751 0 0 1-1.042-.018.751.751 0 0 1-.018-1.042Zm-4.69 9.64a1.998 1.998 0 0 0 2.83 0l1.25-1.25a.751.751 0 0 1 1.042.018.751.751 0 0 1 .018 1.042l-1.25 1.25a3.5 3.5 0 1 1-4.95-4.95l2.5-2.5a3.5 3.5 0 0 1 4.95 0 .751.751 0 0 1-.018 1.042.751.751 0 0 1-1.042.018 1.998 1.998 0 0 0-2.83 0l-2.5 2.5a1.998 1.998 0 0 0 0 2.83Z"></path></svg>
+  </a>
+</h4><ul>
+<li><strong>X锁是排他锁(写锁)</strong>: 若事务 T 对数据对象 A 加上 X 锁，则只允许 T 读取和修改 A，<strong>其他事务都不能再对 A 加任何类型的锁</strong>，直到 T 释放 A 上的锁</li>
+<li><strong>S锁是共享锁(读锁)</strong>: 若事务 T 对数据对象 A 加上 S 锁，则只允许 T 读取 A，但是不能修改 A，其他事务只能再对 A 加 S 锁（即也能读不能修改），直到 T 释放 A 上的 S 锁</li>
+<li>共分为三级封锁协议
+<ul>
+<li>一级封锁协议: 事务再修改<strong>数据 R 之前必须先对其加 X 锁</strong>，直到事务结束才释放。<strong>可解决丢失更新问题</strong></li>
+<li>二级封锁协议: 在一级封锁协议的基础上加上事务 T 在<strong>读数据 R 之前必须先对其加 S 锁，读完后即可释放 S 锁</strong>。<strong>可解决丢失更新、读脏数据问题</strong></li>
+<li>三级封锁协议: 一级封锁协议加上事务 T 在<strong>读取数据 R 之前先对其加 S 锁，直到事务结束才释放</strong>。<strong>可解决丢失更新、读脏数据、数据重复读问题</strong></li>
+</ul>
+</li>
+</ul>
+</div><div class="post-footer" id="post-footer">
+  <div class="post-info">
+    <div class="post-info-line">
+      <div class="post-info-mod">
+        <span title="更新于 2025-02-12 08:00:00">更新于 2025-02-12&nbsp;</span>
+      </div><div class="post-info-license">
+            <span><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a></span>
+          </div></div><div class="post-info-line">
+        <div class="post-info-md"><span><a href="/posts/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/index.md" title="阅读原始文档" class="link-to-markdown">阅读原始文档</a></span><span><a href="https://github.com/RoninZc/RoninZc.github.io.git/blob/main/content/posts/%e7%ac%94%e8%ae%b0/%e9%ab%98%e7%ba%a7%e6%9e%b6%e6%9e%84/%e7%bb%bc%e5%90%88%e7%9f%a5%e8%af%86/3-%e6%95%b0%e6%8d%ae%e5%ba%93%e6%8a%80%e6%9c%af%e5%9f%ba%e7%a1%80.md?plain=1" title="查看源码"target="_blank" rel="external nofollow noopener noreferrer" class="link-to-source">查看源码</a></span><span><a href="https://github.com/RoninZc/RoninZc.github.io.git/edit/main/content/posts/%e7%ac%94%e8%ae%b0/%e9%ab%98%e7%ba%a7%e6%9e%b6%e6%9e%84/%e7%bb%bc%e5%90%88%e7%9f%a5%e8%af%86/3-%e6%95%b0%e6%8d%ae%e5%ba%93%e6%8a%80%e6%9c%af%e5%9f%ba%e7%a1%80.md" title="编辑此页"target="_blank" rel="external nofollow noopener noreferrer" class="link-to-edit">编辑此页</a></span><span><a href="https://github.com/RoninZc/RoninZc.github.io.git/issues/new?title=[BUG]%20%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80&amp;body=%7cField%7cValue%7c%0A%7c-%7c-%7c%0A%7cTitle%7c%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80%7c%0A%7cURL%7chttps://ronin-zc.com/posts/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/%7c%0A%7cFilename%7chttps://github.com/RoninZc/RoninZc.github.io.git/blob/main/content/posts/%e7%ac%94%e8%ae%b0/%e9%ab%98%e7%ba%a7%e6%9e%b6%e6%9e%84/%e7%bb%bc%e5%90%88%e7%9f%a5%e8%af%86/3-%e6%95%b0%e6%8d%ae%e5%ba%93%e6%8a%80%e6%9c%af%e5%9f%ba%e7%a1%80.md?plain=1%7c" title="报告问题"target="_blank" rel="external nofollow noopener noreferrer" class="link-to-report">报告问题</a></span></div>
+        <div class="post-info-share">
+          <span><a href="javascript:void(0);" title="分享到 X" data-sharer="twitter" data-url="https://ronin-zc.com/posts/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/" data-title="数据库技术基础" data-hashtags="软考,架构,笔记"><i class="fa-brands fa-x-twitter fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 Facebook" data-sharer="facebook" data-url="https://ronin-zc.com/posts/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/" data-hashtag="软考"><i class="fa-brands fa-facebook-square fa-fw" aria-hidden="true"></i></a>
+  <a href="javascript:void(0);" title="分享到 微博" data-sharer="weibo" data-url="https://ronin-zc.com/posts/3-%E6%95%B0%E6%8D%AE%E5%BA%93%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/" data-title="数据库技术基础"><i class="fa-brands fa-weibo fa-fw" aria-hidden="true"></i></a>
+  </span>
+        </div>
+      </div></div>
+
+  <div class="post-info-more">
+    <section class="post-tags"><i class="fa-solid fa-tags fa-fw me-1" aria-hidden="true"></i><a href="/tags/%E8%BD%AF%E8%80%83/" class="post-tag" title="标签 - 软考">软考</a><a href="/tags/%E6%9E%B6%E6%9E%84/" class="post-tag" title="标签 - 架构">架构</a><a href="/tags/%E7%AC%94%E8%AE%B0/" class="post-tag" title="标签 - 笔记">笔记</a></section>
+    <section>
+      <span><a href="javascript:void(0);" onclick="window.history.back();">返回</a></span>&nbsp;|&nbsp;<span><a href="/">主页</a></span>
+    </section>
+  </div><div class="post-nav"><a href="/posts/20250209/" class="post-nav-item" rel="prev" title="20250209"><i class="fa-solid fa-angle-left fa-fw" aria-hidden="true"></i>20250209</a><a href="/posts/2-%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/" class="post-nav-item" rel="next" title="操作系统">操作系统<i class="fa-solid fa-angle-right fa-fw" aria-hidden="true"></i></a></div>
+</div>
+<div id="comments"><div id="gitalk" class="comment"></div><noscript>
+        Please enable JavaScript to view the comments powered by <a href="https://github.com/gitalk/gitalk" rel="external nofollow noopener noreferrer">Gitalk</a>.
+      </noscript></div></article>
+
+  <aside class="toc" id="toc-auto" aria-label="目录"><h2 class="toc-title">目录&nbsp;<i class="toc-icon fa-solid fa-angle-down fa-fw" aria-hidden="true"></i></h2>
+      <div class="toc-content" id="toc-content-auto"></div></aside></main><footer class="footer">
+    <div class="footer-container"><div class="footer-line powered">由 <a href="https://gohugo.io/" target="_blank" rel="external nofollow noopener noreferrer" title="Hugo 0.140.2"><img class="hugo-icon" src="/images/hugo.min.svg" alt="Hugo logo" /> Hugo</a> 强力驱动 | 主题 - <a href="https://github.com/hugo-fixit/FixIt" target="_blank" rel="external" title="FixIt v0.3.16"><img class="fixit-icon" src="/images/fixit.min.svg" alt="FixIt logo" /> FixIt</a>
+        </div><div class="footer-line copyright" itemscope itemtype="http://schema.org/CreativeWork"><i class="fa-regular fa-copyright fa-fw" aria-hidden="true"></i>
+            <span itemprop="copyrightYear">2021 - 2025</span><span class="author" itemprop="copyrightHolder">
+              <a href="/">RoninZc</a></span><span class="license footer-divider"><a rel="license external nofollow noopener noreferrer" href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank">CC BY-NC 4.0</a></span></div><div class="footer-line statistics"><span class="site-time" title='网站运行中……'><i class="fa-solid fa-heartbeat fa-fw animate-icon" aria-hidden="true"></i><span class="run-times ms-1">网站运行中……</span></span></div><div class="footer-line visitor">
+          <span id="busuanzi_container_site_uv" title='总访客数'><i class="fa-regular fa-user fa-fw me-1" aria-hidden="true"></i><span id="busuanzi_value_site_uv"><i class="fa-solid fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span></span><span id="busuanzi_container_site_pv" class="footer-divider" title='总访问量'><i class="fa-regular fa-eye fa-fw me-1" aria-hidden="true"></i><span id="busuanzi_value_site_pv"><i class="fa-solid fa-spinner fa-spin fa-fw" aria-hidden="true"></i></span></span>
+        </div><div class="footer-line beian"><span class="icp footer-divider"><a href="https://beian.miit.gov.cn/">赣ICP备18014838号</a></span></div></div>
+  </footer></div><div class="widgets"><div class="fixed-buttons animate__faster d-none"><div class="fixed-button back-to-top" role="button" aria-label="回到顶部"><i class="fa-solid fa-arrow-up fa-fw" aria-hidden="true"></i><span class="variant-numeric d-none">0%</span>
+        </div><div class="fixed-button view-comments d-none" role="button" aria-label="查看评论"><i class="fa-solid fa-comment fa-fw" aria-hidden="true"></i></div></div><div id="mask"></div><noscript>
+    <div class="noscript-warning">该网站在启用 JavaScript 的情况下效果最佳。</div>
+  </noscript>
+</div><link rel="stylesheet" href="/lib/gitalk/gitalk.min.css"><link rel="preload" href="/lib/katex/katex.min.css" as="style" onload="this.removeAttribute('onload');this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="/lib/katex/katex.min.css"></noscript><link rel="stylesheet" href="/lib/cookieconsent/cookieconsent.min.css"><script src="/lib/gitalk/gitalk.min.js"></script><script src="/lib/sharer/sharer.min.js" async defer></script><script src="/lib/typeit/index.umd.js" defer></script><script src="/lib/katex/katex.min.js" defer></script><script src="/lib/katex/auto-render.min.js" defer></script><script src="/lib/katex/copy-tex.min.js" defer></script><script src="/lib/katex/mhchem.min.js" defer></script><script src="/lib/cookieconsent/cookieconsent.min.js" defer></script><script src="https://vercount.one/js" async defer></script><script>window.config={"code":{"copyTitle":"复制到剪贴板","editLockTitle":"锁定可编辑代码块","editUnLockTitle":"解锁可编辑代码块","editable":true,"maxShownLines":10},"comment":{"enable":true,"expired":false,"gitalk":{"admin":["RoninZc"],"clientID":"9c7b40a3888f1e78b982","clientSecret":"735c7f29eddf00774f46187ff25824109753fb3a","id":"2025-02-12T08:00:00+08:00","owner":"RoninZc","repo":"RoninZc.github.io","title":"数据库技术基础"}},"cookieconsent":{"content":{"dismiss":"同意","link":"了解更多","message":"本网站使用 Cookies 来改善您的浏览体验。"},"enable":true,"palette":{"button":{"background":"#f0f0f0"},"popup":{"background":"#1aa3ff"}},"theme":"edgeless"},"enablePWA":true,"math":{"delimiters":[{"display":true,"left":"$$","right":"$$"},{"display":true,"left":"\\[","right":"\\]"},{"display":true,"left":"\\begin{equation}","right":"\\end{equation}"},{"display":true,"left":"\\begin{equation*}","right":"\\end{equation*}"},{"display":true,"left":"\\begin{align}","right":"\\end{align}"},{"display":true,"left":"\\begin{align*}","right":"\\end{align*}"},{"display":true,"left":"\\begin{alignat}","right":"\\end{alignat}"},{"display":true,"left":"\\begin{alignat*}","right":"\\end{alignat*}"},{"display":true,"left":"\\begin{gather}","right":"\\end{gather}"},{"display":true,"left":"\\begin{CD}","right":"\\end{CD}"},{"display":false,"left":"$","right":"$"},{"display":false,"left":"\\(","right":"\\)"}],"strict":false},"siteTime":"2021-11-01T00:00:00+08:00","typeit":{"cursorChar":"|","cursorSpeed":1000,"duration":-1,"loop":false,"speed":100},"version":"v0.3.16"};</script><script src="/js/theme.min.js" defer></script></body>
+</html>
