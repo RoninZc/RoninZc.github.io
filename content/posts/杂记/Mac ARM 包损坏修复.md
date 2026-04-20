@@ -25,7 +25,7 @@ hiddenFromHomePage: false
 之前下载的 CFW 和 PicGo 的 ARM 版本一直提示损坏😫
 
 ```bash
-sudo xattr -d com.apple.quarantine "/Applications/Clash for Windows.app"
+sudo xattr -d com.apple.quarantine "/Applications/XXX.app"
 ```
 
 执行完成重新打开即可
