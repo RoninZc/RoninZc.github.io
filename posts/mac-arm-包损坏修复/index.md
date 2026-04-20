@@ -4,7 +4,7 @@
 之前下载的 CFW 和 PicGo 的 ARM 版本一直提示损坏😫
 
 ```bash
-sudo xattr -d com.apple.quarantine &#34;/Applications/Clash for Windows.app&#34;
+sudo xattr -d com.apple.quarantine &#34;/Applications/XXX.app&#34;
 ```
 
 执行完成重新打开即可
