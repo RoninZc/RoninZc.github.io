@@ -73,54 +73,6 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://ronin-zc.com/tags/arm/</loc>
-    <lastmod>2023-04-04T23:02:13+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://ronin-zc.com/tags/mac/</loc>
-    <lastmod>2023-04-04T23:02:13+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://ronin-zc.com/posts/mac-arm-%E5%8C%85%E6%8D%9F%E5%9D%8F%E4%BF%AE%E5%A4%8D/</loc>
-    <lastmod>2023-04-04T23:02:13+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://ronin-zc.com/categories/%E6%9D%82%E8%AE%B0/</loc>
-    <lastmod>2023-04-04T23:02:13+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://ronin-zc.com/tags/dns/</loc>
-    <lastmod>2023-02-08T13:45:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://ronin-zc.com/tags/macos/</loc>
-    <lastmod>2023-02-08T13:45:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://ronin-zc.com/posts/macos%E4%BD%BF%E7%94%A8doh/</loc>
-    <lastmod>2023-02-08T13:45:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://ronin-zc.com/categories/%E6%8A%98%E8%85%BE/</loc>
-    <lastmod>2023-02-08T13:45:00+08:00</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
     <loc>https://ronin-zc.com/tags/docker/</loc>
     <lastmod>2022-07-20T15:17:19+08:00</lastmod>
     <changefreq>weekly</changefreq>
@@ -134,6 +86,12 @@
   </url>
   <url>
     <loc>https://ronin-zc.com/tags/nginx/</loc>
+    <lastmod>2022-07-20T15:17:19+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://ronin-zc.com/categories/%E6%8A%98%E8%85%BE/</loc>
     <lastmod>2022-07-20T15:17:19+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
@@ -183,6 +141,12 @@
   <url>
     <loc>https://ronin-zc.com/posts/k8sv1.24.0-containerd%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/</loc>
     <lastmod>2022-05-14T16:45:00+08:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://ronin-zc.com/tags/arm/</loc>
+    <lastmod>2022-05-13T14:13:00+08:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.5</priority>
   </url>
